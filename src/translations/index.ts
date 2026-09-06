@@ -7,7 +7,7 @@ export const translations = {
     'nav.map': 'Peta',
     'nav.routes': 'Rute',
     'nav.schedule': 'Jadwal',
-    'nav.budget': 'Budget',
+    'nav.budget': 'Anggaran',
     'nav.disruptions': 'Peringatan',
     'nav.ask_ai': 'Tanya AI',
     'nav.settings': 'Pengaturan',

@@ -123,7 +123,7 @@ export default function Schedule() {
     >
       <div className="container" style={{ maxWidth: 840, paddingLeft: 20, paddingRight: 20, margin: '0 auto' }}>
         {/* --- HEADER --- */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <div className="rutein-slide-in" style={{ textAlign: 'center', marginBottom: 32 }}>
           <h1
             className="font-jockey"
             style={{
@@ -151,6 +151,7 @@ export default function Schedule() {
 
         {/* --- SECTION 1: SEARCH & FILTER BAR --- */}
         <div
+          className="rutein-slide-in-1"
           style={{
             marginBottom: 24,
             background: '#FFFFFF',
@@ -158,6 +159,8 @@ export default function Schedule() {
             borderRadius: 20,
             padding: '24px 28px',
             boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+            position: 'relative',
+            zIndex: 20,
           }}
         >
           {/* Station Search Bar */}
@@ -352,6 +355,7 @@ export default function Schedule() {
         {/* --- SECTION 2: SELECTED STATION HERO CARD --- */}
         {selectedStation && selectedRoute && (
           <div
+            className="rutein-slide-in-2"
             style={{
               marginBottom: 32,
               background: '#FFFFFF',
@@ -359,6 +363,8 @@ export default function Schedule() {
               borderRadius: 20,
               padding: '28px 32px',
               boxShadow: '0 8px 24px rgba(218, 54, 42, 0.12)',
+              position: 'relative',
+              zIndex: 10,
             }}
           >
             {/* Station Title & Header */}
@@ -460,6 +466,7 @@ export default function Schedule() {
                     {upcomingDepartures.map((dep) => (
                       <div
                         key={dep.id}
+                        className="rutein-scale-in"
                         style={{
                           background: '#FFFFFF',
                           border: '1.5px solid #E5D5C5',
@@ -509,19 +516,19 @@ export default function Schedule() {
                     <CalendarDays size={18} color="#DA362A" /> Jadwal Lengkap Harian
                   </h3>
 
-                  {/* Direction Switcher Tabs */}
-                  <div style={{ display: 'flex', gap: 6, background: '#FDF0ED', padding: 4, borderRadius: 999, border: '1px solid #E5D5C5' }}>
+                  {/* Direction Tabs */}
+                  <div style={{ display: 'flex', background: '#FDF0ED', padding: 3, borderRadius: 10, border: '1px solid #E5D5C5' }}>
                     <button
                       type="button"
                       onClick={() => setActiveDirection('outbound')}
                       style={{
                         padding: '6px 14px',
-                        fontSize: 13,
-                        fontWeight: 700,
-                        borderRadius: 999,
+                        borderRadius: 8,
                         background: activeDirection === 'outbound' ? '#DA362A' : 'transparent',
                         color: activeDirection === 'outbound' ? '#FFFFFF' : '#1E1E1E',
                         border: 'none',
+                        fontSize: 12,
+                        fontWeight: 700,
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                       }}
@@ -533,12 +540,12 @@ export default function Schedule() {
                       onClick={() => setActiveDirection('inbound')}
                       style={{
                         padding: '6px 14px',
-                        fontSize: 13,
-                        fontWeight: 700,
-                        borderRadius: 999,
+                        borderRadius: 8,
                         background: activeDirection === 'inbound' ? '#DA362A' : 'transparent',
                         color: activeDirection === 'inbound' ? '#FFFFFF' : '#1E1E1E',
                         border: 'none',
+                        fontSize: 12,
+                        fontWeight: 700,
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
                       }}
@@ -548,9 +555,9 @@ export default function Schedule() {
                   </div>
                 </div>
 
-                {/* Grouped Departure Hours */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10 }}>
-                  {Object.keys(fullDayGrouped[activeDirection] || {})
+                {/* Grouped Hourly Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 10 }}>
+                  {Object.keys(fullDayGrouped[activeDirection])
                     .sort()
                     .map((hour) => (
                       <div
@@ -559,14 +566,13 @@ export default function Schedule() {
                           background: '#FFFFFF',
                           border: '1px solid #E5D5C5',
                           borderRadius: 12,
-                          padding: '10px 14px',
-                          fontSize: 13,
+                          padding: '10px 12px',
                         }}
                       >
-                        <strong style={{ color: '#DA362A', fontSize: 14, display: 'block', marginBottom: 4 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#DA362A', display: 'block', marginBottom: 4 }}>
                           Jam {hour}:00
-                        </strong>
-                        <div style={{ color: '#4A4A4A', lineHeight: 1.5, fontSize: 12 }}>
+                        </span>
+                        <div style={{ fontSize: 12, color: '#1E1E1E', fontWeight: 600, lineHeight: 1.4 }}>
                           {fullDayGrouped[activeDirection][hour].map((e) => e.time.slice(3)).join(', ')}
                         </div>
                       </div>
@@ -578,7 +584,7 @@ export default function Schedule() {
         )}
 
         {/* --- SECTION 3: ROUTE & STATION LIST --- */}
-        <div>
+        <div className="rutein-fade-up-2">
           <h2
             className="font-jockey"
             style={{
@@ -599,6 +605,7 @@ export default function Schedule() {
               return (
                 <div
                   key={route.key}
+                  className="rutein-scale-in"
                   style={{
                     background: '#FFFFFF',
                     border: '1.5px solid #E5D5C5',

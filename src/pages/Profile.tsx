@@ -15,7 +15,7 @@
 //    stays mounted for the short exit transition instead of disappearing instantly.
 
 import React, { useEffect, useState } from 'react';
-import { Home, GraduationCap, Briefcase, MapPin, Trash2, X } from 'lucide-react';
+import { Home, GraduationCap, Briefcase, MapPin, Trash2, X, LucideIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import PlaceSearchInput from '@/components/PlaceSearchInput';
 import { getProfile, updateProfile, getPreferences, upsertPreferences } from '@/services/preferencesService';
@@ -194,7 +194,7 @@ const ALL_TRANSPORTS: OnboardingTransportType[] = [
 const PLACE_CATEGORIES: {
   value: PlaceCategory;
   label: string;
-  icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  icon: LucideIcon;
 }[] = [
   { value: 'home', label: 'Rumah', icon: Home },
   { value: 'school', label: 'Sekolah', icon: GraduationCap },
