@@ -301,7 +301,7 @@ npm run lint
 | Anggota | Fitur yang Dikerjakan |
 |---------|------------------------|
 | **Quan** | Sign Up / Sign In, User Preferences, Profile, Saved Places, Backend & System Architecture, |
-| **Syakir** | Landing Page, Transport Schedule, Budget Planner, Confused Mode, Tutorial Penggunaan Web |
+| **Syakirah** | Landing Page, Transport Schedule, Budget Planner, Confused Mode, Tutorial Penggunaan Web |
 | **Nael** | Interactive Map, Dashboard, Route Comparison, Multi-Transit Routes, Live Disruption, Design System, App Design Mockup |
 
 ---

@@ -370,13 +370,13 @@ export default function MapRouteDetailBar({
           </div>
 
           {(() => {
-            const cost = activeOption ? activeOption.totalCostIdr : 8000;
+            const cost = activeOption ? activeOption.totalCostIdr : 'Rp.000';
             return (
               <div style={costEstimationRowStyle}>
                 <div style={costBadgeGroupStyle}>
                   <Wallet size={14} color="#059669" />
-                  <span style={costLabelStyle}>Estimasi Biaya:</span>
-                  <span style={costValueStyle}>{formatCost(cost)}</span>
+                  <span style={costLabelStyle}>Pilih opsi rute untuk melihat estimasi biaya</span>
+
                 </div>
                 <span style={costDetailTagStyle}>
                   ({budgetPreference === 'cheapest' ? 'Murah' : budgetPreference === 'fastest' ? 'Cepat' : 'Efisien'})

@@ -113,9 +113,20 @@ export function usePublishSidebarMapControls(controls: SidebarMapControls) {
   const controlsRef = useRef(controls);
   controlsRef.current = controls;
 
+  // Build a stable, primitive signature of the parts of `controls` that
+  // actually represent state changes. Functions and the `activeTypes` Set
+  // are recreated with a new identity on every caller render regardless
+  // of whether their contents changed, so depending on `controls` itself
+  // (or its functions/Set directly) would just reproduce the infinite
+  // render loop this hook is trying to avoid. Depending on this signature
+  // instead means the effect — and therefore setControls, and therefore
+  // the re-render it causes — only fires when something real changed.
+  const activeTypesKey = Array.from(controls.activeTypes).sort().join(',');
+
   useEffect(() => {
     setControls(controlsRef.current);
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTypesKey, controls.savedPlacesTrigger, setControls]);
 
   useEffect(() => {
     return () => resetControls();
