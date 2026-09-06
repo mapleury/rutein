@@ -34,9 +34,9 @@
 
 | Nama | Peran | GitHub |
 |------|-------|--------|
-| **Quan** | Backend Developer & System Architect | [GitHub](https://github.com/[username-quan]) |
-| **Syakir** | Frontend Developer & UI/UX Designer | [GitHub](https://github.com/[username-syakir]) |
-| **Nael** | Frontend Developer & UI/UX Designer | [GitHub](https://github.com/[username-nael]) |
+| **Quan** | Backend Developer & System Architect | [GitHub](https://github.com/mapleury) |
+| **Syakir** | Frontend Developer & UI/UX Designer | [GitHub](https://github.com/syakirahh8) |
+| **Nael** | Frontend Developer & UI/UX Designer | [GitHub](https://github.com/nnaelmuna) |
 
 ---
 
@@ -52,13 +52,13 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 
 ### Tujuan Proyek
 
-- 🎯 **Tujuan Utama**: Membuat perjalanan dengan transportasi publik lebih terencana, transparan, dan mudah dipahami.
-- 📊 **Target Pengguna**: Warga urban (khususnya Jabodetabek) yang menggunakan transportasi publik untuk aktivitas sehari-hari — pelajar, pekerja, hingga pendatang baru.
-- 💡 **Value Proposition**: Perbandingan rute yang logis (efisien, termurah, tercepat), data transportasi Indonesia yang terkurasi secara nyata, serta asisten AI kontekstual yang memahami lokasi dan situasi pengguna secara real-time.
+- **Tujuan Utama**: Membuat perjalanan dengan transportasi publik lebih terencana, transparan, dan mudah dipahami.
+- **Target Pengguna**: Warga urban (khususnya Jabodetabek) yang menggunakan transportasi publik untuk aktivitas sehari-hari — pelajar, pekerja, hingga pendatang baru.
+- **Value Proposition**: Perbandingan rute yang logis (efisien, termurah, tercepat), data transportasi Indonesia yang terkurasi secara nyata, serta asisten AI kontekstual yang memahami lokasi dan situasi pengguna secara real-time.
 
 ---
 
-## ✨ Fitur Unggulan
+## Fitur Unggulan
 
 ### Fitur Utama
 
@@ -171,7 +171,7 @@ Version Ctrl : Git & GitHub
 
 ---
 
-## 🏗️ Arsitektur Sistem
+## Arsitektur Sistem
 
 ### System Architecture
 
@@ -205,7 +205,7 @@ project-root/
 
 ---
 
-## ⚙️ Instalasi & Setup
+## Instalasi & Setup
 
 ### Prerequisites
 
@@ -217,20 +217,20 @@ Pastikan Anda telah menginstall:
 
 ### Langkah Instalasi
 
-#### 1️⃣ Clone Repository
+#### 1. Clone Repository
 
 ```bash
 git clone https://github.com/[username]/rutein.git
 cd rutein
 ```
 
-#### 2️⃣ Install Dependencies
+#### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-#### 3️⃣ Setup Environment Variables
+#### 3. Setup Environment Variables
 
 Buat file `.env` di root directory:
 
@@ -246,11 +246,11 @@ VITE_MAP_STYLE="positron"
 VITE_MAPILLARY_TOKEN="[token_mapillary_anda]"
 ```
 
-#### 4️⃣ Setup Database
+#### 4. Setup Database
 
 Jalankan skema tabel Supabase Anda (auth, saved_places, budget_plans, user_preferences, transport_stops, transport_routes, disruptions, dsb.) sesuai migrasi proyek, lalu deploy Edge Function untuk **Confused Mode** melalui Supabase CLI.
 
-#### 5️⃣ Run Development Server
+#### 5. Run Development Server
 
 ```bash
 npm run dev
@@ -260,7 +260,7 @@ Aplikasi akan berjalan di `http://localhost:5173` (port default Vite).
 
 ---
 
-## 🚀 Penggunaan
+## Penggunaan
 
 ### Menjalankan Aplikasi
 
@@ -286,7 +286,7 @@ npm run lint
 
 ---
 
-## 🧩 Pembagian Tugas Tim
+## Pembagian Tugas Tim
 
 | Anggota | Fitur yang Dikerjakan |
 |---------|------------------------|
@@ -296,7 +296,7 @@ npm run lint
 
 ---
 
-## 📌 Progress & To-Do
+## Progress & To-Do
 
 - [x] README.md Update — *Quan*
 - [ ] Finish Design System — *Nael*
@@ -307,7 +307,7 @@ npm run lint
 
 ---
 
-## 📄 Lisensi
+## Lisensi
 
 Proyek ini dilisensikan di bawah [MIT License](LICENSE) - lihat file LICENSE untuk detail lebih lanjut.
 
@@ -315,6 +315,6 @@ Proyek ini dilisensikan di bawah [MIT License](LICENSE) - lihat file LICENSE unt
 
 <div align="center">
 
-  **Made with ❤️ by Tim CEO, CTO, CMO for ITECHNO CUP 2026**
+  **Made proudly by Tim CEO, CTO, CMO for ITECHNO CUP 2026**
 
 </div>
