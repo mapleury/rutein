@@ -21,7 +21,7 @@ import {
   ArrowRightLeft,
   Clock,
   Wallet,
-  AlertTriangle,
+
   Sparkles,
   X,
 } from 'lucide-react';
@@ -234,7 +234,6 @@ export default function Sidebar({
     { to: '/dashboard', label: t('nav.map') || 'Peta', icon: MapIcon },
     { to: '/schedule', label: t('nav.schedule') || 'Jadwal Transportasi', icon: Clock },
     { to: '/budget', label: t('nav.budget') || 'Anggaran', icon: Wallet },
-    { to: '/disruptions', label: t('nav.disruptions') || 'Peringatan', icon: AlertTriangle },
     { to: '/confused', label: t('nav.ask_ai') || 'Tanya AI', icon: Sparkles },
   ];
 
