@@ -5,13 +5,6 @@ interface AssistantMessageContentProps {
   content: string;
 }
 
-/**
- * Renders assistant chat messages as sanitized Markdown — paragraphs,
- * bold, and ordered/unordered lists. react-markdown never renders raw
- * HTML by default (no rehype-raw plugin is used), so this is safe even
- * though the content originates from an LLM. Never use
- * dangerouslySetInnerHTML here.
- */
 export function AssistantMessageContent({ content }: AssistantMessageContentProps) {
   return (
     <ReactMarkdown
@@ -37,8 +30,7 @@ export function AssistantMessageContent({ content }: AssistantMessageContentProp
             {children}
           </a>
         ),
-      }}
-    >
+      }}>
       {content}
     </ReactMarkdown>
   );

@@ -76,13 +76,11 @@ export default function MapRouteDetailBar({
   onCloseRoute,
 }: MapRouteDetailBarProps) {
   const { t } = useLanguage();
-  // Phase management: 'compact' | 1 (Option selection + Summary) | 2 (Multi-transit Step-by-Step Directions)
   const [phase, setPhase] = useState<'compact' | 1 | 2>('compact');
   const [routeOptions, setRouteOptions] = useState<LogicalRouteOption[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<RouteCategory | null>(null);
 
-  // Fetch route options when destination changes
   useEffect(() => {
     if (!destination) {
       setRouteOptions([]);
@@ -122,14 +120,12 @@ export default function MapRouteDetailBar({
     ? routeOptions.find((o) => o.category === selectedCategory) || null
     : null;
 
-  // Handlers for phase transitions
   const handleOpenPhase1 = () => {
     setPhase(1);
     if (onOpenDetails) onOpenDetails();
   };
 
   const handleNextToPhase2 = () => {
-    // If user hasn't selected a category yet, default to budgetPreference or first option
     if (!selectedCategory && routeOptions.length > 0) {
       const prefCategory: RouteCategory = budgetPreference === 'fastest' ? 'hurry' : (budgetPreference as RouteCategory);
       const defaultCat = routeOptions.find((o) => o.category === prefCategory)
@@ -159,7 +155,6 @@ export default function MapRouteDetailBar({
       {/* Mobile drag handle indicator */}
       <div className="route-drag-handle" />
 
-      {/* HEADER ROW */}
       <div style={headerRowStyle}>
         <div style={destinationLabelGroup}>
           <Navigation size={16} color="#DA362A" style={{ flexShrink: 0, marginTop: 2 }} />
@@ -170,7 +165,6 @@ export default function MapRouteDetailBar({
             via {roadName} (Menuju {destination.label})
           </span>
         </div>
-        {/* Top-right controls: ONLY close X button (chevron arrow button removed) */}
         {onCloseRoute && (
           <button onClick={handleClose} style={closeBtnStyle} title="Tutup">
             <X size={16} color="#666" />
@@ -181,9 +175,7 @@ export default function MapRouteDetailBar({
       {loading ? (
         <div style={statusTextStyle}>Menghitung rute perjalanan...</div>
       ) : phase === 1 ? (
-        /* DETAIL BAR PHASE 1: Route Option Cards (Inactive initially, active when selected) & Summary Box */
         <div style={expandedContentStyle}>
-          {/* 1. ROUTE CATEGORY SELECTION CARDS (EFFICIENT, CHEAPEST, HURRY) */}
           <div style={categoryGridStyle}>
             {loadingOptions ? (
               <div style={statusTextStyle}>Memuat opsi perbandingan rute...</div>
@@ -241,7 +233,6 @@ export default function MapRouteDetailBar({
             )}
           </div>
 
-          {/* 2. SUMMARY BOX */}
           <div style={routeSummaryBoxStyle}>
             <div style={addressRowStyle}>
               <span style={addressLabelStyle}>{t('detail_bar.from')}:</span>
@@ -273,7 +264,6 @@ export default function MapRouteDetailBar({
             </div>
           </div>
 
-          {/* PHASE 1 ACTION BUTTONS: Next ("Lanjut") & Preview 360° */}
           <div style={actionsRowStyle}>
             <button onClick={handleNextToPhase2} style={detailsBtnStyle}>
               {t('detail_bar.next')}
@@ -285,7 +275,6 @@ export default function MapRouteDetailBar({
           </div>
         </div>
       ) : phase === 2 ? (
-        /* DETAIL BAR PHASE 2: Multi-Transit Step-by-Step Directions */
         <div style={expandedContentStyle}>
           {activeOption && activeOption.legs && activeOption.legs.length > 0 ? (
             <div style={stepListContainerStyle}>
@@ -350,7 +339,6 @@ export default function MapRouteDetailBar({
             <div style={statusTextStyle}>Memuat rincian langkah rute...</div>
           )}
 
-          {/* PHASE 2 ACTION BUTTONS: Back ("Kembali") & Preview 360° */}
           <div style={actionsRowStyle}>
             <button onClick={handleBackToPhase1} style={detailsBtnStyle}>
               {t('detail_bar.back')}
@@ -362,7 +350,6 @@ export default function MapRouteDetailBar({
           </div>
         </div>
       ) : directions ? (
-        /* COMPACT VIEW */
         <>
           <div style={metricsRowStyle}>
             <span style={durationBadgeStyle}>{formatDuration(directions.durationS)}</span>

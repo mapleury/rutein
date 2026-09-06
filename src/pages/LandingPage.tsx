@@ -37,7 +37,6 @@ function AnimatedTrainTrackTop() {
         strokeWidth="11.1312"
       />
 
-      {/* Train Light Flow along the EXACT Path Curve */}
       <path
         d="M-80 43.9682H260.059L541.526 32.5794C546.418 32.3814 551.309 32.9916 556.002 34.3853L624.775 54.8088C635.074 57.8673 646.132 57.0987 655.909 52.6448L733.434 17.3276C738.388 15.0709 743.713 13.7418 749.146 13.406L830.682 8.3673C836.824 7.98772 842.979 8.88552 848.756 11.004L901.751 30.4354C905.093 31.661 908.571 32.4813 912.109 32.8787L1056.27 49.0702C1059.01 49.3786 1061.78 49.4307 1064.54 49.2259L1292.48 32.2804H1519"
         stroke="#FFFFFF"
@@ -82,7 +81,6 @@ function AnimatedTrainTrackBottom() {
         strokeWidth="11.1312"
       />
 
-      {/* Train Light Flow along the EXACT Path Curve */}
       <path
         d="M-77 18.2483H263.059L544.526 29.6372C549.418 29.8351 554.309 29.225 559.002 27.8312L627.775 7.40777C638.074 4.34923 649.132 5.11782 658.909 9.57177L736.434 44.889C741.388 47.1456 746.713 48.4748 752.146 48.8105L833.682 53.8493C839.824 54.2288 845.979 53.331 851.756 51.2125L904.751 31.7812C908.093 30.5556 911.571 29.7353 915.109 29.3379L1059.27 13.1464C1062.01 12.8379 1064.78 12.7858 1067.54 12.9907L1295.48 29.9361H1522"
         stroke="#FFFFFF"
@@ -501,7 +499,6 @@ export default function LandingPage() {
       {/* Ambient Mesh Glow & Transit Grid BG */}
       <AmbientTransitBackground />
 
-      {/* --- STRICT 100% ANCHORED STATIC TOP HEADER --- */}
       <header
         className="static-header"
         style={{
@@ -529,7 +526,6 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* --- DESKTOP CLEAN SOLID NAVBAR PILL --- */}
       <div
         className="desktop-nav-pill"
         style={{
@@ -637,7 +633,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* --- MOBILE HAMBURGER BUTTONS GROUP --- */}
       <div
         className="hamburger-nav-group"
         style={{
@@ -771,7 +766,6 @@ export default function LandingPage() {
         )}
       </div>
 
-      {/* --- HERO SECTION WITH MATCHING 2-LINE TITLE EXACTLY LIKE IMAGE 3 --- */}
       <section
         className="hero-container"
         style={{
@@ -979,7 +973,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* --- REL LINE ILLUSTRATION 1 (DYNAMIC TRAIN FLOW ALONG PATH CURVE) --- */}
       <div
         style={{
           width: '100vw',
@@ -998,7 +991,6 @@ export default function LandingPage() {
         <AnimatedTrainTrackTop />
       </div>
 
-      {/* --- SECTION 2: KAMI MUDAHKAN PERJALANANMU! --- */}
       <section
         id="tentang"
         style={{
@@ -1009,7 +1001,6 @@ export default function LandingPage() {
           zIndex: 2,
         }}
       >
-        {/* Header Row (Title LEFT, 5K+ Badge RIGHT on Desktop, Column Stack on Mobile) */}
         <SmoothReveal className="tentang-header-row">
           {/* Big Red Location Pin + Title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
@@ -1040,7 +1031,6 @@ export default function LandingPage() {
             </h2>
           </div>
 
-          {/* 5K+ Stats Card Badge (Anchored Right) */}
           <div
             className="hover-lift-card"
             style={{
@@ -1245,7 +1235,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* --- SECTION 3: CARA KERJA & FOOTER CALLOUT --- */}
       <section
         id="cara-kerja"
         style={{
@@ -1495,9 +1484,7 @@ export default function LandingPage() {
           </div>
         </SmoothReveal>
 
-        {/* Giant Footer Callout Heading & Flying Illustrations Section */}
         <SmoothReveal delayMs={150} style={{ textAlign: 'center', padding: '30px 0 60px' }}>
-          {/* Row 1: Merpati Flying Bird + Red "Rutein" (With SplitText) */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, flexWrap: 'wrap', marginBottom: -4 }}>
             <span className="animated-bird">
               <img
@@ -1517,7 +1504,6 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* Row 2: "perjalananmu" (With BlurText) + Animated Train People */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, flexWrap: 'wrap', marginBottom: -4 }}>
             <span className="font-jockey" style={{ fontSize: 'clamp(42px, 8vw, 100px)', color: '#1E1E1E', lineHeight: 0.95 }}>
               <BlurText
@@ -1535,7 +1521,6 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* Row 3: Animated Glowing Star + "biar gampang." (With SplitText) */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, flexWrap: 'wrap' }}>
             <span className="animated-star-glow">
               <img
@@ -1580,7 +1565,6 @@ export default function LandingPage() {
         </SmoothReveal>
       </section>
 
-      {/* --- BOTTOM EDGE TO EDGE REL LINE (DYNAMIC TRAIN FLOW ALONG PATH CURVE) --- */}
       <div
         style={{
           width: '100vw',
@@ -1598,7 +1582,6 @@ export default function LandingPage() {
         <AnimatedTrainTrackBottom />
       </div>
 
-      {/* --- FOOTER SECTION (WITH STAGGERED REVEAL & ICON HOVER BOUNCE) --- */}
       <footer
         style={{
           background: '#FCF4ED',

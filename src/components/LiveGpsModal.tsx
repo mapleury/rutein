@@ -11,7 +11,7 @@ interface Waypoint extends GeoPoint {
 }
 
 interface Props {
-  waypoints: Waypoint[]; // ordered stops along the route
+  waypoints: Waypoint[];
   onClose: () => void;
 }
 
@@ -78,7 +78,6 @@ export default function LiveGpsModal({ waypoints, onClose }: Props) {
     };
   }, []);
 
-  // Detect arrival at the current target waypoint.
   useEffect(() => {
     if (!currentPosition || waypointIndex >= waypoints.length) return;
     const target = waypoints[waypointIndex];

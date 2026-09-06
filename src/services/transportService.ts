@@ -26,28 +26,18 @@ export async function getStopsForRoute(routeId: string): Promise<TransportStop[]
   return data ?? [];
 }
 
-/**
- * A transport_stops row with its parent route's mode/name embedded, plus
- * the computed distance from the search point. `transport_routes` is
- * nullable because `route_id` on TransportStop is nullable in the schema.
- */
 export interface NearbyTransportStop extends TransportStop {
   distanceM: number;
   transport_routes: Pick<TransportRoute, 'mode' | 'route_name' | 'route_code'> | null;
 }
 
-/** Finds transit stops within `radiusM` meters of a point, across all routes. */
 export async function findNearbyStops(
   point: GeoPoint,
   radiusM = 800
 ): Promise<NearbyTransportStop[]> {
-  // Nominal bounding box pre-filter (cheap), then precise haversine filter client-side.
-  const degDelta = radiusM / 111_000; // rough meters-per-degree
+  const degDelta = radiusM / 111_000;
   const { data, error } = await supabase
     .from('transport_stops')
-    // Embed the parent route so callers get the transport mode
-    // (bus/mrt/krl/etc.) and route name without a second round trip.
-    // Requires the transport_stops.route_id -> transport_routes.id FK.
     .select('*, transport_routes(mode, route_name, route_code)')
     .gte('latitude', point.lat - degDelta)
     .lte('latitude', point.lat + degDelta)
@@ -86,7 +76,6 @@ export async function getActiveDisruptions(): Promise<Disruption[]> {
   return data ?? [];
 }
 
-/** Subscribes to realtime disruption changes. Returns an unsubscribe function. */
 export function subscribeToDisruptions(onChange: (disruption: Disruption) => void): () => void {
   const channel = supabase
     .channel('disruptions-realtime')
@@ -102,7 +91,6 @@ export function subscribeToDisruptions(onChange: (disruption: Disruption) => voi
   };
 }
 
-/** Subscribes to realtime schedule updates for a given route. */
 export function subscribeToScheduleUpdates(routeId: string, onChange: (schedule: TransportSchedule) => void): () => void {
   const channel = supabase
     .channel(`schedules-${routeId}`)

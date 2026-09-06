@@ -105,7 +105,6 @@ export default function MapTopSearch({
     <div className="map-top-search-wrapper" style={topSearchWrapper}>
       <style>{topSearchStyles}</style>
 
-      {/* Mobile Drawer Hamburger Trigger */}
       <button
         type="button"
         onClick={openMobileSidebar}
@@ -116,10 +115,8 @@ export default function MapTopSearch({
         <Menu size={20} color="#1E1E1E" />
       </button>
 
-      {/* Search Input Pill Container */}
       <div className="map-search-card" style={searchCardStyle}>
         {!isRouteMode ? (
-          /* Single Destination Search */
           <div style={singleSearchRow}>
             <Search size={18} color="#DA362A" style={{ flexShrink: 0 }} />
             <input
@@ -153,7 +150,6 @@ export default function MapTopSearch({
             </button>
           </div>
         ) : (
-          /* A -> B Origin & Destination Search */
           <div style={routeSearchContainer}>
             <div style={routeSearchHeader}>
               <span style={{ fontSize: 12, fontWeight: 700, color: '#DA362A' }}>Rute Perjalanan</span>
@@ -164,7 +160,6 @@ export default function MapTopSearch({
 
             <div style={routeInputGroupWrapper}>
               <div style={routeInputGroup}>
-                {/* Origin Input */}
                 <div style={routeInputRow}>
                   <div style={{ ...dotStyle, background: '#2563EB' }} />
                   <input
@@ -182,7 +177,6 @@ export default function MapTopSearch({
                   />
                 </div>
 
-                {/* Destination Input */}
                 <div style={routeInputRow}>
                   <div style={{ ...dotStyle, background: '#DA362A' }} />
                   <input
@@ -208,7 +202,6 @@ export default function MapTopSearch({
           </div>
         )}
 
-        {/* Autocomplete Dropdown List */}
         {openDropdown && (results.length > 0 || loading) && (
           <div className="map-search-dropdown" style={dropdownStyle}>
             {loading && <div style={{ padding: 10, fontSize: 12, color: '#888' }}>Mencari lokasi...</div>}
@@ -227,7 +220,6 @@ export default function MapTopSearch({
         )}
       </div>
 
-      {/* Filter Button right next to search bar */}
       <div style={{ position: 'relative' }}>
         <button
           onClick={() => setShowFilterModal((prev) => !prev)}
@@ -238,7 +230,6 @@ export default function MapTopSearch({
           <SlidersHorizontal size={18} color="#DA362A" />
         </button>
 
-        {/* Filter Pop-up Overlay Panel */}
         {showFilterModal && (
           <div className="map-filter-modal" style={filterModalStyle}>
             <div style={filterModalHeader}>
@@ -248,7 +239,6 @@ export default function MapTopSearch({
               </button>
             </div>
 
-            {/* Travel Method Filter */}
             <div style={filterGroupStyle}>
               <label style={filterLabelStyle}>Travel Method</label>
               <div style={filterBtnRow}>
@@ -269,9 +259,6 @@ export default function MapTopSearch({
               </div>
             </div>
 
-
-
-            {/* Map Transport Marker Filter */}
             {onToggleType && (
               <div style={{ ...filterGroupStyle, marginTop: 14, paddingTop: 10, borderTop: '1px solid #F0F0F0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>

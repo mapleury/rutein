@@ -119,7 +119,6 @@ export default function Schedule() {
       }}
     >
       <div className="container" style={{ maxWidth: 840, paddingLeft: 20, paddingRight: 20, margin: '0 auto' }}>
-        {/* --- HEADER --- */}
         <div className="rutein-slide-in" style={{ textAlign: 'center', marginBottom: 32 }}>
           <h1
             className="font-jockey"
@@ -146,7 +145,6 @@ export default function Schedule() {
           </p>
         </div>
 
-        {/* --- SECTION 1: SEARCH & FILTER BAR --- */}
         <div
           className="rutein-slide-in-1"
           style={{
@@ -349,7 +347,6 @@ export default function Schedule() {
           </div>
         </div>
 
-        {/* --- SECTION 2: SELECTED STATION HERO CARD --- */}
         {selectedStation && selectedRoute && (
           <div
             className="rutein-slide-in-2"
@@ -495,7 +492,6 @@ export default function Schedule() {
               </div>
             )}
 
-            {/* Full Day Schedule Section with Direction Switcher Tabs */}
             {selectedRoute.hasDirections && fullDayGrouped && (
               <div style={{ paddingTop: 16, borderTop: '1.5px solid #E5D5C5' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
@@ -580,7 +576,6 @@ export default function Schedule() {
           </div>
         )}
 
-        {/* --- SECTION 3: ROUTE & STATION LIST --- */}
         <div className="rutein-fade-up-2">
           <h2
             className="font-jockey"

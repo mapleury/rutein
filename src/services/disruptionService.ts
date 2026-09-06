@@ -1,14 +1,6 @@
 import { getActiveDisruptions, subscribeToDisruptions } from './transportService';
 import type { Disruption } from '@/types/database.types';
 
-/**
- * Dedicated disruption-facing service. Currently delegates to
- * transportService's Supabase queries, but kept as its own module per the
- * requested service architecture so disruption-specific logic (e.g. future
- * push-notification triggers, severity-based filtering) has a clear home
- * without touching generic transit queries.
- */
-
 export async function getDisruptions(): Promise<Disruption[]> {
   return getActiveDisruptions();
 }

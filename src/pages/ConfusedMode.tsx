@@ -218,7 +218,6 @@ export default function ConfusedMode() {
     >
       <style>{confusedStyles}</style>
 
-      {/* Mobile History Backdrop Overlay */}
       {isSidebarOpen && (
         <div
           className="confused-history-backdrop"
@@ -241,7 +240,6 @@ export default function ConfusedMode() {
           overflow: 'hidden',
         }}
       >
-        {/* Sidebar Brand Header */}
         <div style={{ padding: '14px 16px', borderBottom: '1.5px solid #E5D5C5', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div
@@ -289,7 +287,7 @@ export default function ConfusedMode() {
         </div>
 
         <div style={{ padding: 12, borderBottom: '1.5px solid #E5D5C5', flexShrink: 0 }}>
-          {/* New Chat Button */}
+          {/* New Chat */}
           <button
             type="button"
             onClick={handleCreateNewChat}
@@ -315,7 +313,7 @@ export default function ConfusedMode() {
           </button>
         </div>
 
-        {/* Chat Sessions History List */}
+        {/* History List */}
         <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#666666', textTransform: 'uppercase', paddingLeft: 8, paddingBottom: 4 }}>
             {t('ai.history_title')} ({sessions.length})
@@ -387,7 +385,6 @@ export default function ConfusedMode() {
           )}
         </div>
 
-        {/* Clear All Sessions Bottom Footer */}
         {sessions.length > 0 && (
           <div style={{ padding: 12, borderTop: '1.5px solid #E5D5C5', flexShrink: 0 }}>
             <button
@@ -415,12 +412,10 @@ export default function ConfusedMode() {
         )}
       </aside>
 
-      {/* --- MAIN CHAT AREA --- */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0, overflow: 'hidden' }}>
         <div
           className="confused-chat-container"
         >
-          {/* Top Header Bar with Sidebar Toggle */}
           <div className="confused-top-bar rutein-slide-in" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
             <button
               type="button"

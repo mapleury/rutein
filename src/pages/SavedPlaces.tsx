@@ -26,7 +26,6 @@ export default function SavedPlaces() {
 
   useEffect(() => {
     if (user) refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   async function refresh() {

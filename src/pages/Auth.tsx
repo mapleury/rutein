@@ -592,8 +592,8 @@ export function Login({ initialMode = 'signin' }: { initialMode?: 'signin' | 'si
       return 'Alamat email wajib diisi.';
     }
 
-const emailPattern =
-  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailPattern =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(trimmedEmail)) {
       return 'Format email tidak valid (contoh: nama@gmail.com).';
     }
@@ -626,30 +626,30 @@ const emailPattern =
         ? await signIn(email.trim(), password)
         : await signUp(email.trim(), password, fullName.trim());
 
-   if (result.error) {
-  console.error('=== SUPABASE AUTH ERROR ===');
-  console.error('message:', result.error.message);
-  console.error('status:', result.error.status);
-  console.error('code:', result.error.code);
-  console.error('full error:', result.error);
+    if (result.error) {
+      console.error('=== SUPABASE AUTH ERROR ===');
+      console.error('message:', result.error.message);
+      console.error('status:', result.error.status);
+      console.error('code:', result.error.code);
+      console.error('full error:', result.error);
 
-  setSubmitting(false);
+      setSubmitting(false);
 
-  setError(result.error.message);
+      setError(result.error.message);
 
-  return;
-}
-if (mode === 'signup') {
-  setSubmitting(false);
+      return;
+    }
+    if (mode === 'signup') {
+      setSubmitting(false);
 
-  if (!result.session) {
-    setNotice('Akun berhasil dibuat. Silakan masuk.');
-    return;
-  }
+      if (!result.session) {
+        setNotice('Akun berhasil dibuat. Silakan masuk.');
+        return;
+      }
 
-  navigate('/onboarding/transport');
-  return;
-}
+      navigate('/onboarding/transport');
+      return;
+    }
     try {
       const status = result.user ? await getOnboardingStatus(result.user.id) : { completed: false };
       navigate(status.completed ? '/' : '/onboarding/transport');
@@ -669,9 +669,6 @@ if (mode === 'signup') {
         {mode === 'signin' ? 'Masuk Rutein' : 'Daftar Rutein'}
       </h1>
 
-      {/* key={mode} forces every field below to fully remount on each
-          Masuk/Daftar toggle, so the whole form fades down together and
-          consistently. */}
       <form key={mode} noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(14px, 2.5vw, 18px)' }}>
         {mode === 'signup' && (
           <input

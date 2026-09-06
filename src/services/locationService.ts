@@ -24,7 +24,6 @@ export function isGeolocationSupported(): boolean {
   return typeof navigator !== 'undefined' && 'geolocation' in navigator;
 }
 
-/** 100% Free IP-Based Geolocation Fallback (No permission needed) */
 export async function fetchIpGeolocation(): Promise<GeoPoint> {
   try {
     const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) });
@@ -34,9 +33,8 @@ export async function fetchIpGeolocation(): Promise<GeoPoint> {
         return { lat: data.latitude, lng: data.longitude };
       }
     }
-  } catch {}
+  } catch { }
 
-  // Fallback to Jakarta Sudirman Center
   return { lat: -6.2088, lng: 106.8456 };
 }
 
@@ -49,7 +47,6 @@ export function getCurrentPosition(): Promise<GeoPoint> {
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       () => {
-        // On permission denied or error, fallback to IP Geolocation
         fetchIpGeolocation().then(resolve);
       },
       { enableHighAccuracy: true, timeout: 6000, maximumAge: 5000 }
@@ -57,17 +54,13 @@ export function getCurrentPosition(): Promise<GeoPoint> {
   });
 }
 
-/**
- * Starts continuous live tracking using watchPosition (used by the Live GPS
- * Modal). Returns an unsubscribe function.
- */
 export function watchPosition(
   onUpdate: (point: GeoPoint, accuracyM: number) => void,
   onError: (error: GeoServiceError) => void
 ): () => void {
   if (!isGeolocationSupported()) {
     onError({ type: 'unsupported', message: 'Geolocation is not supported by this browser.' });
-    return () => {};
+    return () => { };
   }
 
   const watchId = navigator.geolocation.watchPosition(
@@ -79,7 +72,6 @@ export function watchPosition(
   return () => navigator.geolocation.clearWatch(watchId);
 }
 
-/** Haversine distance in meters between two GeoPoints. */
 export function distanceMeters(a: GeoPoint, b: GeoPoint): number {
   const R = 6371000;
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;

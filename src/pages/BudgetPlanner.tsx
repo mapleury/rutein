@@ -109,7 +109,7 @@ export default function BudgetPlanner() {
         if (parsed && parsed.label) {
           setDestinationState(parsed);
         }
-      } catch {}
+      } catch { }
     } else {
       setDestinationState(null);
     }
@@ -123,7 +123,7 @@ export default function BudgetPlanner() {
           setOriginState(parsed);
           hasSavedOrigin = true;
         }
-      } catch {}
+      } catch { }
     }
 
     if (!hasSavedOrigin) {
@@ -154,7 +154,7 @@ export default function BudgetPlanner() {
     }
 
     if (user) {
-      listSavedPlaces(user.id).then(setSavedPlaces).catch(() => {});
+      listSavedPlaces(user.id).then(setSavedPlaces).catch(() => { });
 
       listBudgetPlans(user.id)
         .then((plans) => {
@@ -170,7 +170,7 @@ export default function BudgetPlanner() {
             }
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [user, localStorageBudgetKey, localStorageDestKey, localStorageOrigKey]);
 
@@ -224,7 +224,7 @@ export default function BudgetPlanner() {
             setCalculatedCandidates(newCandidates);
           }
         })
-        .catch(() => {})
+        .catch(() => { })
         .finally(() => setIsCalculatingRoutes(false));
     }
   }, [origin, destination]);
@@ -331,7 +331,7 @@ export default function BudgetPlanner() {
       }}
     >
       <div className="container" style={{ maxWidth: 780, paddingLeft: 20, paddingRight: 20, margin: '0 auto' }}>
-        {/* --- HEADER --- */}
+        {/* Header */}
         <div className="rutein-slide-in" style={{ textAlign: 'center', marginBottom: 36 }}>
           <h1
             className="font-jockey"
@@ -358,7 +358,7 @@ export default function BudgetPlanner() {
           </p>
         </div>
 
-        {/* --- SECTION 1: LOKASI PERJALANAN (ORIGIN & DESTINATION) --- */}
+        {/* Lokasi Perjalanan */}
         <div
           className="rutein-slide-in-1"
           style={{
@@ -532,7 +532,7 @@ export default function BudgetPlanner() {
           </div>
         </div>
 
-        {/* --- SECTION 2: BUDGET INPUT & ADJUSTMENT CARD --- */}
+        {/* Budget Input */}
         <div
           className="rutein-slide-in-2"
           style={{
@@ -561,7 +561,6 @@ export default function BudgetPlanner() {
                 Budget Perjalanan Hari Ini
               </label>
 
-              {/* Main Interactive Budget Input Control */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
                 <div
                   style={{
@@ -606,7 +605,7 @@ export default function BudgetPlanner() {
                   />
                 </div>
 
-                {/* Adjust +/- Buttons */}
+                {/* Adjust */}
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
                     type="button"
@@ -653,7 +652,6 @@ export default function BudgetPlanner() {
               </div>
             </div>
 
-            {/* Quick Preset Chips Row */}
             <div style={{ marginBottom: 26 }}>
               <span style={{ fontSize: 13, color: '#666666', display: 'block', marginBottom: 10, fontWeight: 500 }}>
                 Pilihan Cepat Nominal:
@@ -686,7 +684,6 @@ export default function BudgetPlanner() {
               </div>
             </div>
 
-            {/* Primary Action CTA Button */}
             <button
               type="submit"
               className="font-jockey"
@@ -723,7 +720,6 @@ export default function BudgetPlanner() {
           </form>
         </div>
 
-        {/* --- SECTION 3: PROYEKSI BUDGET JANGKA PANJANG --- */}
         <div
           className="rutein-slide-in-3"
           style={{
@@ -751,7 +747,6 @@ export default function BudgetPlanner() {
           </div>
         </div>
 
-        {/* --- SECTION 4: RESULTS SECTION (RUTEIN MENEMUKAN) --- */}
         <div className="rutein-slide-in-4" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
             <h2
@@ -794,7 +789,6 @@ export default function BudgetPlanner() {
             </p>
           )}
 
-          {/* Insufficient Budget Empty State */}
           {!evaluation.hasInBudgetOptions ? (
             <div
               className="rutein-alert-in"
@@ -998,7 +992,6 @@ function RecommendationCard({ item, icon: CategoryIcon, onStartJourney }: CardPr
           </div>
         </div>
 
-        {/* Transport Mode Sequence Icons & Action Button */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {route.modes.map((mode, idx) => {
@@ -1030,7 +1023,7 @@ function RecommendationCard({ item, icon: CategoryIcon, onStartJourney }: CardPr
             })}
           </div>
 
-          {/* CTA Action Button to Map */}
+          {/* CTA */}
           <button
             type="button"
             onClick={onStartJourney}

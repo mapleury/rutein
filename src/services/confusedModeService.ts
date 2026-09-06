@@ -50,7 +50,6 @@ export async function sendConfusedModeMessage(
   reply: string;
   implemented: boolean;
 }> {
-  // 1. Priority 1: Direct Google Gemini 1.5/2.0 Flash REST API Client Connection
   const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   if (geminiApiKey && geminiApiKey.trim().length > 0) {

@@ -14,7 +14,7 @@ export default function RouteComparison() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const navState = location.state as { origin?: PlaceResult; destination?: PlaceResult } | null;
   const initialOrigin = navState?.origin ?? null;
   const initialDestination = navState?.destination ?? null;
@@ -46,7 +46,6 @@ export default function RouteComparison() {
     if (origin && destination) {
       void runComparison();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [origin, destination]);
 
   async function runComparison() {

@@ -1,29 +1,3 @@
-/**
- * A structured, client-side dataset of real Indonesian public transport
- * locations — used directly by the Map page for marker rendering, so the
- * map isn't limited to whatever happens to be in the transport_stops table
- * (which currently only covers Jakarta's TransJakarta/MRT/LRT/KRL corridors
- * used by routeService's journey planning).
- *
- * PROVENANCE: every entry here is a real, named, currently-operating station
- * or stop, compiled from well-documented public knowledge of these systems
- * (Wikipedia-level facts: system names, station names, real lines/corridors).
- * Coordinates are best-effort approximations of each location's real
- * position, not survey-grade GPS pulled from an official dataset — treat
- * this the same as the `curated` tag used in the Supabase schema, NOT as
- * `official` government data. See README for why the actual data.go.id /
- * satudata.jakarta.go.id / jakartasatu.jakarta.go.id sources couldn't be
- * scraped automatically (JS-rendered dashboards, bot detection, and a
- * non-lat/lng coordinate system, respectively).
- *
- * Coverage is representative, not nationwide-exhaustive — full national
- * coverage of every angkot/mikrolet stop in Indonesia is not a static-file
- * problem, it's a live-GTFS-feed problem. This covers Jakarta most densely
- * (since that's where Rutein's journey planning lives) plus the major
- * transit systems of five other big Indonesian cities, intercity rail
- * hubs, airport rail, and key ferry/port terminals.
- */
-
 export type IndonesiaTransportType =
   | 'transjakarta'
   | 'bus'
@@ -44,7 +18,6 @@ export interface IndonesiaTransportLocation {
   longitude: number;
   city: string;
   province: string;
-  /** Optional: line/corridor/operator name, shown in the marker popup. */
   line?: string;
 }
 
@@ -63,9 +36,6 @@ function loc(
 }
 
 export const INDONESIA_TRANSPORT_DATA: IndonesiaTransportLocation[] = [
-  // ------------------------------------------------------------
-  // Jakarta — MRT (North-South Line, all 13 real stations)
-  // ------------------------------------------------------------
   loc('Lebak Bulus Grab', 'mrt', -6.2897, 106.7750, 'Jakarta', 'DKI Jakarta', 'MRT North-South Line'),
   loc('Fatmawati', 'mrt', -6.2921, 106.7976, 'Jakarta', 'DKI Jakarta', 'MRT North-South Line'),
   loc('Cipete Raya', 'mrt', -6.2851, 106.7994, 'Jakarta', 'DKI Jakarta', 'MRT North-South Line'),
@@ -145,58 +115,36 @@ export const INDONESIA_TRANSPORT_DATA: IndonesiaTransportLocation[] = [
   loc('Terminal Pulogebang', 'terminal', -6.1859, 106.9412, 'Jakarta', 'DKI Jakarta', 'Intercity bus terminal'),
   loc('Terminal Kalideres', 'terminal', -6.1531, 106.7027, 'Jakarta', 'DKI Jakarta', 'Intercity bus terminal'),
 
-  // ------------------------------------------------------------
-  // Bandung — Trans Metro Bandung + intercity rail
-  // ------------------------------------------------------------
   loc('Cibiru', 'bus', -6.9187, 107.7218, 'Bandung', 'Jawa Barat', 'Trans Metro Bandung Koridor 2'),
   loc('Alun-alun Bandung', 'bus', -6.9218, 107.6070, 'Bandung', 'Jawa Barat', 'Trans Metro Bandung Koridor 2'),
   loc('Cibeureum', 'bus', -6.9367, 107.5648, 'Bandung', 'Jawa Barat', 'Trans Metro Bandung Koridor 2'),
   loc('Bandung', 'train', -6.9147, 107.6023, 'Bandung', 'Jawa Barat', 'Intercity rail — main station'),
 
-  // ------------------------------------------------------------
-  // Yogyakarta — Trans Jogja + intercity rail
-  // ------------------------------------------------------------
   loc('Terminal Jombor', 'bus', -7.7481, 110.3572, 'Yogyakarta', 'DI Yogyakarta', 'Trans Jogja Koridor 1A'),
   loc('Malioboro', 'bus', -7.7930, 110.3654, 'Yogyakarta', 'DI Yogyakarta', 'Trans Jogja Koridor 1A'),
   loc('Prambanan', 'bus', -7.7521, 110.4914, 'Yogyakarta', 'DI Yogyakarta', 'Trans Jogja Koridor 1A'),
   loc('Yogyakarta Tugu', 'train', -7.7893, 110.3634, 'Yogyakarta', 'DI Yogyakarta', 'Intercity rail — main station'),
 
-  // ------------------------------------------------------------
-  // Surabaya — Suroboyo Bus + intercity rail
-  // ------------------------------------------------------------
   loc('Terminal Purabaya (Bungurasih)', 'terminal', -7.3466, 112.7189, 'Surabaya', 'Jawa Timur', 'Suroboyo Bus / intercity terminal'),
   loc('Tugu Pahlawan', 'bus', -7.2455, 112.7378, 'Surabaya', 'Jawa Timur', 'Suroboyo Bus'),
   loc('Rajawali', 'bus', -7.2350, 112.7350, 'Surabaya', 'Jawa Timur', 'Suroboyo Bus'),
   loc('Surabaya Gubeng', 'train', -7.2646, 112.7526, 'Surabaya', 'Jawa Timur', 'Intercity rail — main station'),
 
-  // ------------------------------------------------------------
-  // Semarang — Trans Semarang + intercity rail
-  // ------------------------------------------------------------
   loc('Terminal Mangkang', 'bus', -6.9575, 110.2938, 'Semarang', 'Jawa Tengah', 'Trans Semarang Koridor 1'),
   loc('Simpang Lima', 'bus', -6.9902, 110.4229, 'Semarang', 'Jawa Tengah', 'Trans Semarang Koridor 1'),
   loc('Semarang Tawang', 'train', -6.9667, 110.4308, 'Semarang', 'Jawa Tengah', 'Intercity rail — main station'),
 
-  // ------------------------------------------------------------
-  // Palembang — LRT Palembang (real, opened 2018 for Asian Games) + ferry
-  // ------------------------------------------------------------
   loc('Bandara SMB II', 'lrt', -2.8987, 104.6997, 'Palembang', 'Sumatera Selatan', 'LRT Sumatera Selatan'),
   loc('Jakabaring', 'lrt', -3.0034, 104.7729, 'Palembang', 'Sumatera Selatan', 'LRT Sumatera Selatan'),
   loc('Ampera', 'lrt', -2.9917, 104.7614, 'Palembang', 'Sumatera Selatan', 'LRT Sumatera Selatan'),
 
-  // ------------------------------------------------------------
-  // Medan — airport rail + intercity rail
-  // ------------------------------------------------------------
   loc('Medan', 'train', -3.5952, 98.6772, 'Medan', 'Sumatera Utara', 'Intercity rail — main station'),
   loc('Kualanamu Airport Station', 'airport_rail', -3.6425, 98.8853, 'Deli Serdang', 'Sumatera Utara', 'KA Bandara Kualanamu'),
 
-  // ------------------------------------------------------------
-  // Java-Bali ferry crossing — Merak/Bakauheni + Ketapang/Gilimanuk
-  // ------------------------------------------------------------
   loc('Pelabuhan Merak', 'ferry', -5.9319, 106.0022, 'Cilegon', 'Banten', 'Java-Sumatra ferry crossing'),
   loc('Pelabuhan Ketapang', 'ferry', -8.1478, 114.3922, 'Banyuwangi', 'Jawa Timur', 'Java-Bali ferry crossing'),
 ];
 
-/** Lookup used by marker/filter components to render every known type consistently. */
 export const TRANSPORT_TYPE_LABELS: Record<IndonesiaTransportType, string> = {
   transjakarta: 'TransJakarta',
   bus: 'Bus / BRT',

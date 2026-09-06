@@ -8,14 +8,6 @@ export interface OnboardingStatus {
   completed: boolean;
 }
 
-/**
- * Source of truth for "has this user already done onboarding?" —
- * reads `user_preferences.onboarding_completed_at` directly rather than
- * `auth.users.user_metadata`, since nothing in the app ever writes that
- * metadata flag. `finish()` in ProfileSelect sets this timestamp on
- * every completion path (even "Nanti saja"/skip), so its presence alone
- * is enough to know the flow is done.
- */
 export async function getOnboardingStatus(userId: string): Promise<OnboardingStatus> {
   const { data, error } = await supabase
     .from('user_preferences')
@@ -25,10 +17,6 @@ export async function getOnboardingStatus(userId: string): Promise<OnboardingSta
 
   if (error) {
     console.warn('getOnboardingStatus failed:', error.message);
-    // Fail open toward "not completed" is wrong here — failing open
-    // toward "completed" would silently skip onboarding on a transient
-    // error. Safer to let the user through to onboarding again than to
-    // block them from the app entirely.
     return { completed: false };
   }
 

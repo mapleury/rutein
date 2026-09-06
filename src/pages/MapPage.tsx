@@ -111,7 +111,7 @@ export default function MapPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
   const [hoveredStopId, setHoveredStopId] = useState<string | null>(null);
-  
+
   const [hoveredDisruptionId, setHoveredDisruptionId] = useState<string | null>(null);
 
   const [pendingStreetViewPoint, setPendingStreetViewPoint] = useState<GeoPoint | null>(null);
@@ -262,13 +262,13 @@ export default function MapPage() {
 
   const routeGeoJson = directions
     ? {
-        type: 'Feature' as const,
-        properties: {},
-        geometry: {
-          type: 'LineString' as const,
-          coordinates: directions.geometry.map((p) => [p.lng, p.lat]),
-        },
-      }
+      type: 'Feature' as const,
+      properties: {},
+      geometry: {
+        type: 'LineString' as const,
+        coordinates: directions.geometry.map((p) => [p.lng, p.lat]),
+      },
+    }
     : null;
 
   const routeMidpoint = useMemo(
@@ -335,8 +335,6 @@ export default function MapPage() {
         >
           <NavigationControl position="top-right" showCompass={false} />
 
-          {/* Single-destination walk/ojek route (search-driven flow). Hidden
-              entirely when a full multi-leg itinerary is loaded instead. */}
           {!itineraryOption && routeGeoJson && (
             <Source id="route" type="geojson" data={routeGeoJson}>
               <Layer
@@ -374,11 +372,6 @@ export default function MapPage() {
             </Marker>
           )}
 
-          {/* Full multi-leg itinerary — each leg gets its own accurate
-              polyline, colored + dashed by mode, with an icon marker at its
-              midpoint (skipped for plain walking legs to avoid clutter) and
-              a small dot marking the transfer/board/alight point between
-              consecutive legs. */}
           {itineraryOption &&
             itineraryOption.legs.map((leg, i) => {
               const coords = legCoordinates(leg);
@@ -444,9 +437,6 @@ export default function MapPage() {
                 setPopupTarget('user');
               }}
             >
-              {/* Reuses MapLibre's built-in "you are here" dot styling
-                  (pulsing animation + white ring), already loaded via
-                  maplibre-gl.css — no custom icon asset needed. */}
               <div className="maplibregl-user-location-dot" />
             </Marker>
           )}
@@ -491,8 +481,8 @@ export default function MapPage() {
                   borderRadius: '50%',
                   background: SEVERITY_COLORS[d.severity],
                   border: '2px solid #FFFFFF',
-                  boxShadow: hoveredDisruptionId === d.id 
-                    ? '0 0 0 5px rgba(255,255,255,0.15), 0 2px 6px rgba(0,0,0,0.4)' 
+                  boxShadow: hoveredDisruptionId === d.id
+                    ? '0 0 0 5px rgba(255,255,255,0.15), 0 2px 6px rgba(0,0,0,0.4)'
                     : '0 2px 5px rgba(0,0,0,0.35)',
                   display: 'flex',
                   alignItems: 'center',
@@ -544,8 +534,6 @@ export default function MapPage() {
             );
           })()}
 
-          {/* Live transport network (transjakarta, MRT, LRT, KRL, etc.) —
-              viewport-filtered against the static curated dataset. */}
           {visibleTransportLocations.map((stop: IndonesiaTransportLocation) => (
             <Marker
               key={stop.id}
@@ -598,7 +586,7 @@ export default function MapPage() {
                   }}
                 />
               </Marker>
-          )}
+            )}
         </Map>
       </div>
 

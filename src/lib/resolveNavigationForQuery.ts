@@ -30,7 +30,6 @@ export async function resolveNavigationForQuery(
   origin: GpsPosition | null,
   originAddress: string | null
 ): Promise<ResolveNavigationResult> {
-  // Use user's live GPS origin or fallback to Sudirman Jakarta
   const activeOrigin = origin || DEFAULT_JAKARTA_ORIGIN;
 
   let candidates: PlaceResultLike[];

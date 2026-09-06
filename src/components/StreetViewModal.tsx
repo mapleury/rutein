@@ -63,7 +63,6 @@ export default function StreetViewModal({ point, locationLabel, onClose }: Props
       viewerRef.current?.remove();
       viewerRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [point.lat, point.lng]);
 
   return (

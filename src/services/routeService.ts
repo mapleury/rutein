@@ -5,12 +5,6 @@ import { findNearbyStops, getAllRoutes, getStopsForRoute } from './transportServ
 import { distanceMeters } from './locationService';
 import { supabase } from '@/lib/supabaseClient';
 
-// ------------------------------------------------------------------
-// Cost model (flat fares, IDR) — realistic public TransJakarta/MRT/KRL
-// approximations. Swap with a real fare-matrix table/API later.
-// Ojek (ride-hailing motorbike) is distance-based, not flat — see
-// estimateOjekFareIdr() below, matching how Gojek/Grab Bike actually price.
-// ------------------------------------------------------------------
 const FARE_IDR: Record<TransportMode, number> = {
   walk: 0,
   bus: 4000,
@@ -18,10 +12,10 @@ const FARE_IDR: Record<TransportMode, number> = {
   mrt: 8000,
   krl: 4000,
   lrt: 5000,
-  train: 15000,        // intercity — rough flat estimate, refine with real fare tiers later
-  airport_rail: 70000, // KA Bandara Soekarno-Hatta/Kualanamu real flat-fare ballpark
+  train: 15000,
+  airport_rail: 70000,
   ferry: 15000,
-  ojek: 0, // computed dynamically per-leg, see estimateOjekFareIdr()
+  ojek: 0,
   other: 5000,
 };
 
@@ -39,27 +33,14 @@ const MODE_SPEED_MPS: Record<TransportMode, number> = {
   other: 7,
 };
 
-// Modes that actually run on streets, so a driving-car route is a real
-// approximation of the corridor they follow. Fixed-rail/waterborne modes
-// (MRT/KRL/LRT/train/airport_rail/ferry) don't follow roads at all, so a
-// straight line between stations/ports is more honest than a road-snapped
-// one would be (see buildTransitLeg).
 const ROAD_BASED_MODES = new Set<TransportMode>(['bus', 'transjakarta', 'ojek']);
 
-// How far a user is assumed willing to walk to reach a transit stop.
-// Widened for longer trips — it's worth a 1.5-2km walk to reach a stop
-// that saves many kilometers of walking/riding overall, but not worth it
-// for a trip that's only a couple hundred meters to begin with.
-const STOP_SEARCH_RADIUS_SHORT_M = 900;  // trips under ~5km
-const STOP_SEARCH_RADIUS_LONG_M = 2200;  // trips 5km and above
+const STOP_SEARCH_RADIUS_SHORT_M = 900;
+const STOP_SEARCH_RADIUS_LONG_M = 2200;
 const LONG_TRIP_THRESHOLD_M = 5000;
 
-// Below this, walking the whole way is genuinely the simplest answer and
-// ojek isn't worth booking. Above it, ojek becomes a real alternative.
 const OJEK_MIN_DISTANCE_M = 700;
 
-// Gojek/Grab-style motorbike ride-hailing fare model: a flat minimum fare
-// covers a base distance, then a per-km rate applies beyond that.
 const OJEK_BASE_FARE_IDR = 9000;
 const OJEK_BASE_DISTANCE_M = 4000;
 const OJEK_PER_KM_IDR = 2500;
@@ -78,10 +59,6 @@ function makeLegId() {
   return crypto.randomUUID();
 }
 
-/**
- * Builds a single walk-only leg between two points using real routing
- * (or the transparent straight-line fallback inside mapService).
- */
 async function buildWalkLeg(from: GeoPoint | PlaceResult, to: GeoPoint | PlaceResult): Promise<RouteLeg> {
   const directions = await walkingDirections(from, to);
   return {
@@ -100,12 +77,6 @@ async function buildWalkLeg(from: GeoPoint | PlaceResult, to: GeoPoint | PlaceRe
   };
 }
 
-/**
- * Builds a door-to-door ojek online (ride-hailing motorbike) leg — the
- * default fallback for distances too far to walk comfortably that aren't
- * covered by a single fixed-route transit line. No walking required; the
- * driver picks up right at the origin.
- */
 async function buildOjekLeg(from: GeoPoint | PlaceResult, to: GeoPoint | PlaceResult): Promise<RouteLeg> {
   const directions = await drivingDirections(from, to);
   return {
@@ -124,14 +95,6 @@ async function buildOjekLeg(from: GeoPoint | PlaceResult, to: GeoPoint | PlaceRe
   };
 }
 
-/**
- * Builds one transit leg riding `route` from the stop nearest `from` to the
- * stop nearest `to`. Road-based modes (bus/TransJakarta) actually run on
- * streets, so a driving-car route is a real approximation of the corridor
- * they follow. Fixed-rail/waterborne modes (MRT/KRL/LRT/train/airport_rail/
- * ferry) don't follow roads at all, so a straight line between
- * stations/ports is more honest than a road-snapped one would be.
- */
 async function buildTransitLeg(
   route: TransportRoute,
   boardStop: TransportStop,
@@ -151,7 +114,7 @@ async function buildTransitLeg(
       geometryIsEstimate = driving.isEstimate;
       distanceM = driving.distanceM;
     } catch {
-      // keep the straight-line fallback set above
+
     }
   }
 
@@ -181,115 +144,6 @@ function summarizeOption(legs: RouteLeg[]): Omit<RouteOption, 'id' | 'category' 
   return { legs, totalDistanceM, totalDurationS, totalCostIdr, transfers: Math.max(transfers, 0), walkingDistanceM, modesUsed };
 }
 
-/**
-export async function generateRouteOptions(origin: PlaceResult, destination: PlaceResult): Promise<RouteOption[]> {
-  const options: RouteOption[] = [];
-  const directDistanceM = distanceMeters(origin, destination);
-
-  // Option A: direct walk.
-  const directWalk = await buildWalkLeg(origin, destination);
-  options.push({ id: makeLegId(), ...summarizeOption([directWalk]) });
-
-  // Option B: direct ojek online — always offered above a short minimum
-  // distance, since it's realistically how most medium-distance trips in
-  // Jakarta actually get made when transit doesn't line up conveniently.
-  if (directDistanceM >= OJEK_MIN_DISTANCE_M) {
-    const ojekLeg = await buildOjekLeg(origin, destination);
-    options.push({ id: makeLegId(), ...summarizeOption([ojekLeg]) });
-  }
-
-  // Option C..N: single-route transit journeys (walk -> ride -> walk).
-  const stopSearchRadiusM = directDistanceM >= LONG_TRIP_THRESHOLD_M ? STOP_SEARCH_RADIUS_LONG_M : STOP_SEARCH_RADIUS_SHORT_M;
-
-  const [nearOrigin, nearDest, allRoutes] = await Promise.all([
-    findNearbyStops(origin, stopSearchRadiusM),
-    findNearbyStops(destination, stopSearchRadiusM),
-    getAllRoutes(),
-  ]);
-
-  const nearDestRouteIds = new Set(nearDest.map((s) => s.route_id));
-  const candidateRouteIds = new Set(
-    nearOrigin.map((s) => s.route_id).filter((id): id is string => !!id && nearDestRouteIds.has(id))
-  );
-
-  for (const routeId of candidateRouteIds) {
-    const route = allRoutes.find((r) => r.id === routeId);
-    if (!route) continue;
-
-    const boardStop = nearOrigin.find((s) => s.route_id === routeId);
-    const alightStop = nearDest.find((s) => s.route_id === routeId);
-    if (!boardStop || !alightStop || boardStop.id === alightStop.id) continue;
-
-    const walkToStop = await buildWalkLeg(origin, {
-      lat: boardStop.latitude,
-      lng: boardStop.longitude,
-      label: boardStop.stop_name,
-      address: boardStop.stop_name,
-    });
-    const transitLeg = await buildTransitLeg(route, boardStop, alightStop);
-    const walkFromStop = await buildWalkLeg(
-      { lat: alightStop.latitude, lng: alightStop.longitude, label: alightStop.stop_name, address: alightStop.stop_name },
-      destination
-    );
-
-    const legs = [walkToStop, transitLeg, walkFromStop];
-    options.push({ id: makeLegId(), ...summarizeOption(legs) });
-  }
-
-  // Option: ojek to a nearby transit hub, then ride, then walk — used only
-  // when no single route directly covers both ends (candidateRouteIds is
-  // empty) but the origin is near *some* stop and the trip is long enough
-  // that a hybrid ojek+transit trip beats a long ojek-only ride on cost.
-  if (candidateRouteIds.size === 0 && directDistanceM >= LONG_TRIP_THRESHOLD_M) {
-    const nearOriginWide = await findNearbyStops(origin, 5000);
-    const nearDestWide = nearOriginWide.length > 0 ? await findNearbyStops(destination, 5000) : [];
-    const destRouteIdsWide = new Set(nearDestWide.map((s) => s.route_id));
-    const hubRouteId = nearOriginWide.map((s) => s.route_id).find((id): id is string => !!id && destRouteIdsWide.has(id));
-
-    if (hubRouteId) {
-      const route = allRoutes.find((r) => r.id === hubRouteId);
-      const boardStop = nearOriginWide.find((s) => s.route_id === hubRouteId);
-      const alightStop = nearDestWide.find((s) => s.route_id === hubRouteId);
-
-      if (route && boardStop && alightStop && boardStop.id !== alightStop.id) {
-        const ojekToHub = await buildOjekLeg(origin, {
-          lat: boardStop.latitude,
-          lng: boardStop.longitude,
-          label: boardStop.stop_name,
-          address: boardStop.stop_name,
-        });
-        const transitLeg = await buildTransitLeg(route, boardStop, alightStop);
-        const walkFromStop = await buildWalkLeg(
-          { lat: alightStop.latitude, lng: alightStop.longitude, label: alightStop.stop_name, address: alightStop.stop_name },
-          destination
-        );
-
-        const legs = [ojekToHub, transitLeg, walkFromStop];
-        options.push({ id: makeLegId(), ...summarizeOption(legs) });
-      }
-    }
-  }
-
-  return options;
-}
-
-// ------------------------------------------------------------------
-// Reusable scoring/classification service — this is what turns a flat
-// list of RouteOptions into "Cheapest / Fastest / Moderate" categories.
-// Still used by the Budget Planner. The Route Comparison screen uses the
-// purpose-built logical planner further down instead.
-// ------------------------------------------------------------------
-
-function normalize(value: number, min: number, max: number): number {
-  if (max === min) return 0;
-  return (value - min) / (max - min);
-}
-
-/**
- * Computes a balanced "moderate" score for each option (0 = best) using
- * min-max normalized cost, duration, and transfer count. Weights can be
- * tuned or later replaced by user preference weighting.
- */
 export function scoreRouteOptions(
   options: RouteOption[],
   weights: { cost: number; duration: number; transfers: number } = { cost: 0.4, duration: 0.4, transfers: 0.2 }
@@ -313,10 +167,6 @@ export function scoreRouteOptions(
   }));
 }
 
-/**
- * Classifies a set of route options into cheapest / fastest / moderate.
- * Still used by the Budget Planner.
- */
 export function classifyRouteOptions(rawOptions: RouteOption[]): RouteComparisonResult {
   if (rawOptions.length === 0) {
     return { options: [], cheapest: null, fastest: null, moderate: null };
@@ -344,21 +194,13 @@ export function classifyRouteOptions(rawOptions: RouteOption[]): RouteComparison
   };
 }
 
-// ------------------------------------------------------------------
-// Logical route planner — this is what actually powers the Route
-// Comparison screen. Instead of generating a pile of candidates and
-// labeling whichever "wins" on some score, it builds exactly three
 export type RouteCategory = 'efficient' | 'cheapest' | 'hurry';
 
 export interface LogicalRouteOption extends Omit<RouteOption, 'category'> {
   category: RouteCategory;
-  /** Short human-readable name for the category, e.g. "Efficient". */
   label: string;
-  /** One-line explanation of *why* this option earned its category. */
   description: string;
-  /** Formatted local arrival time, e.g. "14:32", computed once at generation time. */
   arrivalTime: string;
-  /** ISO timestamp of the same estimate, for callers that want to reformat it. */
   arrivalIso: string;
 }
 
@@ -379,14 +221,6 @@ const TRANSFER_WALK_RADIUS_M = 500;
 const MAX_TRANSFERS = 5;
 const MAX_CHEAPEST_STATES_EXPANDED = 120;
 
-/**
- * Builds the "Efficient" journey: the fastest-mode station reachable from
- * the origin (regardless of walking distance) whose alighting stop is a
- * comfortable walk from the destination. Bridges the first mile with ojek
- * when walking there would be uncomfortable (e.g. the classic "nearest
- * station is 5km away" case — any first-mile distance beyond
- * WALK_COMFORT_RADIUS_M triggers ojek, not just an extreme 5km+ case).
- */
 async function buildEfficientLegs(
   origin: PlaceResult,
   destination: PlaceResult,
@@ -417,8 +251,6 @@ async function buildEfficientLegs(
     const speed = MODE_SPEED_MPS[route.mode] ?? MODE_SPEED_MPS.other;
     const bestSpeed = best ? MODE_SPEED_MPS[best.route.mode] ?? MODE_SPEED_MPS.other : -1;
 
-    // Prefer the fastest mode of transport available; among equally fast
-    // modes, prefer whichever station is closer to the origin.
     if (!best || speed > bestSpeed || (speed === bestSpeed && boardDistanceM < best.boardDistanceM)) {
       best = { boardStop, alightStop, route, boardDistanceM };
     }
@@ -448,20 +280,11 @@ async function buildEfficientLegs(
   return [firstMile, transitLeg, lastMile];
 }
 
-/** Result wrapper so callers know whether a genuine transit route was found or Efficient had to fall back to plain ojek. */
 interface EfficientResult {
   legs: RouteLeg[];
-  /** true if no transit route connects these points at all, and this is really just the Hurry ojek plan. */
   usedFallback: boolean;
 }
 
-/**
- * Tries buildEfficientLegs at the normal radius, then a wider one, before
- * conceding. If no transit route connects the two points at all, Efficient
- * still has to show *something* per the "always 3 options" guarantee — it
- * falls back to the same door-to-door ojek as Hurry rather than vanishing,
- * and the caller marks the description accordingly so it stays honest.
- */
 async function buildSyntheticEfficientLegs(origin: PlaceResult, destination: PlaceResult): Promise<RouteLeg[]> {
   const totalDistanceM = distanceMeters(origin, destination);
   const transitDistM = Math.max(1000, totalDistanceM * 0.82);
@@ -560,13 +383,6 @@ interface CheapestSearchState {
   visitedRouteIds: Set<string>;
 }
 
-/**
- * Builds the "Cheapest" journey: a walk-only, transit-only multi-hop
- * search that's willing to accept more transfers and more walking in
- * exchange for the lowest total fare. Bounded BFS over (route, stop)
- * states — see MAX_TRANSFERS for the depth cap and
- * MAX_CHEAPEST_STATES_EXPANDED for the total-branching safety valve.
- */
 async function buildCheapestLegs(
   origin: PlaceResult,
   destination: PlaceResult,
@@ -611,8 +427,6 @@ async function buildCheapestLegs(
     const nextQueue: CheapestSearchState[] = [];
 
     for (const state of queue) {
-      // Can we finish from here? (i.e. this route also has a stop walkable
-      // from the destination.)
       const alightStop = destStopByRoute.get(state.atRoute.id);
       if (alightStop && alightStop.id !== state.atStop.id) {
         const transitLeg = await buildTransitLeg(state.atRoute, state.atStop, alightStop);

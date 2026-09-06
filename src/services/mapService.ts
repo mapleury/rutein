@@ -1,43 +1,19 @@
 import type { GeoPoint } from '@/types/domain.types';
 import { distanceMeters } from './locationService';
 
-/**
- * Routing/directions provider — OSRM public demo server
- * (https://router.project-osrm.org), used temporarily in place of the
- * ORS Supabase proxy because the ORS account quota was exhausted.
- *
- * No API key needed, no Supabase round-trip. This is OSRM's shared public
- * demo instance — fine for a deadline/demo tonight, but NOT meant for
- * sustained production traffic (no SLA, can rate-limit or go down without
- * notice). Swap back to the ors-proxy path once ORS quota resets or a
- * paid plan is in place — see fetchOrsDirections below for the old impl
- * to restore.
- *
- * Same two caches as before:
- *  - success cache: identical (profile, from, to) results are reused.
- *  - failure cache: a coordinate pair that just failed is assumed likely
- *    to fail again for a short window, so repeat requests skip the
- *    network and go straight to the straight-line estimate.
- *
- * Requests go through a shared throttled queue so a single search never
- * bursts the shared public server too hard.
- */
-
 const OSRM_BASE = 'https://router.project-osrm.org/route/v1';
-const AVERAGE_WALK_SPEED_MPS = 1.35; // ~4.9 km/h
+const AVERAGE_WALK_SPEED_MPS = 1.35;
 
 export interface DirectionsResult {
   distanceM: number;
   durationS: number;
-  geometry: GeoPoint[]; // decoded route as lat/lng pairs
-  isEstimate: boolean;  // true when using the straight-line fallback
+  geometry: GeoPoint[];
+  isEstimate: boolean;
 }
 
-// --- Success cache ---
 const directionsCache = new Map<string, DirectionsResult>();
 
-// --- Failure cache ---
-const FAILURE_CACHE_TTL_MS = 60000; // 1 minute
+const FAILURE_CACHE_TTL_MS = 60000;
 const failureCache = new Map<string, number>();
 
 function cacheKey(profile: string, from: GeoPoint, to: GeoPoint): string {
@@ -50,9 +26,6 @@ function recentlyFailed(key: string): boolean {
   return t !== undefined && Date.now() - t < FAILURE_CACHE_TTL_MS;
 }
 
-// --- Throttled queue ---
-// OSRM's public demo server is shared infrastructure — keep a slightly
-// wider gap than the old ORS proxy used, to be a good citizen of it.
 const MIN_GAP_MS = 400;
 let queueTail: Promise<void> = Promise.resolve();
 
@@ -65,11 +38,6 @@ function throttled<T>(fn: () => Promise<T>): Promise<T> {
   return run;
 }
 
-/**
- * OSRM profiles: 'foot' (walking), 'driving' (used here for the ojek/
- * motorbike case — OSRM has no dedicated motorbike profile, driving is
- * the closest approximation, same as before with ORS's driving-car).
- */
 async function fetchOsrmDirections(profile: 'foot' | 'driving', from: GeoPoint, to: GeoPoint) {
   const coordsPath = `${from.lng},${from.lat};${to.lng},${to.lat}`;
   const url = `${OSRM_BASE}/${profile}/${coordsPath}?overview=full&geometries=geojson`;
@@ -82,7 +50,6 @@ async function fetchOsrmDirections(profile: 'foot' | 'driving', from: GeoPoint, 
       const body = await res.json();
       if (body?.message) message = body.message;
     } catch {
-      // body wasn't JSON — keep the generic message
     }
     throw new Error(message);
   }

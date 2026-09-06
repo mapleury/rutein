@@ -32,10 +32,6 @@ export interface LongTermProjection {
   formattedMonthly: string;
 }
 
-/**
- * Realistic default candidate dataset representing real public transport
- * options in Jakarta (TransJakarta, KRL, MRT, LRT, KA Bandara, Ojek).
- */
 export const CANDIDATE_JOURNEYS: BudgetRouteCandidate[] = [
   {
     id: 'route-tj-direct',
@@ -137,10 +133,6 @@ export function calculateLongTermProjection(costPerTrip: number): LongTermProjec
   };
 }
 
-/**
- * Evaluates candidates ensuring Paling Hemat, Seimbang, and Lebih Cepat
- * return UNIQUE, distinct options whenever possible.
- */
 export function evaluateBudgetOptions(
   appliedBudget: number,
   customCandidates?: BudgetRouteCandidate[]
@@ -151,8 +143,7 @@ export function evaluateBudgetOptions(
   hasInBudgetOptions: boolean;
 } {
   const pool = (customCandidates && customCandidates.length > 0) ? customCandidates : CANDIDATE_JOURNEYS;
-  
-  // Absolute minimum fare threshold for public transit (Rp3.500)
+
   const ABSOLUTE_MIN_FARE = 3500;
   if (appliedBudget < ABSOLUTE_MIN_FARE) {
     return {
@@ -169,12 +160,10 @@ export function evaluateBudgetOptions(
   const inBudgetOptions = pool.filter((r) => r.totalCostIdr <= appliedBudget);
   const availablePool = inBudgetOptions.length > 0 ? inBudgetOptions : pool;
 
-  // 1. CHEAPEST: Lowest cost option
   const cheapestRoute = [...availablePool].sort(
     (a, b) => a.totalCostIdr - b.totalCostIdr || a.totalDurationMins - b.totalDurationMins
   )[0] || sortedByCost[0];
 
-  // 2. BALANCED: Find the best balanced route distinct from cheapest if another option exists
   const maxCost = Math.max(...pool.map((r) => r.totalCostIdr));
   const minDur = Math.min(...pool.map((r) => r.totalDurationMins));
   const maxDur = Math.max(...pool.map((r) => r.totalDurationMins));
@@ -193,7 +182,6 @@ export function evaluateBudgetOptions(
     balancedRoute = cheapestRoute;
   }
 
-  // 3. FASTEST: Fastest option fitting the applied budget (or fastest overall flagged over-budget)
   const fastestInBudget = inBudgetOptions.length > 0
     ? [...inBudgetOptions].sort((a, b) => a.totalDurationMins - b.totalDurationMins)[0]
     : null;

@@ -73,21 +73,13 @@ function getOperatorIcon(type: IndonesiaTransportType) {
 type ActiveSection = 'operators' | 'saved' | null;
 
 interface SidebarProps {
-  /** Which transport types are currently shown on the map. Map pages only. */
   activeTypes?: Set<IndonesiaTransportType>;
-  /** Toggle a transport type's visibility on the map. Map pages only. */
   onToggleType?: (type: IndonesiaTransportType) => void;
-  /** Reset the filter to show every transport type. Map pages only. */
   onShowAllTypes?: () => void;
-  /** Jump the map to a saved place. */
   onSelectSavedPlace?: (lat: number, lng: number, name?: string, address?: string) => void;
-  /** Focus the map on a specific operator's routes. Map pages only. */
   onSelectOperator?: (type: IndonesiaTransportType) => void;
-  /** Bump this to force a re-fetch of saved places (e.g. after saving one). */
   savedPlacesTrigger?: number;
-  /** Controls mobile drawer open state */
   mobileOpen?: boolean;
-  /** Callback to close mobile drawer */
   onCloseMobile?: () => void;
 }
 
@@ -108,7 +100,6 @@ export default function Sidebar({
 
   const isMapPage = MAP_ROUTES.includes(location.pathname);
 
-  // Tablet (>=768px) and Desktop default to expanded sidebar (isCollapsed: false) to match desktop
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== 'undefined' && window.innerWidth < 768
@@ -122,7 +113,6 @@ export default function Sidebar({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Auto-close mobile drawer when route changes
   useEffect(() => {
     if (onCloseMobile) onCloseMobile();
   }, [location.pathname]);
@@ -156,7 +146,6 @@ export default function Sidebar({
     };
   }, [user]);
 
-  // Close the profile popover on outside click.
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
@@ -196,7 +185,6 @@ export default function Sidebar({
 
   useEffect(() => {
     loadAllSavedPlaces();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, savedPlacesTrigger]);
 
   const handleDeleteSaved = async (e: React.MouseEvent, placeId: string, placeName: string) => {
@@ -275,7 +263,6 @@ export default function Sidebar({
       <aside style={sidebarContainer(isCollapsed, isMobile, mobileOpen)}>
         <style>{sidebarStyles}</style>
 
-        {/* Header — logo disappears entirely when collapsed on desktop */}
         <div style={headerStyle(isCollapsed, isMobile)}>
           {(!isCollapsed || isMobile) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
@@ -330,10 +317,8 @@ export default function Sidebar({
           )}
         </div>
 
-        {/* Scrollable body — scrollbar is flipped to the left edge via rtl/ltr */}
         <div className="side-scroll-rtl" style={contentOuterStyle}>
           <div style={contentInnerStyle}>
-            {/* Primary navigation */}
             <nav style={navGroupStyle}>
               {NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
@@ -357,8 +342,6 @@ export default function Sidebar({
             </nav>
 
             <div style={dividerStyle} />
-
-            {/* Operator & transport filter — map pages only */}
             {isMapPage && (
               <div style={sectionWrapperStyle}>
                 <button
@@ -443,7 +426,7 @@ export default function Sidebar({
               </div>
             )}
 
-            {/* Saved places — available everywhere */}
+            {/* Saved places */}
             <div style={sectionWrapperStyle}>
               <button
                 type="button"
@@ -523,7 +506,7 @@ export default function Sidebar({
           </div>
         </div>
 
-        {/* Profile footer — avatar treatment matches Profile.tsx */}
+        {/* Profile footer */}
         <div style={footerStyle} ref={profileRef}>
           {isProfileOpen && (!isCollapsed || isMobile) && (
             <div className="side-profile-popover" style={profilePopoverStyle}>
@@ -666,9 +649,6 @@ const sidebarStyles = `
   .side-scroll-rtl::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
 `;
 
-// ────────────────────────────────────────────────────────────────────────
-// Styles
-// ────────────────────────────────────────────────────────────────────────
 const sidebarContainer = (
   isCollapsed: boolean,
   isMobile: boolean,

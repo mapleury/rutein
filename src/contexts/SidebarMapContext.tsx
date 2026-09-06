@@ -1,17 +1,3 @@
-// contexts/SidebarMapContext.tsx
-// Bridges the map page's local state (which transport types are active,
-// which operator was picked, etc.) to the Sidebar, which now lives in
-// AppLayout instead of inside the map page.
-//
-// - Wrap your app in <SidebarMapProvider> once, above <AppLayout>.
-// - AppLayout reads the current controls with useSidebarMapControls()
-//   and forwards them to <Sidebar />.
-// - Your Dashboard/Map page calls usePublishSidebarMapControls({...})
-//   with its real state+handlers. Every other page simply never calls it,
-//   so Sidebar falls back to harmless no-op defaults — which is fine,
-//   since Sidebar only shows the operator/filter section on map routes
-//   anyway.
-
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type { IndonesiaTransportType } from '@/data/indonesiaTransportData';
 
@@ -24,7 +10,7 @@ export interface SidebarMapControls {
   savedPlacesTrigger: number;
 }
 
-const noop = () => {};
+const noop = () => { };
 
 const DEFAULT_CONTROLS: SidebarMapControls = {
   activeTypes: new Set<IndonesiaTransportType>(),
@@ -88,48 +74,27 @@ export function SidebarMapProvider({ children }: { children: React.ReactNode }) 
   );
 }
 
-/** Hook to control mobile sidebar drawer from anywhere */
 export function useMobileSidebar() {
   const { isMobileSidebarOpen, openMobileSidebar, closeMobileSidebar, toggleMobileSidebar } = useContext(SidebarMapContext);
   return { isMobileSidebarOpen, openMobileSidebar, closeMobileSidebar, toggleMobileSidebar };
 }
 
-/** Used by AppLayout to read whatever the current page has published. */
 export function useSidebarMapControls() {
   return useContext(SidebarMapContext).controls;
 }
 
-/**
- * Used by the Dashboard/Map page to publish its live map state into the
- * sidebar. Call this once near the top of that page's component, passing
- * the same values you used to pass directly as <MapSidebar /> props.
- *
- * It also resets the controls back to the harmless defaults when the map
- * page unmounts, so navigating away doesn't leave stale filters visible
- * (moot anyway, since Sidebar hides that section off the map routes).
- */
 export function usePublishSidebarMapControls(controls: SidebarMapControls) {
   const { setControls, resetControls } = useContext(SidebarMapContext);
   const controlsRef = useRef(controls);
   controlsRef.current = controls;
 
-  // Build a stable, primitive signature of the parts of `controls` that
-  // actually represent state changes. Functions and the `activeTypes` Set
-  // are recreated with a new identity on every caller render regardless
-  // of whether their contents changed, so depending on `controls` itself
-  // (or its functions/Set directly) would just reproduce the infinite
-  // render loop this hook is trying to avoid. Depending on this signature
-  // instead means the effect — and therefore setControls, and therefore
-  // the re-render it causes — only fires when something real changed.
   const activeTypesKey = Array.from(controls.activeTypes).sort().join(',');
 
   useEffect(() => {
     setControls(controlsRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTypesKey, controls.savedPlacesTrigger, setControls]);
 
   useEffect(() => {
     return () => resetControls();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

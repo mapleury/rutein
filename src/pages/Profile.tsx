@@ -172,11 +172,11 @@ const PLACE_CATEGORIES: {
   label: string;
   icon: LucideIcon;
 }[] = [
-  { value: 'home', label: 'Rumah', icon: Home },
-  { value: 'school', label: 'Sekolah', icon: GraduationCap },
-  { value: 'workplace', label: 'Kantor', icon: Briefcase },
-  { value: 'custom', label: 'Lainnya', icon: MapPin },
-];
+    { value: 'home', label: 'Rumah', icon: Home },
+    { value: 'school', label: 'Sekolah', icon: GraduationCap },
+    { value: 'workplace', label: 'Kantor', icon: Briefcase },
+    { value: 'custom', label: 'Lainnya', icon: MapPin },
+  ];
 
 const cardStyle: React.CSSProperties = {
   background: C.surface,
@@ -513,7 +513,7 @@ export default function Profile() {
           )}
         </div>
 
-        {/* Saved places — add/manage directly here */}
+        {/* Saved places */}
         <div className="profile-fade" style={{ marginBottom: 20, animationDelay: '240ms' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
             <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>Tempat tersimpan</div>

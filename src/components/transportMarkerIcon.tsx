@@ -33,18 +33,9 @@ const TRANSPORT_TYPE_ICON: Record<IndonesiaTransportType, IconComponent> = {
 
 interface Props {
   type: IndonesiaTransportType;
-  /** Slightly larger + a highlight ring when the marker is hovered/selected. */
   highlighted?: boolean;
 }
 
-/**
- * Renders a transport-type marker as a live React element, meant to sit
- * inside a react-map-gl <Marker>. MapLibre markers (unlike Leaflet's
- * L.DivIcon) accept real JSX children directly, so there's no need to
- * pre-render icons to an HTML string and hand that to an imperative API —
- * that indirection in the old Leaflet version was the likely source of the
- * "images just don't show" flakiness. This is a plain, cacheable component.
- */
 export default function TransportMarkerIcon({ type, highlighted = false }: Props) {
   const color = TRANSPORT_TYPE_COLOR[type] ?? TRANSPORT_TYPE_COLOR.other;
   const Icon = TRANSPORT_TYPE_ICON[type] ?? TRANSPORT_TYPE_ICON.other;
@@ -70,16 +61,6 @@ export default function TransportMarkerIcon({ type, highlighted = false }: Props
     </div>
   );
 }
-
-// ------------------------------------------------------------------
-// Leg-mode styling — used on the Map page to render a computed
-// RouteOption's legs (walk / bus / ojek / etc.), as opposed to the static
-// station dataset above which is keyed by IndonesiaTransportType instead
-// of TransportMode. Two separate keyspaces because a leg's `mode` field
-// (TransportMode) and a station's `type` field (IndonesiaTransportType)
-// aren't quite the same enum — e.g. legs have 'walk' and 'ojek', stations
-// don't.
-// ------------------------------------------------------------------
 
 export const LEG_MODE_COLOR: Record<TransportMode, string> = {
   walk: '#38BDF8',
@@ -109,7 +90,6 @@ const LEG_MODE_ICON: Record<TransportMode, IconComponent> = {
   other: MapPin,
 };
 
-/** Small colored pin+icon marker for a single route leg, used on the itinerary map. */
 export function LegModeMarker({ mode }: { mode: TransportMode }) {
   const color = LEG_MODE_COLOR[mode] ?? LEG_MODE_COLOR.other;
   const Icon = LEG_MODE_ICON[mode] ?? LEG_MODE_ICON.other;

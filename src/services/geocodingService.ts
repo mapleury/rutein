@@ -3,7 +3,6 @@ import type { PlaceResult } from '@/types/domain.types';
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
 const JAKARTA_VIEWBOX = '106.5,-6.5,107.1,-5.9';
 
-// Pre-loaded popular Indonesian transit spots for instant 0ms responses
 const POPULAR_INDONESIAN_PLACES: PlaceResult[] = [
   {
     lat: -6.2917,
@@ -77,7 +76,6 @@ const POPULAR_INDONESIAN_PLACES: PlaceResult[] = [
   },
 ];
 
-// In-Memory Geocoding Cache for 0ms repeated searches
 const placeCache = new Map<string, PlaceResult[]>();
 
 const MIN_GAP_MS = 800;
@@ -106,7 +104,6 @@ export async function searchPlaces(query: string, limit = 6): Promise<PlaceResul
   if (!query || query.trim().length < 2) return [];
   const q = query.trim().toLowerCase();
 
-  // 1. Instant check popular pre-loaded places (0ms)
   const popularMatches = POPULAR_INDONESIAN_PLACES.filter(
     (p) => p.label.toLowerCase().includes(q) || p.address.toLowerCase().includes(q)
   );
@@ -114,7 +111,6 @@ export async function searchPlaces(query: string, limit = 6): Promise<PlaceResul
     return popularMatches.slice(0, limit);
   }
 
-  // 2. Instant check in-memory cache (0ms)
   if (placeCache.has(q)) {
     return placeCache.get(q)!.slice(0, limit);
   }
@@ -147,7 +143,6 @@ export async function searchPlaces(query: string, limit = 6): Promise<PlaceResul
     }
     return results;
   } catch (err) {
-    // If network fetch fails, fallback to best matching popular spot
     return POPULAR_INDONESIAN_PLACES.slice(0, limit);
   }
 }

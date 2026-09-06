@@ -5,7 +5,7 @@ import type { RouteOption } from '@/types/domain.types';
 
 export interface BudgetCalculationInput {
   travelPeriod: TravelPeriod;
-  tripsPerPeriod: number; // e.g. 2 for a daily round trip
+  tripsPerPeriod: number;
   routeOption: RouteOption;
 }
 
@@ -17,14 +17,9 @@ export interface BudgetCalculationResult {
 }
 
 const DAYS_PER_WEEK = 7;
-const WORK_DAYS_PER_WEEK = 5; // assume commute-style usage on weekdays
+const WORK_DAYS_PER_WEEK = 5;
 const WEEKS_PER_MONTH = 4.345;
 
-/**
- * Pure calculation function — reusable by both the Budget Planner screen
- * and (optionally) a future recommendation feature. No I/O here so it's
- * easy to unit test.
- */
 export function calculateBudget({ travelPeriod, tripsPerPeriod, routeOption }: BudgetCalculationInput): BudgetCalculationResult {
   const costPerTrip = routeOption.totalCostIdr;
 

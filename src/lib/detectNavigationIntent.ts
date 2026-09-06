@@ -3,11 +3,6 @@ export interface DetectedNavigationIntent {
   destinationQuery: string | null;
 }
 
-/**
- * Extracts a destination phrase from natural language messages in both
- * Indonesian and English. (e.g. "mau ke South Quarter" -> "South Quarter",
- * "naik apa ke Lotte Mart Fatmawati" -> "Lotte Mart Fatmawati", "South Quarter deh" -> "South Quarter").
- */
 const ROUTE_TRIGGER_PATTERNS: RegExp[] = [
   // Indonesian patterns
   /(?:mau|ingin|rute|cara|bagaimana cara|naik apa|naik apa ke|arah)\s+(?:ke|menuju)\s+(.+)/i,
@@ -44,8 +39,6 @@ export function detectNavigationIntent(text: string): DetectedNavigationIntent {
     }
   }
 
-  // Fallback: If user inputs a direct location query like "South Quarter" or "Lotte Mart Fatmawati"
-  // (2 words or more, or noun phrase), treat it as a direct route request!
   if (trimmed.length >= 3 && !trimmed.endsWith('?')) {
     return { isRouteRequest: true, destinationQuery: trimmed };
   }

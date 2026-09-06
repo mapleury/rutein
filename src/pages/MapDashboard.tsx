@@ -106,7 +106,7 @@ export default function MapDashboard() {
     if (!isGeolocationSupported()) return;
     getCurrentPosition()
       .then((point) => setUserLocation(point))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -231,39 +231,39 @@ export default function MapDashboard() {
     setActiveTypes(new Set(ALL_TRANSPORT_TYPES));
   };
 
-const OPERATOR_SCHEDULE_MOCK: Record<
-  string,
-  Array<{ line: string; departure: string; estimate: string; station: string }>
-> = {
-  transjakarta: [
-    { line: 'Koridor 1 (Blok M - Kota)', departure: '14:15 WIB', estimate: 'Dalam 5 mnt', station: 'Halte Bundaran HI' },
-    { line: 'Koridor 9 (Pinang Ranti - Pluit)', departure: '14:22 WIB', estimate: 'Dalam 12 mnt', station: 'Halte Semanggi' },
-  ],
-  bus: [
-    { line: 'BRT Feeder Sudirman', departure: '14:14 WIB', estimate: 'Dalam 4 mnt', station: 'Halte Tosari' },
-    { line: 'Bus Kota Reguler AC', departure: '14:25 WIB', estimate: 'Dalam 15 mnt', station: 'Halte Slipi' },
-  ],
-  krl: [
-    { line: 'Lin Bogor (Jakarta Kota - Bogor)', departure: '14:10 WIB', estimate: 'Dalam 2 mnt', station: 'Stasiun Manggarai' },
-    { line: 'Lin Cikarang (Manggarai - Cikarang)', departure: '14:18 WIB', estimate: 'Dalam 8 mnt', station: 'Stasiun Sudirman' },
-  ],
-  mrt: [
-    { line: 'Lin Utara-Selatan (Lebak Bulus - HI)', departure: '14:12 WIB', estimate: 'Dalam 4 mnt', station: 'Stasiun MRT Dukuh Atas' },
-    { line: 'Lin Utara-Selatan (HI - Lebak Bulus)', departure: '14:17 WIB', estimate: 'Dalam 9 mnt', station: 'Stasiun MRT Bundaran HI' },
-  ],
-  lrt: [
-    { line: 'LRT Jabodebek (Dukuh Atas - Harjamukti)', departure: '14:16 WIB', estimate: 'Dalam 6 mnt', station: 'Stasiun LRT Dukuh Atas' },
-    { line: 'LRT Jabodebek (Dukuh Atas - Jati Mulya)', departure: '14:24 WIB', estimate: 'Dalam 14 mnt', station: 'Stasiun LRT Cikoko' },
-  ],
-  train: [
-    { line: 'KA Argo Parahyangan (Gambir - Bandung)', departure: '14:45 WIB', estimate: 'Tersedia', station: 'Stasiun Gambir' },
-    { line: 'KA Taksaka (Gambir - Yogyakarta)', departure: '15:20 WIB', estimate: 'Tersedia', station: 'Stasiun Pasarsenen' },
-  ],
-  airport_rail: [
-    { line: 'KA Bandara Soekarno-Hatta (Manggarai - SHIA)', departure: '14:30 WIB', estimate: 'Dalam 20 mnt', station: 'Stasiun BNI City' },
-    { line: 'KA Bandara Soekarno-Hatta (SHIA - Manggarai)', departure: '15:00 WIB', estimate: 'Dalam 50 mnt', station: 'Stasiun Bandara SHIA' },
-  ],
-};
+  const OPERATOR_SCHEDULE_MOCK: Record<
+    string,
+    Array<{ line: string; departure: string; estimate: string; station: string }>
+  > = {
+    transjakarta: [
+      { line: 'Koridor 1 (Blok M - Kota)', departure: '14:15 WIB', estimate: 'Dalam 5 mnt', station: 'Halte Bundaran HI' },
+      { line: 'Koridor 9 (Pinang Ranti - Pluit)', departure: '14:22 WIB', estimate: 'Dalam 12 mnt', station: 'Halte Semanggi' },
+    ],
+    bus: [
+      { line: 'BRT Feeder Sudirman', departure: '14:14 WIB', estimate: 'Dalam 4 mnt', station: 'Halte Tosari' },
+      { line: 'Bus Kota Reguler AC', departure: '14:25 WIB', estimate: 'Dalam 15 mnt', station: 'Halte Slipi' },
+    ],
+    krl: [
+      { line: 'Lin Bogor (Jakarta Kota - Bogor)', departure: '14:10 WIB', estimate: 'Dalam 2 mnt', station: 'Stasiun Manggarai' },
+      { line: 'Lin Cikarang (Manggarai - Cikarang)', departure: '14:18 WIB', estimate: 'Dalam 8 mnt', station: 'Stasiun Sudirman' },
+    ],
+    mrt: [
+      { line: 'Lin Utara-Selatan (Lebak Bulus - HI)', departure: '14:12 WIB', estimate: 'Dalam 4 mnt', station: 'Stasiun MRT Dukuh Atas' },
+      { line: 'Lin Utara-Selatan (HI - Lebak Bulus)', departure: '14:17 WIB', estimate: 'Dalam 9 mnt', station: 'Stasiun MRT Bundaran HI' },
+    ],
+    lrt: [
+      { line: 'LRT Jabodebek (Dukuh Atas - Harjamukti)', departure: '14:16 WIB', estimate: 'Dalam 6 mnt', station: 'Stasiun LRT Dukuh Atas' },
+      { line: 'LRT Jabodebek (Dukuh Atas - Jati Mulya)', departure: '14:24 WIB', estimate: 'Dalam 14 mnt', station: 'Stasiun LRT Cikoko' },
+    ],
+    train: [
+      { line: 'KA Argo Parahyangan (Gambir - Bandung)', departure: '14:45 WIB', estimate: 'Tersedia', station: 'Stasiun Gambir' },
+      { line: 'KA Taksaka (Gambir - Yogyakarta)', departure: '15:20 WIB', estimate: 'Tersedia', station: 'Stasiun Pasarsenen' },
+    ],
+    airport_rail: [
+      { line: 'KA Bandara Soekarno-Hatta (Manggarai - SHIA)', departure: '14:30 WIB', estimate: 'Dalam 20 mnt', station: 'Stasiun BNI City' },
+      { line: 'KA Bandara Soekarno-Hatta (SHIA - Manggarai)', departure: '15:00 WIB', estimate: 'Dalam 50 mnt', station: 'Stasiun Bandara SHIA' },
+    ],
+  };
 
   const handleSelectSavedPlace = (lat: number, lng: number, name?: string, address?: string) => {
     setSelectedOperatorForSchedule(null);
@@ -333,7 +333,7 @@ const OPERATOR_SCHEDULE_MOCK: Record<
           address: placeAddr,
           latitude: selectedPlace.lat,
           longitude: selectedPlace.lng,
-        }).catch(() => {});
+        }).catch(() => { });
       }
 
       setSavedPlacesTrigger((prev) => prev + 1);
@@ -405,13 +405,13 @@ const OPERATOR_SCHEDULE_MOCK: Record<
 
   const routeGeoJson = directions
     ? {
-        type: 'Feature' as const,
-        properties: {},
-        geometry: {
-          type: 'LineString' as const,
-          coordinates: directions.geometry.map((p) => [p.lng, p.lat]),
-        },
-      }
+      type: 'Feature' as const,
+      properties: {},
+      geometry: {
+        type: 'LineString' as const,
+        coordinates: directions.geometry.map((p) => [p.lng, p.lat]),
+      },
+    }
     : null;
 
   return (
@@ -466,7 +466,6 @@ const OPERATOR_SCHEDULE_MOCK: Record<
           onShowAllTypes={showAllTypes}
         />
 
-        {/* Top-Right Disruption Warning Notification Banner */}
         {selectedPlace && showRouteDisruptionNotif && activeDisruptionsForRoute.length > 0 && (
           <div
             className="map-route-disruption-banner"
@@ -546,7 +545,6 @@ const OPERATOR_SCHEDULE_MOCK: Record<
           </div>
         )}
 
-        {/* 3. Right Floating Point Controls */}
         <MapPointControls
           onZoomIn={() => mapRef.current?.zoomIn()}
           onZoomOut={() => mapRef.current?.zoomOut()}
@@ -621,7 +619,6 @@ const OPERATOR_SCHEDULE_MOCK: Record<
               </button>
             </div>
 
-            {/* 2 Upcoming Schedule Items or Empty State */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
               {(() => {
                 const items = OPERATOR_SCHEDULE_MOCK[selectedOperatorForSchedule];
@@ -726,7 +723,6 @@ const OPERATOR_SCHEDULE_MOCK: Record<
           style={{ width: '100%', height: '100%' }}
         >
 
-          {/* Render Route Line if directions available */}
           {!itineraryOption && routeGeoJson && (
             <Source id="single-route" type="geojson" data={routeGeoJson}>
               <Layer
@@ -752,7 +748,6 @@ const OPERATOR_SCHEDULE_MOCK: Record<
             </Source>
           )}
 
-          {/* Multi-leg itinerary rendering if passed */}
           {itineraryOption &&
             itineraryOption.legs.map((leg, i) => {
               const coords = legCoordinates(leg);

@@ -5,39 +5,14 @@ import {
   type IndonesiaTransportType,
 } from './indonesiaTransportData';
 
-/**
- * Precise-as-possible mock daily schedules, generated from the curated
- * station/line dataset in indonesiaTransportData.ts.
- *
- * PROVENANCE: no live GTFS/AVL feed is wired up (see the provenance note
- * in indonesiaTransportData.ts for why), so exact departure times can't be
- * pulled from a real source. Instead, each transport mode is modeled with
- * realistic *published* operating hours and headway (gap between
- * departures) ranges, generated deterministically for "today" — this is a
- * faithful approximation of how these systems actually run, not literal
- * live data. Fixed-interval modes (TransJakarta, MRT, LRT, KRL, city BRT,
- * ferry, airport rail) use headway generation with shorter gaps during
- * peak hours (06:00-09:00, 16:00-19:00). Intercity trains run far fewer
- * services per day, so they use a fixed departure list instead of headway.
- * Terminal/other entries are hubs, not a single line, so no departure
- * times are generated for them.
- */
-
-// ------------------------------------------------------------------
-// Routes: every line grouped into an ordered sequence of stops, the same
-// grouping logic used by the Supabase seed script (type::line as the key,
-// array order == geographic sequence, since the source data lists each
-// line's stations in real order already).
-// ------------------------------------------------------------------
 
 export interface RouteInfo {
-  key: string; // `${type}::${line}`
+  key: string;
   type: IndonesiaTransportType;
   line: string;
-  stops: IndonesiaTransportLocation[]; // ordered
+  stops: IndonesiaTransportLocation[];
   originLabel: string;
   destinationLabel: string;
-  /** false for single-stop groupings (e.g. one-off ferry/airport-rail hubs) — no meaningful direction to schedule. */
   hasDirections: boolean;
 }
 
@@ -77,16 +52,11 @@ export function getRouteForStation(stationId: string): RouteInfo | null {
   return routeByStationId.get(stationId) ?? null;
 }
 
-// ------------------------------------------------------------------
-// Per-mode operating pattern
-// ------------------------------------------------------------------
-
 type ModeSchedulePattern =
   | { kind: 'headway'; startHour: number; endHour: number; peakHeadwayMin: number; offpeakHeadwayMin: number }
   | { kind: 'fixed'; times: string[] }
   | { kind: 'none' };
 
-// Peak windows, in minutes-since-midnight: 06:00-09:00 and 16:00-19:00.
 const PEAK_WINDOWS: [number, number][] = [
   [6 * 60, 9 * 60],
   [16 * 60, 19 * 60],
@@ -109,7 +79,6 @@ const MODE_PATTERN: Record<IndonesiaTransportType, ModeSchedulePattern> = {
   other: { kind: 'none' },
 };
 
-/** Real fare estimates by mode — flat/tiered fares as currently published, not distance-computed. */
 export const FARE_ESTIMATE: Record<IndonesiaTransportType, string> = {
   transjakarta: 'Rp3.500 (flat)',
   mrt: 'Rp3.000 + Rp1.000/station (max ~Rp14.000)',
@@ -141,10 +110,6 @@ function generateHeadwayTimes(startHour: number, endHour: number, peakHeadwayMin
   return times;
 }
 
-// ------------------------------------------------------------------
-// Schedule entries
-// ------------------------------------------------------------------
-
 export type DepartureStatus = 'on_time' | 'delayed' | 'cancelled';
 export type Direction = 'outbound' | 'inbound';
 
@@ -156,9 +121,9 @@ export interface ScheduleEntry {
   line: string;
   direction: Direction;
   directionLabel: string;
-  time: string; // HH:mm, today
+  time: string;
   status: DepartureStatus;
-  headwayMin: number | null; // null for fixed-departure modes (intercity trains)
+  headwayMin: number | null;
 }
 
 function randomStatus(): DepartureStatus {
@@ -168,7 +133,6 @@ function randomStatus(): DepartureStatus {
   return 'on_time';
 }
 
-/** Full day's scheduled departures (both directions) for a single station. Empty for terminal/other or single-stop routes. */
 export function getFullDaySchedule(stationId: string): ScheduleEntry[] {
   const station = INDONESIA_TRANSPORT_DATA.find((s) => s.id === stationId);
   const route = getRouteForStation(stationId);
@@ -221,7 +185,6 @@ export interface UpcomingDeparture extends ScheduleEntry {
   humanText: string;
 }
 
-/** Next `limit` departures (across both directions) from the current time of day, merged and sorted. */
 export function getUpcomingDepartures(stationId: string, from: Date = new Date(), limit = 6): UpcomingDeparture[] {
   const nowMinutes = from.getHours() * 60 + from.getMinutes();
   const today = getFullDaySchedule(stationId);
@@ -238,16 +201,14 @@ export function getUpcomingDepartures(stationId: string, from: Date = new Date()
         entry.status === 'cancelled'
           ? 'Service cancelled'
           : minutesAway <= 1
-          ? 'Arriving now'
-          : minutesAway <= 5
-          ? `Coming in ${minutesAway} minutes`
-          : minutesAway <= 15
-          ? `Arriving in ${minutesAway} minutes`
-          : `Wait around ${minutesAway} minutes`,
+            ? 'Arriving now'
+            : minutesAway <= 5
+              ? `Coming in ${minutesAway} minutes`
+              : minutesAway <= 15
+                ? `Arriving in ${minutesAway} minutes`
+                : `Wait around ${minutesAway} minutes`,
     }));
 }
-
-/** Groups a full day's schedule by direction, then by hour — for compact rendering instead of one row per departure. */
 export function groupScheduleByDirectionAndHour(entries: ScheduleEntry[]): Record<Direction, Record<string, ScheduleEntry[]>> {
   const result: Record<Direction, Record<string, ScheduleEntry[]>> = { outbound: {}, inbound: {} };
   for (const entry of entries) {
