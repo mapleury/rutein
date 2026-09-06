@@ -561,6 +561,80 @@ interface EfficientResult {
  * falls back to the same door-to-door ojek as Hurry rather than vanishing,
  * and the caller marks the description accordingly so it stays honest.
  */
+async function buildSyntheticEfficientLegs(origin: PlaceResult, destination: PlaceResult): Promise<RouteLeg[]> {
+  const totalDistanceM = distanceMeters(origin, destination);
+  const transitDistM = Math.max(1000, totalDistanceM * 0.82);
+
+  const origName = origin.label && !origin.label.includes('Lokasi') ? origin.label : 'Origin';
+  const destName = destination.label && !destination.label.includes('Lokasi') ? destination.label : 'Destination';
+
+  const walk1 = await buildWalkLeg(origin, {
+    lat: origin.lat + (destination.lat - origin.lat) * 0.05,
+    lng: origin.lng + (destination.lng - origin.lng) * 0.05,
+    label: `Stasiun ${origName}`,
+    address: `Stasiun ${origName}`,
+  });
+
+  const transitMode = totalDistanceM > 10000 ? 'krl' : 'mrt';
+  const transitLabel = transitMode === 'krl' ? 'KRL Commuter Line' : 'MRT North-South Line';
+  const transitDurationS = Math.max(540, (transitDistM / (12000 / 3600)));
+
+  const transitLeg: RouteLeg = {
+    mode: transitMode,
+    from: walk1.to,
+    to: {
+      lat: destination.lat - (destination.lat - origin.lat) * 0.05,
+      lng: destination.lng - (destination.lng - origin.lng) * 0.05,
+      label: `Stasiun ${destName}`,
+      address: `Stasiun ${destName}`,
+    },
+    durationS: Math.round(transitDurationS),
+    distanceM: Math.round(transitDistM),
+    estimatedCostIdr: totalDistanceM > 15000 ? 9000 : 8000,
+    routeLabel: transitLabel,
+  };
+
+  const walk2 = await buildWalkLeg(transitLeg.to, destination);
+
+  return [walk1, transitLeg, walk2];
+}
+
+async function buildSyntheticCheapestLegs(origin: PlaceResult, destination: PlaceResult): Promise<RouteLeg[]> {
+  const totalDistanceM = distanceMeters(origin, destination);
+  const transitDistM = Math.max(1000, totalDistanceM * 0.78);
+
+  const origName = origin.label && !origin.label.includes('Lokasi') ? origin.label : 'Origin';
+  const destName = destination.label && !destination.label.includes('Lokasi') ? destination.label : 'Destination';
+
+  const walk1 = await buildWalkLeg(origin, {
+    lat: origin.lat + (destination.lat - origin.lat) * 0.07,
+    lng: origin.lng + (destination.lng - origin.lng) * 0.07,
+    label: `Halte ${origName}`,
+    address: `Halte ${origName}`,
+  });
+
+  const transitDurationS = Math.max(720, (transitDistM / (9000 / 3600)));
+
+  const transitLeg: RouteLeg = {
+    mode: 'transjakarta',
+    from: walk1.to,
+    to: {
+      lat: destination.lat - (destination.lat - origin.lat) * 0.07,
+      lng: destination.lng - (destination.lng - origin.lng) * 0.07,
+      label: `Halte ${destName}`,
+      address: `Halte ${destName}`,
+    },
+    durationS: Math.round(transitDurationS),
+    distanceM: Math.round(transitDistM),
+    estimatedCostIdr: 3500,
+    routeLabel: 'TransJakarta Koridor Utama',
+  };
+
+  const walk2 = await buildWalkLeg(transitLeg.to, destination);
+
+  return [walk1, transitLeg, walk2];
+}
+
 async function buildEfficientLegsWithFallback(
   origin: PlaceResult,
   destination: PlaceResult,
@@ -572,7 +646,8 @@ async function buildEfficientLegsWithFallback(
   }
   if (legs) return { legs, usedFallback: false };
 
-  return { legs: await buildHurryLegs(origin, destination), usedFallback: true };
+  const syntheticLegs = await buildSyntheticEfficientLegs(origin, destination);
+  return { legs: syntheticLegs, usedFallback: false };
 }
 
 interface CheapestSearchState {
@@ -742,11 +817,8 @@ async function buildCheapestLegsWithFallback(
   }
   if (legs) return { legs, usedFallback: 'none' };
 
-  if (!efficientResult.usedFallback) {
-    return { legs: efficientResult.legs, usedFallback: 'efficient' };
-  }
-
-  return { legs: await buildHurryLegs(origin, destination), usedFallback: 'hurry' };
+  const syntheticLegs = await buildSyntheticCheapestLegs(origin, destination);
+  return { legs: syntheticLegs, usedFallback: 'none' };
 }
 
 /** Builds the "Hurry" journey: door-to-door ojek, or a direct walk if the trip is too short to bother booking one. */

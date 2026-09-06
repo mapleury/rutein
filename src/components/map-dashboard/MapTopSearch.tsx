@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, SlidersHorizontal, ArrowUpDown, X, Navigation, Footprints, Car, DollarSign, Check } from 'lucide-react';
+import { Search, SlidersHorizontal, ArrowUpDown, X, Navigation, Footprints, Car, Check } from 'lucide-react';
 import { searchPlaces, debounce } from '@/services/geocodingService';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TRANSPORT_TYPE_LABELS, type IndonesiaTransportType } from '@/data/indonesiaTransportData';
@@ -253,31 +253,7 @@ export default function MapTopSearch({
               </div>
             </div>
 
-            {/* Compare Route / Budget Plan Efficient */}
-            <div style={{ ...filterGroupStyle, marginTop: 12 }}>
-              <label style={filterLabelStyle}>Compare Route / Budget Plan</label>
-              <div style={filterBtnRow}>
-                <button
-                  style={filterChoiceBtn(budgetPreference === 'efficient')}
-                  onClick={() => onChangeBudgetPreference('efficient')}
-                >
-                  <DollarSign size={14} />
-                  <span>Paling Efisien</span>
-                </button>
-                <button
-                  style={filterChoiceBtn(budgetPreference === 'cheapest')}
-                  onClick={() => onChangeBudgetPreference('cheapest')}
-                >
-                  <span>Paling Murah</span>
-                </button>
-                <button
-                  style={filterChoiceBtn(budgetPreference === 'fastest')}
-                  onClick={() => onChangeBudgetPreference('fastest')}
-                >
-                  <span>Paling Cepat</span>
-                </button>
-              </div>
-            </div>
+
 
             {/* Map Transport Marker Filter */}
             {onToggleType && (

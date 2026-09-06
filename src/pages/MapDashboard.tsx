@@ -702,16 +702,12 @@ const OPERATOR_SCHEDULE_MOCK: Record<
           </div>
         ) : (
           <MapRouteDetailBar
+            origin={userLocation || { lat: -6.2088, lng: 106.8456, label: 'Lokasi Saya' }}
             destination={selectedPlace}
             directions={directions}
             loading={loadingDirections}
             travelMode={travelMode}
             budgetPreference={budgetPreference}
-            onOpenDetails={() => {
-              if (selectedPlace) {
-                navigate('/routes', { state: { destination: selectedPlace } });
-              }
-            }}
             onOpenPreview={() => {
               if (selectedPlace) {
                 setStreetViewPoint({ lat: selectedPlace.lat, lng: selectedPlace.lng });
