@@ -85,30 +85,29 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 🔗 **[Kunjungi Website](https://[URL_DEMO])**
 
 ### Screenshot Aplikasi
-
 <div align="center">
-  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/docs/Landing-Page.png" alt="Landing Page" width="100%"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Landing-Page.png" alt="Landing Page" width="100%"/>
   <p><em>Landing Page - Perkenalan RUTEIN</em></p>
 
-  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/docs/Login-Page.png" alt="Login Page" width="100%"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Login-Page.png" alt="Login Page" width="100%"/>
   <p><em>Login/Sign In - Masuk ke akun RUTEIN</em></p>
 
-  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/docs/Map-Dashboard-Page.png" alt="Dashboard & Map" width="100%"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Map-Dashboard-Page.png" alt="Dashboard & Map" width="100%"/>
   <p><em>Dashboard & Peta Interaktif - Titik awal perencanaan perjalanan</em></p>
 
-  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/docs/Schedule-Page.png" alt="Transport Schedule" width="100%"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Schedule-Page.png" alt="Transport Schedule" width="100%"/>
   <p><em>Transport Schedule - Jadwal keberangkatan real-time</em></p>
 
-  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/docs/Disruption-Page.png" alt="Disruption Alerts" width="100%"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Disruption-Page.png" alt="Disruption Alerts" width="100%"/>
   <p><em>Live Disruption Alerts - Info gangguan lalu lintas</em></p>
 
-  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/docs/Budget-Page.png" alt="Budget Planner" width="100%"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Budget-Page.png" alt="Budget Planner" width="100%"/>
   <p><em>Budget Planner - Estimasi biaya transportasi</em></p>
 
-  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/docs/Profile-Page.png" alt="Profile Page" width="100%"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Profile-Page.png" alt="Profile Page" width="100%"/>
   <p><em>Profile - Preferensi & tempat favorit</em></p>
 
-  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/docs/Chatbot-Page.png" alt="Confused Mode" width="100%"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Chatbot-Page.png" alt="Confused Mode" width="100%"/>
   <p><em>Confused Mode - Asisten navigasi berbasis AI</em></p>
 </div>
 
