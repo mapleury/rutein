@@ -510,7 +510,8 @@ export function Login() {
       return 'Alamat email wajib diisi.';
     }
 
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const emailPattern =
+  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(trimmedEmail)) {
       return 'Format email tidak valid (contoh: nama@gmail.com).';
     }
@@ -543,23 +544,31 @@ export function Login() {
         ? await signIn(email.trim(), password)
         : await signUp(email.trim(), password, fullName.trim());
 
-    if (result.error) {
-      setSubmitting(false);
-      setError(translateAuthError(result.error.message, mode));
-      return;
-    }
+   if (result.error) {
+  console.error('=== SUPABASE AUTH ERROR ===');
+  console.error('message:', result.error.message);
+  console.error('status:', result.error.status);
+  console.error('code:', result.error.code);
+  console.error('full error:', result.error);
 
-    if (mode === 'signup') {
-      setSubmitting(false);
-      if (!result.session) {
-        setNotice('Akun berhasil dibuat. Cek email kamu untuk konfirmasi sebelum masuk.');
-        return;
-      }
-      // Brand-new account — always send straight to onboarding.
-      navigate('/onboarding/transport');
-      return;
-    }
+  setSubmitting(false);
 
+  // TEMPORARY: show the actual Supabase error
+  setError(result.error.message);
+
+  return;
+}
+if (mode === 'signup') {
+  setSubmitting(false);
+
+  if (!result.session) {
+    setNotice('Akun berhasil dibuat. Silakan masuk.');
+    return;
+  }
+
+  navigate('/onboarding/transport');
+  return;
+}
     // Sign in: only send returning users through onboarding if they
     // genuinely haven't finished it yet (checked against the real
     // `user_preferences.onboarding_completed_at` column, not client

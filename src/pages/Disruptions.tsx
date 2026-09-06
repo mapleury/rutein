@@ -31,8 +31,8 @@ const bodyFont: React.CSSProperties = { fontFamily: "'Aileron', sans-serif" };
 const sharedStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Aileron:wght@400;600;700&display=swap');
 
-  @keyframes pageFadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-  .page-fade { opacity: 0; animation: pageFadeDown 0.5s ease forwards; }
+  @keyframes pageFadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .page-fade { opacity: 0; animation: pageFadeUp 0.5s ease forwards; }
 
   .filter-chip { transition: all 0.15s ease; cursor: pointer; }
   .filter-chip:hover { opacity: 0.85; transform: translateY(-1px); }

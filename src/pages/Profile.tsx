@@ -56,8 +56,8 @@ const bodyFont: React.CSSProperties = { fontFamily: "'Aileron', sans-serif" };
 const sharedStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Aileron:wght@400;600;700&display=swap');
 
-  @keyframes profileFadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-  .profile-fade { opacity: 0; animation: profileFadeDown 0.5s ease forwards; }
+  @keyframes profileFadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .profile-fade { opacity: 0; animation: profileFadeUp 0.5s ease forwards; }
 
   .profile-input::placeholder { color: #9A9A9A; }
   .profile-input:focus { outline: none; border-color: ${C.primary}; }
