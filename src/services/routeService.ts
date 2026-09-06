@@ -143,6 +143,10 @@ function summarizeOption(legs: RouteLeg[]): Omit<RouteOption, 'id' | 'category' 
 
   return { legs, totalDistanceM, totalDurationS, totalCostIdr, transfers: Math.max(transfers, 0), walkingDistanceM, modesUsed };
 }
+function normalize(value: number, min: number, max: number): number {
+  if (max === min) return 0;
+  return (value - min) / (max - min);
+}
 
 export function scoreRouteOptions(
   options: RouteOption[],
