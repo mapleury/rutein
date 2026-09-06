@@ -117,7 +117,7 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 
 ### Video Demo
 
-📹 **[Link Video Demo](https://www.youtube.com/watch?v=joQlO1Zzllo)** _(opsional)_
+📹 **[Link Video Demo](https://www.youtube.com/watch?v=joQlO1Zzllo)** 
 
 ---
 
