@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { SidebarMapProvider, useSidebarMapControls, useMobileSidebar } from '@/contexts/SidebarMapContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -18,7 +18,6 @@ import ConfusedMode from '@/pages/ConfusedMode';
 import SavedPlaces from '@/pages/SavedPlaces';
 import Profile from '@/pages/Profile';
 
-import { useLocation } from 'react-router-dom';
 import { MobileTopBar } from '@/components/MobileNav';
 
 const MAP_PATHS = ['/dashboard', '/map', '/'];
@@ -64,6 +63,19 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function LogoutHandler() {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    signOut().finally(() => {
+      navigate('/beranda', { replace: true });
+    });
+  }, [signOut, navigate]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -74,6 +86,8 @@ export default function App() {
               <Route path="/" element={<AppLayout><MapDashboard /></AppLayout>} />
               <Route path="/beranda" element={<LandingPage />} />
               <Route path="/landing" element={<Navigate to="/beranda" replace />} />
+              <Route path="/logout" element={<LogoutHandler />} />
+              <Route path="/keluar" element={<LogoutHandler />} />
               <Route path="/login" element={<Login />} />
               <Route path="/daftar" element={<Register />} />
               <Route path="/register" element={<Navigate to="/daftar" replace />} />

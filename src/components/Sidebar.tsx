@@ -265,8 +265,9 @@ export default function Sidebar({
 
   async function handleSignOut() {
     setIsProfileOpen(false);
+    if (isMobile && onCloseMobile) onCloseMobile();
     await signOut();
-    navigate('/login');
+    navigate('/beranda');
   }
 
   const NAV_ITEMS = [
