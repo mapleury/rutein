@@ -48,6 +48,7 @@ import {
   Wallet,
   AlertTriangle,
   Sparkles,
+  X,
 } from 'lucide-react';
 import {
   TRANSPORT_TYPE_LABELS,
@@ -111,6 +112,10 @@ interface SidebarProps {
   onSelectOperator?: (type: IndonesiaTransportType) => void;
   /** Bump this to force a re-fetch of saved places (e.g. after saving one). */
   savedPlacesTrigger?: number;
+  /** Controls mobile drawer open state */
+  mobileOpen?: boolean;
+  /** Callback to close mobile drawer */
+  onCloseMobile?: () => void;
 }
 
 export default function Sidebar({
@@ -120,6 +125,8 @@ export default function Sidebar({
   onSelectSavedPlace,
   onSelectOperator,
   savedPlacesTrigger = 0,
+  mobileOpen = false,
+  onCloseMobile,
 }: SidebarProps) {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
@@ -128,7 +135,25 @@ export default function Sidebar({
 
   const isMapPage = MAP_ROUTES.includes(location.pathname);
 
+  // Tablet (>=768px) and Desktop default to expanded sidebar (isCollapsed: false) to match desktop
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 768
+  );
+
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 768);
+    }
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Auto-close mobile drawer when route changes
+  useEffect(() => {
+    if (onCloseMobile) onCloseMobile();
+  }, [location.pathname]);
+
   const [activeSection, setActiveSection] = useState<ActiveSection>(
     isMapPage ? 'operators' : null
   );
@@ -259,79 +284,128 @@ export default function Sidebar({
       : location.pathname === to || location.pathname.startsWith(to + '/');
 
   return (
-    <aside style={sidebarContainer(isCollapsed)}>
-      <style>{sidebarStyles}</style>
+    <>
+      {isMobile && mobileOpen && (
+        <div
+          onClick={onCloseMobile}
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.45)',
+            backdropFilter: 'blur(3px)',
+            WebkitBackdropFilter: 'blur(3px)',
+            zIndex: 9998,
+            animation: 'sideFadeIn 0.2s ease forwards',
+          }}
+        />
+      )}
+      <aside style={sidebarContainer(isCollapsed, isMobile, mobileOpen)}>
+        <style>{sidebarStyles}</style>
 
-      {/* Header — logo disappears entirely when collapsed */}
-      <div style={headerStyle(isCollapsed)}>
-        {!isCollapsed && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <Link to="/dashboard" className="side-logo-link" title="Rutein Dashboard">
-              <img
-                src={logoRuteinSvg}
-                alt="Rutein"
-                style={{ marginLeft: 10, height: 22, width: 'auto', filter: 'brightness(0) invert(1)', flexShrink: 0 }}
-              />
-            </Link>
-            <LanguageSwitcher variant="white" size="sm" style={{ marginLeft: 40 }} />
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={() => setIsCollapsed((prev) => !prev)}
-          className="side-toggle-btn"
-          style={toggleBtnStyle(isCollapsed)}
-          title={isCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-        >
-          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-        </button>
-      </div>
-
-      {/* Scrollable body — scrollbar is flipped to the left edge via rtl/ltr */}
-      <div className="side-scroll-rtl" style={contentOuterStyle}>
-        <div style={contentInnerStyle}>
-          {/* Primary navigation */}
-          <nav style={navGroupStyle}>
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const active = isPathActive(item.to);
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className="side-nav-item"
-                  style={navItemStyle(active)}
-                  title={item.label}
-                >
-                  <Icon size={17} strokeWidth={active ? 2.4 : 1.9} />
-                  {!isCollapsed && <span>{item.label}</span>}
-                </NavLink>
-              );
-            })}
-          </nav>
-
-          <div style={dividerStyle} />
-
-          {/* Operator & transport filter — map pages only */}
-          {isMapPage && (
-            <div style={sectionWrapperStyle}>
-              <button
-                type="button"
-                onClick={() => toggleSection('operators')}
-                className="side-nav-item"
-                style={sectionHeaderStyle(activeSection === 'operators' && !isCollapsed)}
-                title="Operator & Moda"
+        {/* Header — logo disappears entirely when collapsed on desktop */}
+        <div style={headerStyle(isCollapsed, isMobile)}>
+          {(!isCollapsed || isMobile) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+              <Link
+                to="/dashboard"
+                className="side-logo-link"
+                title="Rutein Dashboard"
+                onClick={() => {
+                  if (isMobile && onCloseMobile) onCloseMobile();
+                }}
               >
-                <div style={navItemLabelGroup}>
-                  <Sliders size={17} />
-                  {!isCollapsed && <span>Operator & Moda</span>}
-                </div>
-                {!isCollapsed && (
-                  <ChevronDown size={14} style={chevronStyle(activeSection === 'operators')} />
-                )}
-              </button>
+                <img
+                  src={logoRuteinSvg}
+                  alt="Rutein"
+                  style={{ marginLeft: 10, height: 22, width: 'auto', filter: 'brightness(0) invert(1)', flexShrink: 0 }}
+                />
+              </Link>
+              <LanguageSwitcher variant="white" size="sm" style={{ marginLeft: 40 }} />
+            </div>
+          )}
+          {isMobile ? (
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              style={{
+                background: 'rgba(255, 255, 255, 0.15)',
+                border: 'none',
+                borderRadius: '50%',
+                width: 32,
+                height: 32,
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                marginLeft: 'auto',
+              }}
+              aria-label="Tutup menu"
+            >
+              <X size={18} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsCollapsed((prev) => !prev)}
+              className="side-toggle-btn"
+              style={toggleBtnStyle(isCollapsed)}
+              title={isCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
+            >
+              {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            </button>
+          )}
+        </div>
 
-              {!isCollapsed && activeSection === 'operators' && (
+        {/* Scrollable body — scrollbar is flipped to the left edge via rtl/ltr */}
+        <div className="side-scroll-rtl" style={contentOuterStyle}>
+          <div style={contentInnerStyle}>
+            {/* Primary navigation */}
+            <nav style={navGroupStyle}>
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+                const active = isPathActive(item.to);
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    className="side-nav-item"
+                    style={navItemStyle(active)}
+                    title={item.label}
+                    onClick={() => {
+                      if (isMobile && onCloseMobile) onCloseMobile();
+                    }}
+                  >
+                    <Icon size={17} strokeWidth={active ? 2.4 : 1.9} />
+                    {(!isCollapsed || isMobile) && <span>{item.label}</span>}
+                  </NavLink>
+                );
+              })}
+            </nav>
+
+            <div style={dividerStyle} />
+
+            {/* Operator & transport filter — map pages only */}
+            {isMapPage && (
+              <div style={sectionWrapperStyle}>
+                <button
+                  type="button"
+                  onClick={() => toggleSection('operators')}
+                  className="side-nav-item"
+                  style={sectionHeaderStyle(activeSection === 'operators' && (!isCollapsed || isMobile))}
+                  title="Operator & Moda"
+                >
+                  <div style={navItemLabelGroup}>
+                    <Sliders size={17} />
+                    {(!isCollapsed || isMobile) && <span>Operator & Moda</span>}
+                  </div>
+                  {(!isCollapsed || isMobile) && (
+                    <ChevronDown size={14} style={chevronStyle(activeSection === 'operators')} />
+                  )}
+                </button>
+
+              {(!isCollapsed || isMobile) && activeSection === 'operators' && (
                 <div style={accordionContentStyle}>
                   <div style={treeListStyle}>
                     {ALL_TRANSPORT_TYPES.map((type) => (
@@ -339,9 +413,15 @@ export default function Sidebar({
                         <div
                           role="button"
                           tabIndex={0}
-                          onClick={() => onSelectOperator?.(type)}
+                          onClick={() => {
+                            onSelectOperator?.(type);
+                            if (isMobile && onCloseMobile) onCloseMobile();
+                          }}
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter') onSelectOperator?.(type);
+                            if (e.key === 'Enter') {
+                              onSelectOperator?.(type);
+                              if (isMobile && onCloseMobile) onCloseMobile();
+                            }
                           }}
                           className="op-tree-row"
                           style={{
@@ -397,19 +477,19 @@ export default function Sidebar({
               type="button"
               onClick={() => toggleSection('saved')}
               className="side-nav-item"
-              style={sectionHeaderStyle(activeSection === 'saved' && !isCollapsed)}
+              style={sectionHeaderStyle(activeSection === 'saved' && (!isCollapsed || isMobile))}
               title="Tempat Tersimpan"
             >
               <div style={navItemLabelGroup}>
                 <Bookmark size={17} />
-                {!isCollapsed && <span>Tempat Tersimpan</span>}
+                {(!isCollapsed || isMobile) && <span>Tempat Tersimpan</span>}
               </div>
-              {!isCollapsed && (
+              {(!isCollapsed || isMobile) && (
                 <ChevronDown size={14} style={chevronStyle(activeSection === 'saved')} />
               )}
             </button>
 
-            {!isCollapsed && activeSection === 'saved' && (
+            {(!isCollapsed || isMobile) && activeSection === 'saved' && (
               <div style={accordionContentStyle}>
                 {loadingSaved ? (
                   <div style={mutedTextStyle}>Memuat…</div>
@@ -439,9 +519,10 @@ export default function Sidebar({
                       return (
                         <div
                           key={place.id}
-                          onClick={() =>
-                            handleSelectSavedPlace(place, displayName, displayAddress || undefined)
-                          }
+                          onClick={() => {
+                            handleSelectSavedPlace(place, displayName, displayAddress || undefined);
+                            if (isMobile && onCloseMobile) onCloseMobile();
+                          }}
                           className="side-saved-item"
                           style={savedItemStyle}
                           title={`Tampilkan rute ke ${displayName}`}
@@ -472,13 +553,16 @@ export default function Sidebar({
 
       {/* Profile footer — avatar treatment matches Profile.tsx */}
       <div style={footerStyle} ref={profileRef}>
-        {isProfileOpen && !isCollapsed && (
+        {isProfileOpen && (!isCollapsed || isMobile) && (
           <div className="side-profile-popover" style={profilePopoverStyle}>
             <Link
               to="/profile"
               className="side-popover-item"
               style={popoverItemStyle}
-              onClick={() => setIsProfileOpen(false)}
+              onClick={() => {
+                setIsProfileOpen(false);
+                if (isMobile && onCloseMobile) onCloseMobile();
+              }}
             >
               <User size={15} color="#DA362A" />
               <span>Lihat profil</span>
@@ -497,7 +581,7 @@ export default function Sidebar({
 
         <button
           type="button"
-          onClick={() => (isCollapsed ? navigate('/profile') : setIsProfileOpen((p) => !p))}
+          onClick={() => (isCollapsed && !isMobile ? navigate('/profile') : setIsProfileOpen((p) => !p))}
           className="side-profile-btn"
           style={profileBtnStyle}
           title={displayName}
@@ -513,7 +597,7 @@ export default function Sidebar({
               <span style={{ fontSize: 13, fontWeight: 400, color: '#DA362A' }}>{userInitial}</span>
             )}
           </div>
-          {!isCollapsed && (
+          {(!isCollapsed || isMobile) && (
             <div style={profileTextGroup}>
               <span style={userNameStyle}>{displayName}</span>
               <span style={userSubtextStyle}>Lihat profil</span>
@@ -522,6 +606,7 @@ export default function Sidebar({
         </button>
       </div>
     </aside>
+  </>
   );
 }
 
@@ -617,28 +702,58 @@ const sidebarStyles = `
 // ────────────────────────────────────────────────────────────────────────
 // Styles
 // ────────────────────────────────────────────────────────────────────────
-const sidebarContainer = (isCollapsed: boolean): React.CSSProperties => ({
-  width: isCollapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width)',
-  minWidth: isCollapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width)',
-  height: '100vh',
-  backgroundColor: 'var(--color-sidebar, #DA362A)',
-  color: 'var(--color-sidebar-text, #FFFDF9)',
-  display: 'flex',
-  flexDirection: 'column',
-  transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-  zIndex: 'var(--z-panel)' as any,
-  boxShadow: '4px 0 16px rgba(0, 0, 0, 0.15)',
-  userSelect: 'none',
-  flexShrink: 0,
-  borderRadius: '0 24px 24px 0',
-});
+const sidebarContainer = (
+  isCollapsed: boolean,
+  isMobile: boolean,
+  mobileOpen: boolean
+): React.CSSProperties => {
+  if (isMobile) {
+    return {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      width: 280,
+      maxWidth: '84vw',
+      height: '100dvh',
+      backgroundColor: 'var(--color-sidebar, #DA362A)',
+      color: 'var(--color-sidebar-text, #FFFDF9)',
+      display: 'flex',
+      flexDirection: 'column',
+      transform: mobileOpen ? 'translateX(0)' : 'translateX(-105%)',
+      transition: 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+      zIndex: 9999,
+      boxShadow: mobileOpen ? '8px 0 32px rgba(0, 0, 0, 0.35)' : 'none',
+      userSelect: 'none',
+      flexShrink: 0,
+      borderRadius: '0 24px 24px 0',
+      visibility: mobileOpen ? 'visible' : 'hidden',
+    };
+  }
 
-const headerStyle = (isCollapsed: boolean): React.CSSProperties => ({
+  return {
+    width: isCollapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width)',
+    minWidth: isCollapsed ? 'var(--sidebar-width-collapsed)' : 'var(--sidebar-width)',
+    height: '100vh',
+    backgroundColor: 'var(--color-sidebar, #DA362A)',
+    color: 'var(--color-sidebar-text, #FFFDF9)',
+    display: 'flex',
+    flexDirection: 'column',
+    transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+    zIndex: 'var(--z-panel)' as any,
+    boxShadow: '4px 0 16px rgba(0, 0, 0, 0.15)',
+    userSelect: 'none',
+    flexShrink: 0,
+    borderRadius: '0 24px 24px 0',
+  };
+};
+
+const headerStyle = (isCollapsed: boolean, isMobile: boolean): React.CSSProperties => ({
   height: 56,
   display: 'flex',
   alignItems: 'center',
-  justifyContent: isCollapsed ? 'center' : 'space-between',
-  padding: isCollapsed ? '0 10px' : '0 14px',
+  justifyContent: isCollapsed && !isMobile ? 'center' : 'space-between',
+  padding: isCollapsed && !isMobile ? '0 10px' : '0 14px',
   borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
   flexShrink: 0,
 });

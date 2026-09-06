@@ -150,12 +150,23 @@ export default function MapRouteDetailBar({
   };
 
   return (
-    <div style={phase !== 'compact' ? expandedCardWrapperStyle : compactCardWrapperStyle}>
+    <div
+      className={`route-detail-card ${phase !== 'compact' ? 'route-detail-expanded' : 'route-detail-compact'}`}
+      style={phase !== 'compact' ? expandedCardWrapperStyle : compactCardWrapperStyle}
+    >
+      <style>{routeDetailStyles}</style>
+
+      {/* Mobile drag handle indicator */}
+      <div className="route-drag-handle" />
+
       {/* HEADER ROW */}
       <div style={headerRowStyle}>
         <div style={destinationLabelGroup}>
           <Navigation size={16} color="#DA362A" style={{ flexShrink: 0, marginTop: 2 }} />
-          <span style={phase !== 'compact' ? expandedDestinationTitleStyle : compactDestinationTitleStyle}>
+          <span
+            className={phase === 'compact' ? 'route-dest-title-compact' : ''}
+            style={phase !== 'compact' ? expandedDestinationTitleStyle : compactDestinationTitleStyle}
+          >
             via {roadName} (Menuju {destination.label})
           </span>
         </div>
@@ -397,6 +408,56 @@ export default function MapRouteDetailBar({
 }
 
 // STYLES
+const routeDetailStyles = `
+  .route-drag-handle {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    .route-drag-handle {
+      display: block;
+      width: 38px;
+      height: 4.5px;
+      background: #D1D5DB;
+      border-radius: 999px;
+      margin: 0 auto 10px auto;
+      flex-shrink: 0;
+    }
+    .route-detail-card {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 22px 22px 0 0 !important;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.22) !important;
+      z-index: 9995 !important;
+      padding: 12px 16px 24px 16px !important;
+      box-sizing: border-box !important;
+      animation: slideUpRouteMobile 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .route-detail-expanded {
+      max-height: 80dvh !important;
+      overflow-y: auto !important;
+    }
+    .route-detail-compact {
+      max-height: none !important;
+    }
+    .route-dest-title-compact {
+      max-width: calc(100vw - 110px) !important;
+    }
+  }
+
+  @keyframes slideUpRouteMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+`;
+
 const compactCardWrapperStyle: React.CSSProperties = {
   position: 'absolute',
   bottom: 20,

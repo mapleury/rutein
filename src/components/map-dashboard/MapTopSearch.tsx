@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, SlidersHorizontal, ArrowUpDown, X, Navigation, Footprints, Car, Check } from 'lucide-react';
+import { Search, SlidersHorizontal, ArrowUpDown, X, Navigation, Footprints, Car, Check, Menu } from 'lucide-react';
 import { searchPlaces, debounce } from '@/services/geocodingService';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useMobileSidebar } from '@/contexts/SidebarMapContext';
 import { TRANSPORT_TYPE_LABELS, type IndonesiaTransportType } from '@/data/indonesiaTransportData';
 import { TRANSPORT_TYPE_COLOR } from '@/components/transportMarkerIcon';
 import type { PlaceResult } from '@/types/domain.types';
@@ -32,6 +33,7 @@ export default function MapTopSearch({
   onShowAllTypes,
 }: MapTopSearchProps) {
   const { t } = useLanguage();
+  const { openMobileSidebar } = useMobileSidebar();
   const [query, setQuery] = useState('');
   const [originQuery, setOriginQuery] = useState('');
   const [results, setResults] = useState<PlaceResult[]>([]);
@@ -100,9 +102,22 @@ export default function MapTopSearch({
   };
 
   return (
-    <div style={topSearchWrapper}>
+    <div className="map-top-search-wrapper" style={topSearchWrapper}>
+      <style>{topSearchStyles}</style>
+
+      {/* Mobile Drawer Hamburger Trigger */}
+      <button
+        type="button"
+        onClick={openMobileSidebar}
+        className="map-mobile-menu-btn"
+        aria-label="Buka Menu"
+        title="Buka Menu"
+      >
+        <Menu size={20} color="#1E1E1E" />
+      </button>
+
       {/* Search Input Pill Container */}
-      <div style={searchCardStyle}>
+      <div className="map-search-card" style={searchCardStyle}>
         {!isRouteMode ? (
           /* Single Destination Search */
           <div style={singleSearchRow}>
@@ -195,7 +210,7 @@ export default function MapTopSearch({
 
         {/* Autocomplete Dropdown List */}
         {openDropdown && (results.length > 0 || loading) && (
-          <div style={dropdownStyle}>
+          <div className="map-search-dropdown" style={dropdownStyle}>
             {loading && <div style={{ padding: 10, fontSize: 12, color: '#888' }}>Mencari lokasi...</div>}
             {results.map((r) => (
               <button
@@ -216,6 +231,7 @@ export default function MapTopSearch({
       <div style={{ position: 'relative' }}>
         <button
           onClick={() => setShowFilterModal((prev) => !prev)}
+          className="map-filter-pill-btn"
           style={filterPillBtn}
           title="Filter Rute & Metrik"
         >
@@ -224,7 +240,7 @@ export default function MapTopSearch({
 
         {/* Filter Pop-up Overlay Panel */}
         {showFilterModal && (
-          <div style={filterModalStyle}>
+          <div className="map-filter-modal" style={filterModalStyle}>
             <div style={filterModalHeader}>
               <span style={{ fontSize: 13, fontWeight: 700, color: '#1E1E1E' }}>Filter Perjalanan</span>
               <button onClick={() => setShowFilterModal(false)} style={iconBtnStyle}>
@@ -304,6 +320,64 @@ export default function MapTopSearch({
 }
 
 // STYLES
+const topSearchStyles = `
+  .map-mobile-menu-btn {
+    display: none;
+  }
+  @media (max-width: 767px) {
+    .map-top-search-wrapper {
+      top: 12px !important;
+      left: 12px !important;
+      right: 12px !important;
+      gap: 8px !important;
+      max-width: none !important;
+    }
+    .map-search-card {
+      flex: 1 !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      padding: 6px 10px !important;
+    }
+    .map-mobile-menu-btn {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid #E5E5E5;
+      background: #FFFFFF;
+      box-shadow: var(--shadow-floating);
+      cursor: pointer;
+      flex-shrink: 0;
+      color: #1E1E1E;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .map-mobile-menu-btn:active {
+      transform: scale(0.96);
+    }
+    .map-filter-pill-btn {
+      width: 42px !important;
+      height: 42px !important;
+      border-radius: 14px !important;
+    }
+    .map-filter-modal {
+      position: fixed !important;
+      top: 64px !important;
+      left: 12px !important;
+      right: 12px !important;
+      width: auto !important;
+      max-width: none !important;
+      max-height: calc(100dvh - 80px) !important;
+      overflow-y: auto !important;
+      z-index: 9999 !important;
+    }
+    .map-search-dropdown {
+      max-height: 45dvh !important;
+    }
+  }
+`;
+
 const topSearchWrapper: React.CSSProperties = {
   position: 'absolute',
   top: 16,
@@ -312,6 +386,7 @@ const topSearchWrapper: React.CSSProperties = {
   display: 'flex',
   alignItems: 'flex-start',
   gap: 10,
+  maxWidth: 'calc(100vw - 32px)',
 };
 
 const searchCardStyle: React.CSSProperties = {

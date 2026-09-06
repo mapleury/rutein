@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-import { SidebarMapProvider, useSidebarMapControls } from '@/contexts/SidebarMapContext';
+import { SidebarMapProvider, useSidebarMapControls, useMobileSidebar } from '@/contexts/SidebarMapContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Sidebar from '@/components/Sidebar';
 
@@ -18,12 +18,21 @@ import ConfusedMode from '@/pages/ConfusedMode';
 import SavedPlaces from '@/pages/SavedPlaces';
 import Profile from '@/pages/Profile';
 
+import { useLocation } from 'react-router-dom';
+import { MobileTopBar } from '@/components/MobileNav';
+
+const MAP_PATHS = ['/dashboard', '/map', '/'];
+
 function AppLayout({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
   const mapControls = useSidebarMapControls();
+  const { isMobileSidebarOpen, closeMobileSidebar } = useMobileSidebar();
+  const isMap = MAP_PATHS.includes(location.pathname);
+  const isNoScrollPage = isMap || location.pathname === '/confused';
 
   return (
     <ProtectedRoute>
-      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg)', color: 'var(--color-text)' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--color-bg)', color: 'var(--color-text)', position: 'relative' }}>
         <Sidebar
           activeTypes={mapControls.activeTypes}
           onToggleType={mapControls.onToggleType}
@@ -31,8 +40,25 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           onSelectSavedPlace={mapControls.onSelectSavedPlace}
           onSelectOperator={mapControls.onSelectOperator}
           savedPlacesTrigger={mapControls.savedPlacesTrigger}
+          mobileOpen={isMobileSidebarOpen}
+          onCloseMobile={closeMobileSidebar}
         />
-        <main style={{ flex: 1, minWidth: 0, height: '100vh', overflowY: 'auto' }}>{children}</main>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, height: '100vh', overflow: 'hidden', position: 'relative' }}>
+          <MobileTopBar />
+          <main
+            className={`app-main-content ${isMap ? 'is-map' : ''} ${location.pathname === '/confused' ? 'is-confused' : ''}`}
+            style={{
+              flex: 1,
+              minWidth: 0,
+              height: '100%',
+              overflowY: isNoScrollPage ? 'hidden' : 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {children}
+          </main>
+        </div>
       </div>
     </ProtectedRoute>
   );

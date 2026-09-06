@@ -39,16 +39,25 @@ interface ContextValue {
   controls: SidebarMapControls;
   setControls: (partial: Partial<SidebarMapControls>) => void;
   resetControls: () => void;
+  isMobileSidebarOpen: boolean;
+  openMobileSidebar: () => void;
+  closeMobileSidebar: () => void;
+  toggleMobileSidebar: () => void;
 }
 
 const SidebarMapContext = createContext<ContextValue>({
   controls: DEFAULT_CONTROLS,
   setControls: noop,
   resetControls: noop,
+  isMobileSidebarOpen: false,
+  openMobileSidebar: noop,
+  closeMobileSidebar: noop,
+  toggleMobileSidebar: noop,
 });
 
 export function SidebarMapProvider({ children }: { children: React.ReactNode }) {
   const [controls, setControlsState] = useState<SidebarMapControls>(DEFAULT_CONTROLS);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const setControls = useCallback((partial: Partial<SidebarMapControls>) => {
     setControlsState((prev) => ({ ...prev, ...partial }));
@@ -58,11 +67,31 @@ export function SidebarMapProvider({ children }: { children: React.ReactNode }) 
     setControlsState(DEFAULT_CONTROLS);
   }, []);
 
+  const openMobileSidebar = useCallback(() => setIsMobileSidebarOpen(true), []);
+  const closeMobileSidebar = useCallback(() => setIsMobileSidebarOpen(false), []);
+  const toggleMobileSidebar = useCallback(() => setIsMobileSidebarOpen((prev) => !prev), []);
+
   return (
-    <SidebarMapContext.Provider value={{ controls, setControls, resetControls }}>
+    <SidebarMapContext.Provider
+      value={{
+        controls,
+        setControls,
+        resetControls,
+        isMobileSidebarOpen,
+        openMobileSidebar,
+        closeMobileSidebar,
+        toggleMobileSidebar,
+      }}
+    >
       {children}
     </SidebarMapContext.Provider>
   );
+}
+
+/** Hook to control mobile sidebar drawer from anywhere */
+export function useMobileSidebar() {
+  const { isMobileSidebarOpen, openMobileSidebar, closeMobileSidebar, toggleMobileSidebar } = useContext(SidebarMapContext);
+  return { isMobileSidebarOpen, openMobileSidebar, closeMobileSidebar, toggleMobileSidebar };
 }
 
 /** Used by AppLayout to read whatever the current page has published. */

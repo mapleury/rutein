@@ -80,11 +80,11 @@ export const translations = {
     'ai.input_placeholder': 'Tanyakan rute, tarif, atau stasiun terdekat...',
 
     // Quick Actions
-    'quick.where_am_i': '📍 Saya ada di mana sekarang?',
-    'quick.home_route': '🏠 Bagaimana cara pulang ke Rumah?',
-    'quick.office_route': '💼 Rute terbaik ke Kantor / Sekolah',
-    'quick.fastest_route': '⚡ Cari rute paling cepat',
-    'quick.cheapest_route': '💰 Cari rute paling hemat',
+    'quick.where_am_i': 'Saya ada di mana sekarang?',
+    'quick.home_route': 'Bagaimana cara pulang ke Rumah?',
+    'quick.office_route': 'Rute terbaik ke Kantor / Sekolah',
+    'quick.fastest_route': 'Cari rute paling cepat',
+    'quick.cheapest_route': 'Cari rute paling hemat',
 
     // Landing Page
     'landing.hero_title': 'Navigasi Multi-Moda Cerdas untuk Perjalananmu',
@@ -191,11 +191,11 @@ export const translations = {
     'ai.input_placeholder': 'Ask about routes, fares, or nearby stations...',
 
     // Quick Actions
-    'quick.where_am_i': '📍 Where am I right now?',
-    'quick.home_route': '🏠 How do I get back Home?',
-    'quick.office_route': '💼 Best route to Office / School',
-    'quick.fastest_route': '⚡ Find the fastest route',
-    'quick.cheapest_route': '💰 Find the cheapest route',
+    'quick.where_am_i': 'Where am I right now?',
+    'quick.home_route': 'How do I get back Home?',
+    'quick.office_route': 'Best route to Office / School',
+    'quick.fastest_route': 'Find the fastest route',
+    'quick.cheapest_route': 'Find the cheapest route',
 
     // Landing Page
     'landing.hero_title': 'Smart Multi-Modal Navigation for Your Journey',

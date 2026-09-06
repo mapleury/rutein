@@ -427,9 +427,12 @@ const OPERATOR_SCHEDULE_MOCK: Record<
 
   return (
     <div style={dashboardWrapper}>
+      <style>{dashboardStyles}</style>
+
       {/* Dynamic Toast Alert Notification */}
       {toast && (
         <div
+          className="map-toast-alert"
           style={{
             position: 'fixed',
             top: 20,
@@ -477,6 +480,7 @@ const OPERATOR_SCHEDULE_MOCK: Record<
         {/* Top-Right Disruption Warning Notification Banner */}
         {selectedPlace && showRouteDisruptionNotif && activeDisruptionsForRoute.length > 0 && (
           <div
+            className="map-route-disruption-banner"
             style={{
               position: 'absolute',
               top: 16,
@@ -589,6 +593,7 @@ const OPERATOR_SCHEDULE_MOCK: Record<
         {/* 4. Bottom Container: Operator Schedule Overview Card OR Route Detail Bar (Single Container, No Stacking) */}
         {selectedOperatorForSchedule ? (
           <div
+            className="map-operator-schedule-card"
             style={{
               position: 'absolute',
               bottom: 24,
@@ -1026,3 +1031,39 @@ const overlayLoadingFallback: React.CSSProperties = {
   fontSize: 14,
   zIndex: 'var(--z-modal)',
 };
+
+const dashboardStyles = `
+  @media (max-width: 767px) {
+    .map-route-disruption-banner {
+      top: 68px !important;
+      left: 12px !important;
+      right: 12px !important;
+      width: auto !important;
+      max-width: none !important;
+    }
+    .map-operator-schedule-card {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      border-radius: 22px 22px 0 0 !important;
+      padding: 16px 20px 24px !important;
+      box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.22) !important;
+      z-index: 9995 !important;
+      animation: slideUpMobile 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .map-toast-alert {
+      top: 12px !important;
+      left: 12px !important;
+      right: 12px !important;
+      max-width: none !important;
+      justify-content: space-between !important;
+    }
+  }
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+`;

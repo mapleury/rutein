@@ -32,6 +32,7 @@ function ControlButtonWithTooltip({
   return (
     <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
       <div
+        className="control-tooltip"
         style={{
           position: 'absolute',
           right: 'calc(100% + 10px)',
@@ -91,7 +92,8 @@ export default function MapPointControls({
   const { t } = useLanguage();
 
   return (
-    <div style={controlsWrapperStyle}>
+    <div className="map-point-controls-wrapper" style={controlsWrapperStyle}>
+      <style>{pointControlsStyles}</style>
       {/* SECTION 1: Confused Mode (Floating White Card Button with Red Rutein Bird Icon) */}
       <ControlButtonWithTooltip
         onClick={() => navigate('/confused')}
@@ -159,6 +161,21 @@ export default function MapPointControls({
 }
 
 // STYLES — Bottom-Right Aligned with 3 Separated Sections
+const pointControlsStyles = `
+  @media (hover: none) and (pointer: coarse) {
+    .control-tooltip {
+      display: none !important;
+    }
+  }
+  @media (max-width: 767px) {
+    .map-point-controls-wrapper {
+      right: 12px !important;
+      bottom: 20px !important;
+      gap: 8px !important;
+    }
+  }
+`;
+
 const controlsWrapperStyle: React.CSSProperties = {
   position: 'absolute',
   bottom: 24,
