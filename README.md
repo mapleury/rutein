@@ -1,13 +1,11 @@
 <div align="center">
 <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/images/rutein-1.png" alt="Landing Page" width="800"/>
-
-  [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_Site-success?style=for-the-badge)](https://[URL_DEMO])
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://[URL_REPO])
-  [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
-
+[![Live Demo](https://raw.githubusercontent.com/syakirahh8/rutein/master/assets/badges/badge-live-demo.svg)](https://[URL_DEMO])
+[![GitHub](https://raw.githubusercontent.com/syakirahh8/rutein/master/assets/badges/badge-github.svg)](https://[URL_REPO])
+[![License](https://raw.githubusercontent.com/syakirahh8/rutein/master/assets/badges/badge-license.svg)](LICENSE)
   **Submission for ITECHNO CUP 2026 - Web Development**
 
-  **By Tim CEO, CTO, CMO**
+  **By Tim CEO, CTO, CMO**  
 
 </div>
 
