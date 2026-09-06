@@ -178,29 +178,33 @@ export default function ConfusedMode() {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 70px)',
+        height: '100vh',
         background: '#FCF4ED',
         color: '#1E1E1E',
         fontFamily: 'var(--font-body)',
         display: 'flex',
+        overflow: 'hidden',
       }}
     >
       {/* --- CHATGPT-STYLE SIDEBAR --- */}
       <aside
         style={{
-          width: isSidebarOpen ? 280 : 0,
+          width: isSidebarOpen ? 300 : 0,
+          minWidth: isSidebarOpen ? 300 : 0,
+          flexShrink: 0,
+          height: '100vh',
           opacity: isSidebarOpen ? 1 : 0,
           background: '#FFFFFF',
           borderRight: '1.5px solid #E5D5C5',
           display: 'flex',
           flexDirection: 'column',
-          transition: 'all 0.25s ease',
+          transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease',
           overflow: 'hidden',
           zIndex: 40,
         }}
       >
         {/* Sidebar Brand Header (Clean header without duplicate logo) */}
-        <div style={{ padding: '16px 18px 14px', borderBottom: '1.5px solid #E5D5C5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '16px 18px 14px', borderBottom: '1.5px solid #E5D5C5', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div
               style={{
@@ -225,7 +229,7 @@ export default function ConfusedMode() {
           </span>
         </div>
 
-        <div style={{ padding: 14, borderBottom: '1.5px solid #E5D5C5' }}>
+        <div style={{ padding: 14, borderBottom: '1.5px solid #E5D5C5', flexShrink: 0 }}>
           {/* New Chat Button */}
           <button
             type="button"
@@ -253,7 +257,7 @@ export default function ConfusedMode() {
         </div>
 
         {/* Chat Sessions History List */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#666666', textTransform: 'uppercase', paddingLeft: 8, paddingBottom: 4 }}>
             {t('ai.history_title')} ({sessions.length})
           </span>
@@ -326,7 +330,7 @@ export default function ConfusedMode() {
 
         {/* Clear All Sessions Bottom Footer */}
         {sessions.length > 0 && (
-          <div style={{ padding: 14, borderTop: '1.5px solid #E5D5C5' }}>
+          <div style={{ padding: 14, borderTop: '1.5px solid #E5D5C5', flexShrink: 0 }}>
             <button
               type="button"
               onClick={clearAllSessions}
@@ -353,11 +357,12 @@ export default function ConfusedMode() {
       </aside>
 
       {/* --- MAIN CHAT AREA --- */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 70px)' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
         <div
           className="container"
           style={{
-            maxWidth: 840,
+            maxWidth: 860,
+            width: '100%',
             paddingLeft: 20,
             paddingRight: 20,
             margin: '0 auto',
@@ -365,8 +370,9 @@ export default function ConfusedMode() {
             flexDirection: 'column',
             flex: 1,
             height: '100%',
-            paddingTop: 20,
-            paddingBottom: 24,
+            paddingTop: 16,
+            paddingBottom: 14,
+            boxSizing: 'border-box',
           }}
         >
           {/* Top Header Bar with Sidebar Toggle */}
@@ -457,9 +463,9 @@ export default function ConfusedMode() {
               display: 'flex',
               flexDirection: 'column',
               gap: 14,
-              marginBottom: 16,
+              marginBottom: 10,
               paddingRight: 4,
-              minHeight: 280,
+              minHeight: 0,
             }}
           >
             {messages.length === 0 && (
@@ -676,7 +682,7 @@ export default function ConfusedMode() {
               event.preventDefault();
               void handleSend(input);
             }}
-            style={{ display: 'flex', gap: 10 }}
+            style={{ display: 'flex', gap: 10, marginBottom: 0 }}
           >
             <input
               placeholder={
