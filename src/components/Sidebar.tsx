@@ -1,28 +1,3 @@
-// Sidebar.tsx
-// Unified left sidebar: replaces both NavBar.tsx and MapSidebar.tsx.
-//
-// - Main nav (Peta, Rute, Jadwal Transportasi, Budget Planner, Peringatan, Tanya AI)
-//   is always visible, so this now IS the app's primary navigation.
-// - "Operator & Moda" (transport filter) only renders on map routes
-//   ('/dashboard', '/map', '/'). It uses a tree/connector-line layout instead
-//   of a flat list, with a small toggle dot per row to control map visibility
-//   and a click on the row to jump to that operator (onSelectOperator).
-// - "Tempat Tersimpan" (saved places) stays available on every page; picking
-//   one navigates to the map first if you're elsewhere.
-// - Profile footer mirrors the avatar treatment from Profile.tsx (circular,
-//   image with object-fit contain, initial-letter fallback) and opens a small
-//   popover with "Lihat profil" / "Keluar".
-// - Collapsed state hides the logo entirely and shows an icon-only rail.
-// - The scroll track is flipped to the left edge of the sidebar via the
-//   direction:rtl / direction:ltr pairing below, and is thin + low-opacity.
-//
-// Integration: mount this once in your app shell (e.g. replacing <NavBar />),
-// give the page content a left margin/padding of var(--sidebar-width)
-// (var(--sidebar-width-collapsed) when collapsed if you track that state
-// higher up), and pass the map-related props only where you actually have
-// map state to hand — they're optional so the component is safe to render
-// on non-map pages too.
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -67,8 +42,6 @@ const ALL_TRANSPORT_TYPES = Object.keys(
   TRANSPORT_TYPE_LABELS
 ) as IndonesiaTransportType[];
 
-// Routes on which the map is actually visible — operator/transport filtering
-// only makes sense there.
 const MAP_ROUTES = ['/dashboard', '/map', '/'];
 
 function getOperatorIcon(type: IndonesiaTransportType) {
@@ -170,7 +143,6 @@ export default function Sidebar({
     'Traveler';
   const userInitial = displayName.charAt(0).toUpperCase();
 
-  // Pull the avatar the same way Profile.tsx does, so the two stay in sync.
   useEffect(() => {
     if (!user) return;
     let isMounted = true;

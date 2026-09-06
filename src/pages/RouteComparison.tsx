@@ -27,7 +27,6 @@ export default function RouteComparison() {
   const [usingCurrentLocation, setUsingCurrentLocation] = useState(false);
 
   useEffect(() => {
-    // Only auto-detect GPS for origin if an initial origin wasn't passed via navigation state
     if (initialOrigin) return;
 
     (async () => {
@@ -37,7 +36,6 @@ export default function RouteComparison() {
         const place = await reverseGeocode(point.lat, point.lng);
         setOrigin((current) => current ?? place ?? { ...point, label: 'Current location', address: 'Current location' });
       } catch {
-        // Silent: user can still type an origin manually.
       } finally {
         setUsingCurrentLocation(false);
       }

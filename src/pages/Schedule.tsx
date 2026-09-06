@@ -37,7 +37,6 @@ import {
 } from '@/data/transportationScheduledata';
 import type { PlaceResult } from '@/types/domain.types';
 
-// RUTEIN Standard Transport Type Icons Mapping
 export const transportIcons: Record<IndonesiaTransportType, React.ComponentType<any>> = {
   transjakarta: Bus,
   bus: Bus,
@@ -64,7 +63,6 @@ export default function Schedule() {
 
   const presentTypes = useMemo(() => TYPE_ORDER.filter((t) => TRANSPORT_ROUTES.some((r) => r.type === t)), []);
 
-  // Filter matching stations for live search dropdown
   const searchedStations = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return [];
@@ -76,7 +74,6 @@ export default function Schedule() {
     }).slice(0, 8);
   }, [searchQuery]);
 
-  // Filter routes based on selected type and search query
   const filteredRoutes = useMemo(() => {
     return TRANSPORT_ROUTES.filter((r) => {
       const matchesType = selectedType === 'all' || r.type === selectedType;

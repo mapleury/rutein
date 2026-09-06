@@ -117,7 +117,7 @@ function AnimatedTrainTrackBottom() {
   );
 }
 
-function RuteinCustomPointer() {
+function CustomTransitCursor() {
   const [pos, setPos] = useState({ x: -100, y: -100 });
   const [trailPos, setTrailPos] = useState({ x: -100, y: -100 });
   const [isHovered, setIsHovered] = useState(false);
@@ -249,7 +249,7 @@ function AmbientTransitBackground() {
   );
 }
 
-function SilkyScrollEntrance({
+function SmoothReveal({
   children,
   delayMs = 0,
   className,
@@ -297,7 +297,7 @@ function SilkyScrollEntrance({
   );
 }
 
-function AnimatedCounter({ from = 0, to, duration = 2.5, suffix = '' }: { from?: number; to: number; duration?: number; suffix?: string }) {
+function AnimatedCounter({ target = 5000, suffix = '+' }: { target?: number; suffix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -308,12 +308,13 @@ function AnimatedCounter({ from = 0, to, duration = 2.5, suffix = '' }: { from?:
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          const duration = 1800;
           const startTime = performance.now();
 
           const update = (now: number) => {
-            const progress = Math.min((now - startTime) / (duration * 1000), 1);
+            const progress = Math.min((now - startTime) / duration, 1);
             const easeProgress = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.floor(from + easeProgress * (to - from)));
+            setCount(Math.floor(easeProgress * target));
 
             if (progress < 1) {
               requestAnimationFrame(update);
@@ -329,7 +330,7 @@ function AnimatedCounter({ from = 0, to, duration = 2.5, suffix = '' }: { from?:
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [to, from, duration]);
+  }, [target]);
 
   return (
     <div ref={ref} className="font-jockey" style={{ fontSize: 32, color: '#DA362A', lineHeight: 1 }}>
@@ -376,7 +377,7 @@ export default function LandingPage() {
         position: 'relative',
       }}
     >
-      <RuteinCustomPointer />
+      <CustomTransitCursor />
 
       <style>{`
         .logo-hover {
