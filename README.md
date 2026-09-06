@@ -40,6 +40,9 @@
 
 ## Tentang Proyek
 
+<img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/About-App.png" alt="Landing Page" width="800"/>
+
+
 ### Latar Belakang
 
 Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta sering kali membingungkan. Ada banyak moda transportasi yang tersedia — TransJakarta, MRT, LRT, KRL, bus kota, hingga ojek online — namun tidak ada satu platform yang memudahkan pengguna untuk membandingkan waktu tempuh, biaya, dan jumlah transit dari semua moda tersebut sekaligus. Ditambah lagi, informasi gangguan lalu lintas dan jadwal keberangkatan seringkali tersebar di berbagai sumber yang tidak terintegrasi, membuat perencanaan perjalanan menjadi tidak efisien — terutama bagi pengguna baru yang belum familiar dengan rute transportasi di kotanya sendiri.
@@ -296,7 +299,7 @@ npm run lint
 
 | Anggota | Fitur yang Dikerjakan |
 |---------|------------------------|
-| **Quan** | Sign Up / Sign In, User Preferences, Profile, Saved Places, Backend & System Architecture, Deployment & Submission |
+| **Quan** | Sign Up / Sign In, User Preferences, Profile, Saved Places, Backend & System Architecture, |
 | **Syakir** | Landing Page, Transport Schedule, Budget Planner, Confused Mode, Tutorial Penggunaan Web |
 | **Nael** | Interactive Map, Dashboard, Route Comparison, Multi-Transit Routes, Live Disruption, Design System, App Design Mockup |
 
