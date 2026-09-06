@@ -33,7 +33,8 @@ export type IndonesiaTransportType =
   | 'train'
   | 'airport_rail'
   | 'ferry'
-  | 'terminal';
+  | 'terminal'
+  | 'other';
 
 export interface IndonesiaTransportLocation {
   id: string;
@@ -206,4 +207,5 @@ export const TRANSPORT_TYPE_LABELS: Record<IndonesiaTransportType, string> = {
   airport_rail: 'Airport Rail',
   ferry: 'Ferry / Port',
   terminal: 'Bus Terminal',
+  other: 'Other',
 };

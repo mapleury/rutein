@@ -51,8 +51,8 @@ export default function NavBar() {
   }, [location.pathname]);
 
   async function handleSignOut() {
+    navigate('/beranda', { replace: true });
     await signOut();
-    navigate('/login');
   }
 
   const userEmail = user?.email || 'Pengguna';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -36,7 +36,8 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<ProtectedRoute><MapDashboard /></ProtectedRoute>} />
-            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/beranda" element={<LandingPage />} />
+            <Route path="/landing" element={<Navigate to="/beranda" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/onboarding/transport" element={<ProtectedRoute><TransportPreference /></ProtectedRoute>} />
             <Route path="/onboarding/profile" element={<ProtectedRoute><ProfileSelect /></ProtectedRoute>} />
