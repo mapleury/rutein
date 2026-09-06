@@ -484,3 +484,143 @@ aside ::-webkit-scrollbar-thumb:hover,
 .loading-dot:nth-child(2) { animation-delay: -0.16s; }
 .loading-dot:nth-child(3) { animation-delay: 0s; }
 
+/* Subtle Section & Page Entrance Animations (Tipis-tipis & Smooth) */
+@keyframes ruteinFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ruteinFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ruteinScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.rutein-fade-up {
+  animation: ruteinFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.rutein-fade-up-1 {
+  animation: ruteinFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+.rutein-fade-up-2 {
+  animation: ruteinFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+}
+
+.rutein-fade-up-3 {
+  animation: ruteinFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+}
+
+.rutein-fade-up-4 {
+  animation: ruteinFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+}
+
+.rutein-scale-in {
+  animation: ruteinScaleIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Warning & Alert Subtle Entrance Animation (Tipis-tipis & Halus) */
+@keyframes ruteinAlertIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rutein-alert-in {
+  animation: ruteinAlertIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Slide In Subtle Animations (Requested for Budget, Jadwal, Tanya AI, Alert/Peringatan) */
+@keyframes ruteinSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ruteinSlideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ruteinSlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.rutein-slide-in {
+  animation: ruteinSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.rutein-slide-in-1 {
+  animation: ruteinSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+.rutein-slide-in-2 {
+  animation: ruteinSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+}
+
+.rutein-slide-in-3 {
+  animation: ruteinSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+}
+
+.rutein-slide-in-4 {
+  animation: ruteinSlideIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+}
+
+.rutein-slide-left {
+  animation: ruteinSlideInLeft 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.rutein-slide-right {
+  animation: ruteinSlideInRight 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+

@@ -348,7 +348,7 @@ export default function BudgetPlanner() {
     >
       <div className="container" style={{ maxWidth: 780, paddingLeft: 20, paddingRight: 20, margin: '0 auto' }}>
         {/* --- HEADER --- */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+        <div className="rutein-slide-in" style={{ textAlign: 'center', marginBottom: 36 }}>
           <h1
             className="font-jockey"
             style={{
@@ -376,6 +376,7 @@ export default function BudgetPlanner() {
 
         {/* --- SECTION 1: LOKASI PERJALANAN (ORIGIN & DESTINATION) --- */}
         <div
+          className="rutein-slide-in-1"
           style={{
             marginBottom: 24,
             background: '#FFFFFF',
@@ -384,6 +385,8 @@ export default function BudgetPlanner() {
             padding: '24px 28px',
             boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
             transition: 'border-color 0.2s ease',
+            position: 'relative',
+            zIndex: 30,
           }}
         >
           <h2
@@ -402,6 +405,7 @@ export default function BudgetPlanner() {
 
           {locationWarning && (
             <div
+              className="rutein-alert-in"
               style={{
                 background: '#FDF0ED',
                 border: '1px solid #DA362A',
@@ -423,7 +427,7 @@ export default function BudgetPlanner() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {/* Origin Input */}
-            <div>
+            <div style={{ position: 'relative', zIndex: 25 }}>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#666666', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                 <Navigation2 size={13} color="#3B82F6" /> Asal
               </label>
@@ -435,7 +439,7 @@ export default function BudgetPlanner() {
             </div>
 
             {/* Destination Input & Active Selected Pill */}
-            <div>
+            <div style={{ position: 'relative', zIndex: 20 }}>
               <label style={{ fontSize: 12, fontWeight: 700, color: '#666666', display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                 <MapPin size={13} color="#DA362A" /> Tujuan
               </label>
@@ -548,6 +552,7 @@ export default function BudgetPlanner() {
 
         {/* --- SECTION 2: BUDGET INPUT & ADJUSTMENT CARD --- */}
         <div
+          className="rutein-slide-in-2"
           style={{
             marginBottom: 32,
             background: '#FFFFFF',
@@ -555,6 +560,8 @@ export default function BudgetPlanner() {
             borderRadius: 20,
             padding: '28px 32px',
             boxShadow: '0 8px 24px rgba(218, 54, 42, 0.12)',
+            position: 'relative',
+            zIndex: 10,
           }}
         >
           <form onSubmit={handleApply}>
@@ -639,6 +646,7 @@ export default function BudgetPlanner() {
                   >
                     <Minus size={18} />
                   </button>
+
                   <button
                     type="button"
                     onClick={() => handleStepBudget(2500)}
@@ -663,20 +671,20 @@ export default function BudgetPlanner() {
               </div>
             </div>
 
-            {/* Preset Chips */}
-            <div style={{ marginBottom: 24 }}>
+            {/* Quick Preset Chips Row */}
+            <div style={{ marginBottom: 26 }}>
               <span style={{ fontSize: 13, color: '#666666', display: 'block', marginBottom: 10, fontWeight: 500 }}>
-                Pilih Cepat Budget Harian:
+                Pilihan Cepat Nominal:
               </span>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {PRESET_BUDGETS.map((preset) => {
                   const isActive = inputBudget === preset;
                   return (
                     <button
                       key={preset}
                       type="button"
-                      onClick={() => handlePresetSelect(preset)}
                       className="font-jockey"
+                      onClick={() => handlePresetSelect(preset)}
                       style={{
                         padding: '8px 18px',
                         fontSize: 16,
@@ -735,6 +743,7 @@ export default function BudgetPlanner() {
 
         {/* --- SECTION 3: PROYEKSI BUDGET JANGKA PANJANG --- */}
         <div
+          className="rutein-slide-in-3"
           style={{
             marginBottom: 32,
             background: '#FFFFFF',
@@ -742,6 +751,8 @@ export default function BudgetPlanner() {
             borderRadius: 20,
             padding: '24px 28px',
             boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+            position: 'relative',
+            zIndex: 5,
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -759,7 +770,7 @@ export default function BudgetPlanner() {
         </div>
 
         {/* --- SECTION 4: RESULTS SECTION (RUTEIN MENEMUKAN) --- */}
-        <div>
+        <div className="rutein-slide-in-4" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
             <h2
               className="font-jockey"
@@ -804,6 +815,7 @@ export default function BudgetPlanner() {
           {/* Insufficient Budget Empty State */}
           {!evaluation.hasInBudgetOptions ? (
             <div
+              className="rutein-alert-in"
               style={{
                 textAlign: 'center',
                 padding: '40px 24px',
@@ -913,6 +925,7 @@ function RecommendationCard({ item, icon: CategoryIcon, onStartJourney }: CardPr
 
   return (
     <div
+      className="rutein-scale-in"
       style={{
         background: '#FFFFFF',
         border: isOverBudget ? '2px solid #E5A020' : '1.5px solid #E5D5C5',

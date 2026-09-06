@@ -10,7 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { createSavedPlace } from '@/services/savedPlacesService';
 
-import MapSidebar from '@/components/map-dashboard/MapSidebar';
+import { usePublishSidebarMapControls } from '@/contexts/SidebarMapContext';
 import MapTopSearch from '@/components/map-dashboard/MapTopSearch';
 import MapPointControls from '@/components/map-dashboard/MapPointControls';
 import MapRouteDetailBar from '@/components/map-dashboard/MapRouteDetailBar';
@@ -399,6 +399,21 @@ const OPERATOR_SCHEDULE_MOCK: Record<
     [pendingStreetViewPoint]
   );
 
+  // Publish live map state to the globally-mounted Sidebar (rendered once
+  // by AppLayout) instead of rendering a sidebar inside this page — that's
+  // what was causing the duplicate sidebar on /dashboard, /map, and /.
+  usePublishSidebarMapControls({
+    activeTypes,
+    onToggleType: toggleType,
+    onShowAllTypes: showAllTypes,
+    onSelectSavedPlace: handleSelectSavedPlace,
+    onSelectOperator: (type) => {
+      setSelectedPlace(null);
+      setSelectedOperatorForSchedule(type);
+    },
+    savedPlacesTrigger,
+  });
+
   const routeGeoJson = directions
     ? {
         type: 'Feature' as const,
@@ -443,19 +458,6 @@ const OPERATOR_SCHEDULE_MOCK: Record<
           </button>
         </div>
       )}
-
-      {/* 1. Sidebar Component */}
-      <MapSidebar
-        activeTypes={activeTypes}
-        onToggleType={toggleType}
-        onShowAllTypes={showAllTypes}
-        onSelectSavedPlace={handleSelectSavedPlace}
-        onSelectOperator={(type) => {
-          setSelectedPlace(null);
-          setSelectedOperatorForSchedule(type);
-        }}
-        savedPlacesTrigger={savedPlacesTrigger}
-      />
 
       {/* Map Viewport Area */}
       <main style={mapContainer}>
@@ -1002,9 +1004,8 @@ const OPERATOR_SCHEDULE_MOCK: Record<
 }
 
 const dashboardWrapper: React.CSSProperties = {
-  display: 'flex',
-  width: '100vw',
-  height: '100vh',
+  width: '100%',
+  height: '100%',
   overflow: 'hidden',
 };
 

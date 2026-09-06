@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import logoRuteinSvg from '@/assets/images/logo-rutein.svg';
+import { useNavigate } from 'react-router-dom';
 import merpatiSvg from '@/assets/images/merpati-terbang.svg';
 import {
   Sparkles,
@@ -179,38 +178,58 @@ export default function ConfusedMode() {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 70px)',
+        height: '100vh',
         background: '#FCF4ED',
         color: '#1E1E1E',
         fontFamily: 'var(--font-body)',
         display: 'flex',
+        overflow: 'hidden',
       }}
     >
       {/* --- CHATGPT-STYLE SIDEBAR --- */}
       <aside
         style={{
-          width: isSidebarOpen ? 280 : 0,
+          width: isSidebarOpen ? 300 : 0,
+          minWidth: isSidebarOpen ? 300 : 0,
+          flexShrink: 0,
+          height: '100vh',
           opacity: isSidebarOpen ? 1 : 0,
           background: '#FFFFFF',
           borderRight: '1.5px solid #E5D5C5',
           display: 'flex',
           flexDirection: 'column',
-          transition: 'all 0.25s ease',
+          transition: 'width 0.25s cubic-bezier(0.16, 1, 0.3, 1), min-width 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease',
           overflow: 'hidden',
           zIndex: 40,
         }}
       >
-        {/* Sidebar Brand Header */}
-        <div style={{ padding: '16px 18px 12px', borderBottom: '1.5px solid #E5D5C5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link to="/dashboard" style={{ display: 'flex', alignItems: 'center' }} title="Rutein Dashboard">
-            <img src={logoRuteinSvg} alt="Rutein" style={{ height: 26, width: 'auto' }} />
-          </Link>
+        {/* Sidebar Brand Header (Clean header without duplicate logo) */}
+        <div style={{ padding: '16px 18px 14px', borderBottom: '1.5px solid #E5D5C5', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 8,
+                background: '#FDF0ED',
+                border: '1px solid rgba(218, 54, 42, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Sparkles size={16} color="#DA362A" />
+            </div>
+            <span className="font-jockey" style={{ fontSize: 19, color: '#1E1E1E', letterSpacing: '0.02em' }}>
+              Tanya AI
+            </span>
+          </div>
           <span style={{ fontSize: 11, fontWeight: 700, background: '#FDF0ED', color: '#DA362A', padding: '3px 9px', borderRadius: 999, border: '1px solid rgba(218,54,42,0.2)' }}>
-            Tanya AI
+            Asisten
           </span>
         </div>
 
-        <div style={{ padding: 14, borderBottom: '1.5px solid #E5D5C5' }}>
+        <div style={{ padding: 14, borderBottom: '1.5px solid #E5D5C5', flexShrink: 0 }}>
           {/* New Chat Button */}
           <button
             type="button"
@@ -238,7 +257,7 @@ export default function ConfusedMode() {
         </div>
 
         {/* Chat Sessions History List */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#666666', textTransform: 'uppercase', paddingLeft: 8, paddingBottom: 4 }}>
             {t('ai.history_title')} ({sessions.length})
           </span>
@@ -311,7 +330,7 @@ export default function ConfusedMode() {
 
         {/* Clear All Sessions Bottom Footer */}
         {sessions.length > 0 && (
-          <div style={{ padding: 14, borderTop: '1.5px solid #E5D5C5' }}>
+          <div style={{ padding: 14, borderTop: '1.5px solid #E5D5C5', flexShrink: 0 }}>
             <button
               type="button"
               onClick={clearAllSessions}
@@ -338,11 +357,12 @@ export default function ConfusedMode() {
       </aside>
 
       {/* --- MAIN CHAT AREA --- */}
-      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: 'calc(100vh - 70px)' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
         <div
           className="container"
           style={{
-            maxWidth: 840,
+            maxWidth: 860,
+            width: '100%',
             paddingLeft: 20,
             paddingRight: 20,
             margin: '0 auto',
@@ -350,12 +370,13 @@ export default function ConfusedMode() {
             flexDirection: 'column',
             flex: 1,
             height: '100%',
-            paddingTop: 20,
-            paddingBottom: 24,
+            paddingTop: 16,
+            paddingBottom: 14,
+            boxSizing: 'border-box',
           }}
         >
           {/* Top Header Bar with Sidebar Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div className="rutein-slide-in" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <button
               type="button"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -363,7 +384,7 @@ export default function ConfusedMode() {
                 background: '#FFFFFF',
                 border: '1.5px solid #E5D5C5',
                 borderRadius: 10,
-                padding: '8px 12px',
+                padding: '8px 14px',
                 color: '#1E1E1E',
                 cursor: 'pointer',
                 display: 'flex',
@@ -371,10 +392,12 @@ export default function ConfusedMode() {
                 gap: 6,
                 fontSize: 13,
                 fontWeight: 600,
+                boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                transition: 'all 0.15s ease',
               }}
             >
-              {isSidebarOpen ? <X size={16} /> : <Menu size={16} />}
-              {isSidebarOpen ? 'Sembunyikan Riwayat' : 'Riwayat Chat'}
+              {isSidebarOpen ? <X size={16} /> : <History size={16} color="#DA362A" />}
+              {isSidebarOpen ? 'Sembunyikan Riwayat' : `Riwayat Chat (${sessions.length})`}
             </button>
 
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -413,6 +436,7 @@ export default function ConfusedMode() {
           {/* Location Error Warning */}
           {locationError && (
             <div
+              className="rutein-alert-in"
               style={{
                 background: '#FFF8ED',
                 border: '1.5px solid #E5A020',
@@ -439,15 +463,16 @@ export default function ConfusedMode() {
               display: 'flex',
               flexDirection: 'column',
               gap: 14,
-              marginBottom: 16,
+              marginBottom: 10,
               paddingRight: 4,
-              minHeight: 280,
+              minHeight: 0,
             }}
           >
             {messages.length === 0 && (
               <div>
                 {/* Welcome Card */}
                 <div
+                  className="rutein-slide-in-1"
                   style={{
                     background: '#FFFFFF',
                     border: '1.5px solid #E5D5C5',
@@ -470,7 +495,7 @@ export default function ConfusedMode() {
                 </span>
 
                 {/* Quick Action Chips */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+                <div className="rutein-fade-up-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
                   {QUICK_ACTIONS.map((action) => {
                     const IconComp = action.icon;
                     return (
@@ -529,6 +554,7 @@ export default function ConfusedMode() {
               return (
                 <div
                   key={`${message.role}-${index}`}
+                  className="rutein-scale-in"
                   style={{
                     maxWidth: '82%',
                     alignSelf: isUser ? 'flex-end' : 'flex-start',
@@ -651,11 +677,12 @@ export default function ConfusedMode() {
 
           {/* Input Form */}
           <form
+            className="rutein-slide-in-2"
             onSubmit={(event) => {
               event.preventDefault();
               void handleSend(input);
             }}
-            style={{ display: 'flex', gap: 10 }}
+            style={{ display: 'flex', gap: 10, marginBottom: 0 }}
           >
             <input
               placeholder={
