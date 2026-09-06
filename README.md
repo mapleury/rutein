@@ -87,19 +87,28 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 ### Screenshot Aplikasi
 
 <div align="center">
-  <img src="[URL_SCREENSHOT_LANDING]" alt="Landing Page" width="800"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/docs/Landing-Page.png" alt="Landing Page" width="100%"/>
   <p><em>Landing Page - Perkenalan RUTEIN</em></p>
 
-  <img src="[URL_SCREENSHOT_DASHBOARD]" alt="Dashboard" width="800"/>
-  <p><em>Dashboard - Titik awal perencanaan perjalanan</em></p>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/docs/Login-Page.png" alt="Login Page" width="100%"/>
+  <p><em>Login/Sign In - Masuk ke akun RUTEIN</em></p>
 
-  <img src="[URL_SCREENSHOT_MAP]" alt="Interactive Map" width="800"/>
-  <p><em>Peta Interaktif - Filter transportasi, mode satelit, dan street view</em></p>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/docs/Map-Dashboard-Page.png" alt="Dashboard & Map" width="100%"/>
+  <p><em>Dashboard & Peta Interaktif - Titik awal perencanaan perjalanan</em></p>
 
-  <img src="[URL_SCREENSHOT_ROUTES]" alt="Route Comparison" width="800"/>
-  <p><em>Route Comparison - Efficient, Cheapest, dan Hurry</em></p>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/docs/Schedule-Page.png" alt="Transport Schedule" width="100%"/>
+  <p><em>Transport Schedule - Jadwal keberangkatan real-time</em></p>
 
-  <img src="[URL_SCREENSHOT_CONFUSED]" alt="Confused Mode" width="800"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/docs/Disruption-Page.png" alt="Disruption Alerts" width="100%"/>
+  <p><em>Live Disruption Alerts - Info gangguan lalu lintas</em></p>
+
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/docs/Budget-Page.png" alt="Budget Planner" width="100%"/>
+  <p><em>Budget Planner - Estimasi biaya transportasi</em></p>
+
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/docs/Profile-Page.png" alt="Profile Page" width="100%"/>
+  <p><em>Profile - Preferensi & tempat favorit</em></p>
+
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/docs/Chatbot-Page.png" alt="Confused Mode" width="100%"/>
   <p><em>Confused Mode - Asisten navigasi berbasis AI</em></p>
 </div>
 
