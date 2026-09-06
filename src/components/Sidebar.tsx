@@ -71,7 +71,7 @@ const ALL_TRANSPORT_TYPES = Object.keys(
 const MAP_ROUTES = ['/dashboard', '/map', '/'];
 
 function getOperatorIcon(type: IndonesiaTransportType) {
-  const iconProps = { size: 14, strokeWidth: 2.3 };
+  const iconProps = { size: 16, strokeWidth: 2 };
   switch (type) {
     case 'transjakarta':
       return <Bus {...iconProps} />;
@@ -333,55 +333,58 @@ export default function Sidebar({
 
               {!isCollapsed && activeSection === 'operators' && (
                 <div style={accordionContentStyle}>
-                  <button
-                    type="button"
-                    onClick={() => onShowAllTypes?.()}
-                    className="side-show-all"
-                    style={showAllBtnStyle}
-                  >
-                    Tampilkan Semua Moda
-                  </button>
-
                   <div style={treeListStyle}>
-                    {ALL_TRANSPORT_TYPES.map((type) => {
-                      const isActive = activeTypes.has(type);
-                      return (
-                        <div key={type} className="op-tree-line">
+                    {ALL_TRANSPORT_TYPES.map((type) => (
+                      <div key={type} className="op-tree-line">
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => onSelectOperator?.(type)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') onSelectOperator?.(type);
+                          }}
+                          className="op-tree-row"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            padding: '7px 8px',
+                            borderRadius: 8,
+                            cursor: 'pointer',
+                            backgroundColor: 'transparent',
+                            color: '#FFFFFF',
+                            transition: 'background-color 0.15s ease, transform 0.15s ease',
+                          }}
+                          title={`Lihat rute & jadwal ${TRANSPORT_TYPE_LABELS[type]}`}
+                        >
                           <div
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => onSelectOperator?.(type)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') onSelectOperator?.(type);
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: 20,
+                              height: 20,
+                              color: '#FFFFFF',
+                              flexShrink: 0,
                             }}
-                            className="op-tree-row"
-                            style={operatorRowStyle(isActive)}
-                            title={`Lihat rute ${TRANSPORT_TYPE_LABELS[type]}`}
                           >
-                            <div style={operatorLabelGroup}>
-                              <span style={operatorIconBubble(isActive, type)}>
-                                {getOperatorIcon(type)}
-                              </span>
-                              <span style={operatorLabelStyle(isActive)}>
-                                {TRANSPORT_TYPE_LABELS[type]}
-                              </span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onToggleType?.(type);
-                              }}
-                              className="op-tree-toggle"
-                              style={toggleDotStyle(isActive)}
-                              title={isActive ? 'Sembunyikan dari peta' : 'Tampilkan di peta'}
-                            >
-                              {isActive && <Check size={10} strokeWidth={3} />}
-                            </button>
+                            {getOperatorIcon(type)}
                           </div>
+                          <span
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 500,
+                              color: '#FFFFFF',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {TRANSPORT_TYPE_LABELS[type]}
+                          </span>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

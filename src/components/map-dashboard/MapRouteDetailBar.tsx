@@ -400,7 +400,7 @@ const compactCardWrapperStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 10,
-  animation: 'slideUpFade 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+  animation: 'slideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
 };
 
 const expandedCardWrapperStyle: React.CSSProperties = {
@@ -419,7 +419,7 @@ const expandedCardWrapperStyle: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: 12,
-  animation: 'slideUpFade 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+  animation: 'slideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
 };
 
 const headerRowStyle: React.CSSProperties = {

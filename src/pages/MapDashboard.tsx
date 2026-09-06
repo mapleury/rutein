@@ -601,7 +601,7 @@ const OPERATOR_SCHEDULE_MOCK: Record<
               border: '1.5px solid #E5D5C5',
               width: 360,
               maxWidth: 'calc(100vw - 40px)',
-              animation: 'slideUpFade 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+              animation: 'slideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>

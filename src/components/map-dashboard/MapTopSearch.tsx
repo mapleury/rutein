@@ -461,6 +461,7 @@ const filterModalStyle: React.CSSProperties = {
   padding: 14,
   boxShadow: '0 12px 32px rgba(0,0,0,0.25)',
   zIndex: 'var(--z-popover)',
+  animation: 'slideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
 };
 
 const filterModalHeader: React.CSSProperties = {
