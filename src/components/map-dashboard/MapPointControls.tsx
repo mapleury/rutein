@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, Minus, Layers, Navigation, Bookmark, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 import merpatiSvg from '@/assets/images/merpati-terbang.svg';
 
 interface MapPointControlsProps {
@@ -13,30 +14,96 @@ interface MapPointControlsProps {
   baseLayer: 'street' | 'satellite';
 }
 
+interface ControlButtonWithTooltipProps {
+  onClick?: () => void;
+  tooltipText: string;
+  children: React.ReactNode;
+  btnStyle: React.CSSProperties;
+}
+
+function ControlButtonWithTooltip({
+  onClick,
+  tooltipText,
+  children,
+  btnStyle,
+}: ControlButtonWithTooltipProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+      <div
+        style={{
+          position: 'absolute',
+          right: 'calc(100% + 10px)',
+          top: '50%',
+          transform: `translateY(-50%) translateX(${isHovered ? '0px' : '6px'})`,
+          opacity: isHovered ? 1 : 0,
+          visibility: isHovered ? 'visible' : 'hidden',
+          transition: 'all 0.18s cubic-bezier(0.4, 0, 0.2, 1)',
+          background: '#1E1E1E',
+          color: '#FFFFFF',
+          padding: '6px 12px',
+          borderRadius: 8,
+          fontSize: 12,
+          fontWeight: 600,
+          whiteSpace: 'nowrap',
+          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.18)',
+          pointerEvents: 'none',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        {tooltipText}
+        <div
+          style={{
+            position: 'absolute',
+            left: '100%',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            borderWidth: '5px 0 5px 5px',
+            borderStyle: 'solid',
+            borderColor: 'transparent transparent transparent #1E1E1E',
+          }}
+        />
+      </div>
+
+      <button
+        onClick={onClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={btnStyle}
+      >
+        {children}
+      </button>
+    </div>
+  );
+}
+
 export default function MapPointControls({
   onZoomIn,
   onZoomOut,
   onToggleMapStyle,
   onReCenterUserLocation,
   onSaveRoute,
-  baseLayer,
 }: MapPointControlsProps) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div style={controlsWrapperStyle}>
       {/* SECTION 1: Confused Mode (Floating White Card Button with Red Rutein Bird Icon) */}
-      <button
+      <ControlButtonWithTooltip
         onClick={() => navigate('/confused')}
-        style={confusedBtnStyle}
-        title="Tanya AI Rutein (Confused Mode)"
+        tooltipText={t('controls.confused_mode')}
+        btnStyle={confusedBtnStyle}
       >
         <img
           src={merpatiSvg}
           alt="Confused Mode"
           style={{ height: 22, width: 'auto', objectFit: 'contain' }}
         />
-      </button>
+      </ControlButtonWithTooltip>
 
       {/* SECTION 2: Zoom Controls Card (White Container) */}
       <div style={zoomCardStyle}>
@@ -52,40 +119,40 @@ export default function MapPointControls({
       {/* SECTION 3: Main Action Buttons (Solid Red Container with White Circular Buttons) */}
       <div style={redActionCardStyle}>
         {/* Map Style Switcher */}
-        <button
+        <ControlButtonWithTooltip
           onClick={onToggleMapStyle}
-          style={actionBtnStyle}
-          title={`Switch to ${baseLayer === 'street' ? 'Satellite' : 'Streets'}`}
+          tooltipText={t('controls.map_style')}
+          btnStyle={actionBtnStyle}
         >
           <Layers size={18} color="#DA362A" />
-        </button>
+        </ControlButtonWithTooltip>
 
         {/* My Location GPS */}
-        <button
+        <ControlButtonWithTooltip
           onClick={onReCenterUserLocation}
-          style={actionBtnStyle}
-          title="Posisiku (GPS)"
+          tooltipText={t('controls.my_location')}
+          btnStyle={actionBtnStyle}
         >
           <Navigation size={18} color="#DA362A" />
-        </button>
+        </ControlButtonWithTooltip>
 
         {/* Save Route / Saved Places */}
-        <button
+        <ControlButtonWithTooltip
           onClick={onSaveRoute}
-          style={actionBtnStyle}
-          title="Simpan Rute Perjalanan (Saved Places)"
+          tooltipText={t('controls.saved_places')}
+          btnStyle={actionBtnStyle}
         >
           <Bookmark size={18} color="#DA362A" />
-        </button>
+        </ControlButtonWithTooltip>
 
         {/* Peringatan Hambatan Jalan (Disruptions) */}
-        <button
+        <ControlButtonWithTooltip
           onClick={() => navigate('/disruptions')}
-          style={actionBtnStyle}
-          title="Peringatan Hambatan Jalan (Disruptions)"
+          tooltipText={t('controls.disruptions')}
+          btnStyle={actionBtnStyle}
         >
           <AlertTriangle size={18} color="#DA362A" />
-        </button>
+        </ControlButtonWithTooltip>
       </div>
     </div>
   );

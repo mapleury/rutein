@@ -24,6 +24,11 @@ export const translations = {
     'sidebar.view_profile': 'Lihat Profil',
 
     // Map Search & Controls
+    'controls.confused_mode': 'Mode Bingung',
+    'controls.map_style': 'Gaya Peta',
+    'controls.my_location': 'Lokasi Saat Ini',
+    'controls.saved_places': 'Tempat Tersimpan',
+    'controls.disruptions': 'Info Gangguan',
     'search.placeholder': 'Cari lokasi atau tujuan...',
     'search.route_btn': 'Rute',
     'search.origin': 'Lokasi Awal',
@@ -33,6 +38,21 @@ export const translations = {
     'search.clear': 'Hapus',
     'search.my_location': 'Lokasi Saya',
     'search.searching': 'Mencari...',
+
+    // Route Detail Bar
+    'detail_bar.efficient': 'Efisien',
+    'detail_bar.cheapest': 'Termurah',
+    'detail_bar.hurry': 'Tercepat',
+    'detail_bar.step_by_step': 'Langkah-langkah Rute',
+    'detail_bar.duration': 'Durasi',
+    'detail_bar.cost': 'Biaya',
+    'detail_bar.transfers': 'Transit',
+    'detail_bar.show_details': 'Lihat Detail Rute',
+    'detail_bar.hide_details': 'Sembunyikan Detail',
+    'detail_bar.next': 'Lanjut',
+    'detail_bar.back': 'Kembali',
+    'detail_bar.from': 'Dari',
+    'detail_bar.to': 'Ke',
 
     // Transport Types
     'transport.transjakarta': 'TransJakarta',
@@ -115,6 +135,11 @@ export const translations = {
     'sidebar.view_profile': 'View Profile',
 
     // Map Search & Controls
+    'controls.confused_mode': 'Confused Mode',
+    'controls.map_style': 'Map Style',
+    'controls.my_location': 'My Location',
+    'controls.saved_places': 'Saved Places',
+    'controls.disruptions': 'Disruption Info',
     'search.placeholder': 'Search location or destination...',
     'search.route_btn': 'Route',
     'search.origin': 'Origin Location',
@@ -124,6 +149,21 @@ export const translations = {
     'search.clear': 'Clear',
     'search.my_location': 'My Location',
     'search.searching': 'Searching...',
+
+    // Route Detail Bar
+    'detail_bar.efficient': 'Efficient',
+    'detail_bar.cheapest': 'Cheapest',
+    'detail_bar.hurry': 'Fastest',
+    'detail_bar.step_by_step': 'Step-by-step directions',
+    'detail_bar.duration': 'Duration',
+    'detail_bar.cost': 'Cost',
+    'detail_bar.transfers': 'Transfers',
+    'detail_bar.show_details': 'View Route Details',
+    'detail_bar.hide_details': 'Hide Details',
+    'detail_bar.next': 'Next',
+    'detail_bar.back': 'Back',
+    'detail_bar.from': 'From',
+    'detail_bar.to': 'To',
 
     // Transport Types
     'transport.transjakarta': 'TransJakarta',

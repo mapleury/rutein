@@ -1,9 +1,25 @@
-import React from 'react';
-import { Navigation, AlertTriangle, ChevronRight, Eye, Wallet } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Navigation,
+  AlertTriangle,
+  Eye,
+  Wallet,
+  Bus,
+  Train,
+  Zap,
+  DollarSign,
+  Sliders,
+  X,
+  Footprints,
+  Bike,
+} from 'lucide-react';
 import type { DirectionsResult } from '@/services/mapService';
 import type { PlaceResult } from '@/types/domain.types';
+import { generateLogicalRouteOptions, type LogicalRouteOption, type RouteCategory } from '@/services/routeService';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MapRouteDetailBarProps {
+  origin?: PlaceResult | null;
   destination: PlaceResult | null;
   directions: DirectionsResult | null;
   loading: boolean;
@@ -44,111 +60,305 @@ function formatDistance(meters: number): string {
   return meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`;
 }
 
-export function estimateRouteCost(
-  distanceM: number,
-  travelMode: 'walk' | 'ojek' | 'transit' = 'transit',
-  budgetPreference: 'cheapest' | 'fastest' | 'efficient' = 'efficient'
-): { costText: string; detailLabel: string } {
-  if (travelMode === 'walk') {
-    return { costText: 'Gratis', detailLabel: 'Jalan Kaki' };
-  }
-
-  const km = distanceM / 1000;
-
-  if (travelMode === 'ojek') {
-    let base = 9000;
-    let perKm = 2500;
-    if (budgetPreference === 'cheapest') {
-      base = 8000;
-      perKm = 2000;
-    } else if (budgetPreference === 'fastest') {
-      base = 12000;
-      perKm = 3200;
-    }
-    const cost = Math.max(9000, Math.round((base + km * perKm) / 500) * 500);
-    return {
-      costText: `Rp ${cost.toLocaleString('id-ID')}`,
-      detailLabel: `Estimasi Ojek (${budgetPreference === 'cheapest' ? 'Murah' : budgetPreference === 'fastest' ? 'Cepat' : 'Efisien'})`,
-    };
-  }
-
-  // Public Transit
-  if (budgetPreference === 'cheapest') {
-    const cost = km > 15 ? 4000 : 3500;
-    return {
-      costText: `Rp ${cost.toLocaleString('id-ID')}`,
-      detailLabel: 'Tarif Paling Murah',
-    };
-  }
-
-  if (budgetPreference === 'fastest') {
-    const cost = Math.min(24000, Math.max(7500, Math.round((7500 + km * 420) / 500) * 500));
-    return {
-      costText: `Rp ${cost.toLocaleString('id-ID')}`,
-      detailLabel: 'Tarif Paling Cepat',
-    };
-  }
-
-  // Efficient (balanced)
-  const cost = Math.min(18000, Math.max(5000, Math.round((4500 + km * 280) / 500) * 500));
-  return {
-    costText: `Rp ${cost.toLocaleString('id-ID')}`,
-    detailLabel: 'Tarif Paling Efisien',
-  };
+function formatCost(costIdr: number): string {
+  if (costIdr === 0) return 'Gratis';
+  return `Rp ${costIdr.toLocaleString('id-ID')}`;
 }
 
 export default function MapRouteDetailBar({
+  origin,
   destination,
   directions,
   loading,
-  travelMode = 'transit',
   budgetPreference = 'efficient',
   onOpenDetails,
   onOpenPreview,
   onCloseRoute,
 }: MapRouteDetailBarProps) {
+  const { t } = useLanguage();
+  // Phase management: 'compact' | 1 (Option selection + Summary) | 2 (Multi-transit Step-by-Step Directions)
+  const [phase, setPhase] = useState<'compact' | 1 | 2>('compact');
+  const [routeOptions, setRouteOptions] = useState<LogicalRouteOption[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<RouteCategory | null>(null);
+
+  // Fetch route options when destination changes
+  useEffect(() => {
+    if (!destination) {
+      setRouteOptions([]);
+      setPhase('compact');
+      setSelectedCategory(null);
+      return;
+    }
+    const orig = origin || { lat: -6.2088, lng: 106.8456, label: 'Lokasi Saya' };
+    setLoadingOptions(true);
+
+    generateLogicalRouteOptions(orig, destination)
+      .then((opts) => {
+        setRouteOptions(opts);
+      })
+      .catch((err) => {
+        console.error('Failed to load route comparison options:', err);
+      })
+      .finally(() => {
+        setLoadingOptions(false);
+      });
+  }, [destination, origin]);
+
   if (!destination) return null;
 
   const roadName = getRouteRoadName(destination.label, destination.lat, destination.lng);
+  const activeOption = selectedCategory
+    ? routeOptions.find((o) => o.category === selectedCategory) || null
+    : null;
+
+  // Handlers for phase transitions
+  const handleOpenPhase1 = () => {
+    setPhase(1);
+    if (onOpenDetails) onOpenDetails();
+  };
+
+  const handleNextToPhase2 = () => {
+    // If user hasn't selected a category yet, default to budgetPreference or first option
+    if (!selectedCategory && routeOptions.length > 0) {
+      const defaultCat = routeOptions.find((o) => o.category === budgetPreference)
+        ? budgetPreference
+        : routeOptions[0].category;
+      setSelectedCategory(defaultCat);
+    }
+    setPhase(2);
+  };
+
+  const handleBackToPhase1 = () => {
+    setPhase(1);
+  };
+
+  const handleClose = () => {
+    setPhase('compact');
+    if (onCloseRoute) onCloseRoute();
+  };
 
   return (
-    <div style={cardWrapperStyle}>
+    <div style={phase !== 'compact' ? expandedCardWrapperStyle : compactCardWrapperStyle}>
+      {/* HEADER ROW */}
       <div style={headerRowStyle}>
         <div style={destinationLabelGroup}>
-          <Navigation size={16} color="#DA362A" />
-          <span style={destinationTitleStyle}>via {roadName} (Menuju {destination.label})</span>
+          <Navigation size={16} color="#DA362A" style={{ flexShrink: 0, marginTop: 2 }} />
+          <span style={phase !== 'compact' ? expandedDestinationTitleStyle : compactDestinationTitleStyle}>
+            via {roadName} (Menuju {destination.label})
+          </span>
         </div>
+        {/* Top-right controls: ONLY close X button (chevron arrow button removed) */}
         {onCloseRoute && (
-          <button onClick={onCloseRoute} style={closeBtnStyle}>
-            ✕
+          <button onClick={handleClose} style={closeBtnStyle} title="Tutup">
+            <X size={16} color="#666" />
           </button>
         )}
       </div>
 
       {loading ? (
         <div style={statusTextStyle}>Menghitung rute perjalanan...</div>
+      ) : phase === 1 ? (
+        /* DETAIL BAR PHASE 1: Route Option Cards (Inactive initially, active when selected) & Summary Box */
+        <div style={expandedContentStyle}>
+          {/* 1. ROUTE CATEGORY SELECTION CARDS (EFFICIENT, CHEAPEST, HURRY) */}
+          <div style={categoryGridStyle}>
+            {loadingOptions ? (
+              <div style={statusTextStyle}>Memuat opsi perbandingan rute...</div>
+            ) : (
+              routeOptions.map((opt) => {
+                const isSelected = selectedCategory === opt.category;
+                let catLabel = t('detail_bar.efficient');
+                let CatIcon = Sliders;
+                let catColor = '#059669';
+
+                if (opt.category === 'cheapest') {
+                  catLabel = t('detail_bar.cheapest');
+                  CatIcon = DollarSign;
+                  catColor = '#2563EB';
+                } else if (opt.category === 'hurry') {
+                  catLabel = t('detail_bar.hurry');
+                  CatIcon = Zap;
+                  catColor = '#DA362A';
+                }
+
+                const transfersCount = typeof opt.transfersCount === 'number' ? opt.transfersCount : 0;
+                const transitText = transfersCount === 0 ? '0 Transit' : `${transfersCount} Transit`;
+
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => setSelectedCategory(opt.category)}
+                    style={{
+                      ...categoryCardStyle,
+                      borderColor: isSelected ? catColor : '#E5E7EB',
+                      backgroundColor: isSelected ? `${catColor}08` : '#FFFFFF',
+                      boxShadow: isSelected ? `0 4px 14px ${catColor}25` : '0 2px 6px rgba(0,0,0,0.04)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <CatIcon size={15} color={isSelected ? catColor : '#6B7280'} />
+                        <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? catColor : '#374151' }}>
+                          {catLabel}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: '#111827' }}>
+                        {formatCost(opt.totalCostIdr)}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#6B7280', marginTop: 4 }}>
+                      <span>🕒 {formatDuration(opt.totalDurationS)}</span>
+                      <span>•</span>
+                      <span>🔄 {transitText}</span>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+
+          {/* 2. SUMMARY BOX */}
+          <div style={routeSummaryBoxStyle}>
+            <div style={addressRowStyle}>
+              <span style={addressLabelStyle}>{t('detail_bar.from')}:</span>
+              <span style={addressValStyle}>{origin?.label || 'Lokasi Saya'}</span>
+            </div>
+            <div style={addressRowStyle}>
+              <span style={addressLabelStyle}>{t('detail_bar.to')}:</span>
+              <span style={addressValStyle}>{destination.label}</span>
+            </div>
+            <div style={summaryMetricsGridStyle}>
+              <div style={metricItemStyle}>
+                <span style={metricLabelStyle}>{t('detail_bar.duration')}</span>
+                <span style={{ ...metricValStyle, color: '#059669' }}>
+                  {activeOption ? formatDuration(activeOption.totalDurationS) : '--'}
+                </span>
+              </div>
+              <div style={metricItemStyle}>
+                <span style={metricLabelStyle}>{t('detail_bar.cost')}</span>
+                <span style={{ ...metricValStyle, color: '#DA362A' }}>
+                  {activeOption ? formatCost(activeOption.totalCostIdr) : '--'}
+                </span>
+              </div>
+              <div style={metricItemStyle}>
+                <span style={metricLabelStyle}>{t('detail_bar.transfers')}</span>
+                <span style={{ ...metricValStyle, color: '#3B82F6' }}>
+                  {activeOption ? (typeof activeOption.transfersCount === 'number' ? activeOption.transfersCount : 0) : '0'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* PHASE 1 ACTION BUTTONS: Next ("Lanjut") & Preview 360° */}
+          <div style={actionsRowStyle}>
+            <button onClick={handleNextToPhase2} style={detailsBtnStyle}>
+              {t('detail_bar.next')}
+            </button>
+            <button onClick={onOpenPreview} style={previewBtnStyle}>
+              <Eye size={14} />
+              <span>Preview 360°</span>
+            </button>
+          </div>
+        </div>
+      ) : phase === 2 ? (
+        /* DETAIL BAR PHASE 2: Multi-Transit Step-by-Step Directions */
+        <div style={expandedContentStyle}>
+          {activeOption && activeOption.legs && activeOption.legs.length > 0 ? (
+            <div style={stepListContainerStyle}>
+              <div style={stepListHeaderStyle}>
+                <span>{t('detail_bar.step_by_step')}</span>
+              </div>
+
+              <div style={timelineWrapperStyle}>
+                {activeOption.legs.map((leg, index) => {
+                  let StepIcon = Footprints;
+                  let stepColor = '#6B7280';
+                  let stepTitle = 'Jalan Kaki';
+
+                  if (leg.mode === 'mrt' || leg.mode === 'krl' || leg.mode === 'lrt') {
+                    StepIcon = Train;
+                    stepColor = '#2563EB';
+                    stepTitle = leg.routeLabel || 'Kereta / Rail';
+                  } else if (leg.mode === 'transjakarta' || leg.mode === 'bus') {
+                    StepIcon = Bus;
+                    stepColor = '#D97706';
+                    stepTitle = leg.routeLabel || 'TransJakarta / Bus';
+                  } else if (leg.mode === 'ojek') {
+                    StepIcon = Bike;
+                    stepColor = '#059669';
+                    stepTitle = 'Ojek Online Direct';
+                  }
+
+                  const fromName = 'label' in leg.from ? leg.from.label : 'Point';
+                  const toName = 'label' in leg.to ? leg.to.label : 'Point';
+
+                  return (
+                    <div key={index} style={timelineItemStyle}>
+                      <div style={timelineBadgeColumnStyle}>
+                        <div style={{ ...timelineIconBadgeStyle, backgroundColor: `${stepColor}15`, color: stepColor }}>
+                          <StepIcon size={14} />
+                        </div>
+                        {index < activeOption.legs.length - 1 && <div style={timelineLineStyle} />}
+                      </div>
+
+                      <div style={timelineContentStyle}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <span style={stepTitleStyle}>{stepTitle}</span>
+                          <span style={stepCostStyle}>{formatCost(leg.estimatedCostIdr)}</span>
+                        </div>
+                        <p style={stepDescStyle}>
+                          {leg.mode === 'walk'
+                            ? `Jalan kaki menuju ${toName}`
+                            : `Naik ${stepTitle} dari ${fromName} ke ${toName}`}
+                        </p>
+                        <div style={stepMetaRowStyle}>
+                          <span>⏱️ {formatDuration(leg.durationS)}</span>
+                          <span>•</span>
+                          <span>📏 {formatDistance(leg.distanceM)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div style={statusTextStyle}>Memuat rincian langkah rute...</div>
+          )}
+
+          {/* PHASE 2 ACTION BUTTONS: Back ("Kembali") & Preview 360° */}
+          <div style={actionsRowStyle}>
+            <button onClick={handleBackToPhase1} style={detailsBtnStyle}>
+              {t('detail_bar.back')}
+            </button>
+            <button onClick={onOpenPreview} style={previewBtnStyle}>
+              <Eye size={14} />
+              <span>Preview 360°</span>
+            </button>
+          </div>
+        </div>
       ) : directions ? (
+        /* COMPACT VIEW */
         <>
           <div style={metricsRowStyle}>
             <span style={durationBadgeStyle}>{formatDuration(directions.durationS)}</span>
             <span style={distanceTextStyle}>{formatDistance(directions.distanceM)}</span>
           </div>
 
-          {/* Budget Estimation directly below duration and distance */}
           {(() => {
-            const { costText, detailLabel } = estimateRouteCost(
-              directions.distanceM,
-              travelMode,
-              budgetPreference
-            );
+            const cost = activeOption ? activeOption.totalCostIdr : 8000;
             return (
               <div style={costEstimationRowStyle}>
                 <div style={costBadgeGroupStyle}>
                   <Wallet size={14} color="#059669" />
                   <span style={costLabelStyle}>Estimasi Biaya:</span>
-                  <span style={costValueStyle}>{costText}</span>
+                  <span style={costValueStyle}>{formatCost(cost)}</span>
                 </div>
-                <span style={costDetailTagStyle}>({detailLabel})</span>
+                <span style={costDetailTagStyle}>
+                  ({budgetPreference === 'cheapest' ? 'Murah' : budgetPreference === 'fastest' ? 'Cepat' : 'Efisien'})
+                </span>
               </div>
             );
           })()}
@@ -159,8 +369,8 @@ export default function MapRouteDetailBar({
           </div>
 
           <div style={actionsRowStyle}>
-            <button onClick={onOpenDetails} style={detailsBtnStyle}>
-              Details
+            <button onClick={handleOpenPhase1} style={detailsBtnStyle}>
+              {t('detail_bar.show_details')}
             </button>
             <button onClick={onOpenPreview} style={previewBtnStyle}>
               <Eye size={14} />
@@ -176,7 +386,7 @@ export default function MapRouteDetailBar({
 }
 
 // STYLES
-const cardWrapperStyle: React.CSSProperties = {
+const compactCardWrapperStyle: React.CSSProperties = {
   position: 'absolute',
   bottom: 20,
   left: 20,
@@ -184,43 +394,83 @@ const cardWrapperStyle: React.CSSProperties = {
   width: 360,
   maxWidth: 'calc(100vw - 120px)',
   background: '#FFFFFF',
-  borderRadius: 16,
+  borderRadius: 18,
   padding: 16,
   boxShadow: 'var(--shadow-floating)',
   display: 'flex',
   flexDirection: 'column',
   gap: 10,
-  animation: 'slideUpFade 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
+  animation: 'slideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
+};
+
+const expandedCardWrapperStyle: React.CSSProperties = {
+  position: 'absolute',
+  bottom: 20,
+  left: 20,
+  zIndex: 'var(--z-panel)',
+  width: 400,
+  maxWidth: 'calc(100vw - 60px)',
+  maxHeight: 'calc(100vh - 100px)',
+  overflowY: 'auto',
+  background: '#FFFFFF',
+  borderRadius: 20,
+  padding: 18,
+  boxShadow: '0 14px 36px rgba(0, 0, 0, 0.22)',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12,
+  animation: 'slideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
 };
 
 const headerRowStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
-  alignItems: 'center',
+  alignItems: 'flex-start',
+  gap: 10,
 };
 
 const destinationLabelGroup: React.CSSProperties = {
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   gap: 8,
+  flex: 1,
 };
 
-const destinationTitleStyle: React.CSSProperties = {
+const compactDestinationTitleStyle: React.CSSProperties = {
   fontSize: 13,
   fontWeight: 700,
   color: '#1E1E1E',
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-  maxWidth: 280,
+  maxWidth: 270,
+};
+
+const expandedDestinationTitleStyle: React.CSSProperties = {
+  fontSize: 14,
+  fontWeight: 700,
+  color: '#1E1E1E',
+  whiteSpace: 'normal',
+  wordBreak: 'break-word',
+  lineHeight: 1.4,
 };
 
 const closeBtnStyle: React.CSSProperties = {
   background: 'transparent',
   border: 'none',
-  fontSize: 12,
-  color: '#888',
+  padding: 4,
   cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: '50%',
+  flexShrink: 0,
+};
+
+const statusTextStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: '#666666',
+  padding: '6px 0',
 };
 
 const metricsRowStyle: React.CSSProperties = {
@@ -241,67 +491,14 @@ const distanceTextStyle: React.CSSProperties = {
   color: '#666666',
 };
 
-const warningNoticeStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  fontSize: 11,
-  color: '#D97706',
-  background: 'rgba(245, 166, 35, 0.1)',
-  padding: '4px 8px',
-  borderRadius: 6,
-};
-
-const actionsRowStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: 8,
-  marginTop: 2,
-};
-
-const detailsBtnStyle: React.CSSProperties = {
-  flex: 1,
-  padding: '8px 14px',
-  borderRadius: 8,
-  border: '1px solid #E5E5E5',
-  background: '#F9F9F9',
-  color: '#1E1E1E',
-  fontSize: 12,
-  fontWeight: 600,
-  cursor: 'pointer',
-};
-
-const previewBtnStyle: React.CSSProperties = {
-  flex: 1,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 6,
-  padding: '8px 14px',
-  borderRadius: 8,
-  border: 'none',
-  background: '#DA362A',
-  color: '#FFFFFF',
-  fontSize: 12,
-  fontWeight: 700,
-  cursor: 'pointer',
-};
-
-const statusTextStyle: React.CSSProperties = {
-  fontSize: 12,
-  color: '#666666',
-  fontStyle: 'italic',
-};
-
 const costEstimationRowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: 8,
-  background: '#ECFDF5',
+  background: '#F0FDF4',
   border: '1px solid #A7F3D0',
   borderRadius: 10,
-  padding: '6px 10px',
-  marginTop: 2,
+  padding: '8px 10px',
 };
 
 const costBadgeGroupStyle: React.CSSProperties = {
@@ -313,18 +510,224 @@ const costBadgeGroupStyle: React.CSSProperties = {
 const costLabelStyle: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 600,
-  color: '#047857',
+  color: '#065F46',
 };
 
 const costValueStyle: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 800,
-  color: '#065F46',
+  color: '#047857',
 };
 
 const costDetailTagStyle: React.CSSProperties = {
   fontSize: 11,
+  fontWeight: 500,
+  color: '#059669',
+};
+
+const warningNoticeStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  fontSize: 11,
+  color: '#D97706',
+  background: 'rgba(245, 166, 35, 0.1)',
+  padding: '6px 10px',
+  borderRadius: 8,
+};
+
+const actionsRowStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: 10,
+  marginTop: 4,
+};
+
+const detailsBtnStyle: React.CSSProperties = {
+  flex: 1,
+  padding: '9px 14px',
+  borderRadius: 10,
+  border: '1px solid #E5E7EB',
+  background: '#FFFFFF',
+  color: '#1E1E1E',
+  fontSize: 13,
+  fontWeight: 700,
+  cursor: 'pointer',
+  transition: 'background 0.15s ease',
+};
+
+const previewBtnStyle: React.CSSProperties = {
+  flex: 1,
+  padding: '9px 14px',
+  borderRadius: 10,
+  border: 'none',
+  background: '#DA362A',
+  color: '#FFFFFF',
+  fontSize: 13,
+  fontWeight: 700,
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 6,
+  boxShadow: '0 4px 12px rgba(218, 54, 42, 0.3)',
+};
+
+// EXPANDED STYLES
+const expandedContentStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12,
+  marginTop: 4,
+};
+
+const categoryGridStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 8,
+};
+
+const categoryCardStyle: React.CSSProperties = {
+  borderWidth: 1.5,
+  borderStyle: 'solid',
+  borderRadius: 12,
+  padding: '10px 12px',
+  textAlign: 'left',
+  cursor: 'pointer',
+  transition: 'all 0.15s ease',
+};
+
+const routeSummaryBoxStyle: React.CSSProperties = {
+  background: '#F9FAFB',
+  border: '1px solid #E5E7EB',
+  borderRadius: 12,
+  padding: 12,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 6,
+};
+
+const addressRowStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: 6,
+  fontSize: 12,
+};
+
+const addressLabelStyle: React.CSSProperties = {
   fontWeight: 600,
-  color: '#047857',
-  opacity: 0.9,
+  color: '#6B7280',
+  minWidth: 32,
+};
+
+const addressValStyle: React.CSSProperties = {
+  fontWeight: 700,
+  color: '#111827',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+};
+
+const summaryMetricsGridStyle: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(3, 1fr)',
+  gap: 8,
+  marginTop: 6,
+  paddingTop: 6,
+  borderTop: '1px dashed #E5E7EB',
+};
+
+const metricItemStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+};
+
+const metricLabelStyle: React.CSSProperties = {
+  fontSize: 10,
+  color: '#6B7280',
+  fontWeight: 600,
+};
+
+const metricValStyle: React.CSSProperties = {
+  fontSize: 13,
+  fontWeight: 800,
+  marginTop: 2,
+};
+
+const stepListContainerStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 8,
+};
+
+const stepListHeaderStyle: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: '#374151',
+};
+
+const timelineWrapperStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+const timelineItemStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: 10,
+  position: 'relative',
+};
+
+const timelineBadgeColumnStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  width: 24,
+};
+
+const timelineIconBadgeStyle: React.CSSProperties = {
+  width: 24,
+  height: 24,
+  borderRadius: '50%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 1,
+};
+
+const timelineLineStyle: React.CSSProperties = {
+  width: 2,
+  flex: 1,
+  backgroundColor: '#E5E7EB',
+  margin: '2px 0',
+};
+
+const timelineContentStyle: React.CSSProperties = {
+  flex: 1,
+  paddingBottom: 12,
+};
+
+const stepTitleStyle: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: '#111827',
+};
+
+const stepCostStyle: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  color: '#059669',
+};
+
+const stepDescStyle: React.CSSProperties = {
+  fontSize: 11,
+  color: '#4B5563',
+  margin: '2px 0 4px 0',
+  lineHeight: 1.3,
+};
+
+const stepMetaRowStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: 6,
+  fontSize: 10,
+  color: '#9CA3AF',
+  fontWeight: 500,
 };
