@@ -14,12 +14,12 @@ import {
   Bike,
 } from 'lucide-react';
 import type { DirectionsResult } from '@/services/mapService';
-import type { PlaceResult } from '@/types/domain.types';
+import type { PlaceResult, GeoPoint } from '@/types/domain.types';
 import { generateLogicalRouteOptions, type LogicalRouteOption, type RouteCategory } from '@/services/routeService';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface MapRouteDetailBarProps {
-  origin?: PlaceResult | null;
+  origin?: PlaceResult | GeoPoint | null;
   destination: PlaceResult | null;
   directions: DirectionsResult | null;
   loading: boolean;
@@ -90,7 +90,17 @@ export default function MapRouteDetailBar({
       setSelectedCategory(null);
       return;
     }
-    const orig = origin || { lat: -6.2088, lng: 106.8456, label: 'Lokasi Saya' };
+    const orig: PlaceResult = origin ? {
+      lat: origin.lat,
+      lng: origin.lng,
+      label: (origin as any).label || 'Lokasi Saya',
+      address: (origin as any).address || (origin as any).label || 'Lokasi Saya',
+    } : {
+      lat: -6.2088,
+      lng: 106.8456,
+      label: 'Lokasi Saya',
+      address: 'Lokasi Saya',
+    };
     setLoadingOptions(true);
 
     generateLogicalRouteOptions(orig, destination)
@@ -121,8 +131,9 @@ export default function MapRouteDetailBar({
   const handleNextToPhase2 = () => {
     // If user hasn't selected a category yet, default to budgetPreference or first option
     if (!selectedCategory && routeOptions.length > 0) {
-      const defaultCat = routeOptions.find((o) => o.category === budgetPreference)
-        ? budgetPreference
+      const prefCategory: RouteCategory = budgetPreference === 'fastest' ? 'hurry' : (budgetPreference as RouteCategory);
+      const defaultCat = routeOptions.find((o) => o.category === prefCategory)
+        ? prefCategory
         : routeOptions[0].category;
       setSelectedCategory(defaultCat);
     }
@@ -182,7 +193,7 @@ export default function MapRouteDetailBar({
                   catColor = '#DA362A';
                 }
 
-                const transfersCount = typeof opt.transfersCount === 'number' ? opt.transfersCount : 0;
+                const transfersCount = opt.transfers ?? (opt as any).transfersCount ?? 0;
                 const transitText = transfersCount === 0 ? '0 Transit' : `${transfersCount} Transit`;
 
                 return (
@@ -223,7 +234,7 @@ export default function MapRouteDetailBar({
           <div style={routeSummaryBoxStyle}>
             <div style={addressRowStyle}>
               <span style={addressLabelStyle}>{t('detail_bar.from')}:</span>
-              <span style={addressValStyle}>{origin?.label || 'Lokasi Saya'}</span>
+              <span style={addressValStyle}>{(origin as PlaceResult)?.label || 'Lokasi Saya'}</span>
             </div>
             <div style={addressRowStyle}>
               <span style={addressLabelStyle}>{t('detail_bar.to')}:</span>
@@ -245,7 +256,7 @@ export default function MapRouteDetailBar({
               <div style={metricItemStyle}>
                 <span style={metricLabelStyle}>{t('detail_bar.transfers')}</span>
                 <span style={{ ...metricValStyle, color: '#3B82F6' }}>
-                  {activeOption ? (typeof activeOption.transfersCount === 'number' ? activeOption.transfersCount : 0) : '0'}
+                  {activeOption ? (activeOption.transfers ?? (activeOption as any).transfersCount ?? 0) : '0'}
                 </span>
               </div>
             </div>

@@ -7,7 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Sidebar from '@/components/Sidebar';
 
 import LandingPage from '@/pages/LandingPage';
-import { Login, TransportPreference, ProfileSelect } from '@/pages/Auth';
+import { Login, Register, TransportPreference, ProfileSelect } from '@/pages/Auth';
 import MapDashboard from '@/pages/MapDashboard';
 import RouteComparison from '@/pages/RouteComparison';
 import RouteDetail from '@/pages/RouteDetail';
@@ -49,6 +49,9 @@ export default function App() {
               <Route path="/beranda" element={<LandingPage />} />
               <Route path="/landing" element={<Navigate to="/beranda" replace />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/daftar" element={<Register />} />
+              <Route path="/register" element={<Navigate to="/daftar" replace />} />
+              <Route path="/signup" element={<Navigate to="/daftar" replace />} />
               <Route path="/onboarding/transport" element={<TransportPreference />} />
               <Route path="/onboarding/profile" element={<ProfileSelect />} />
               <Route path="/dashboard" element={<AppLayout><MapDashboard /></AppLayout>} />

@@ -592,6 +592,7 @@ async function buildSyntheticEfficientLegs(origin: PlaceResult, destination: Pla
     distanceM: Math.round(transitDistM),
     estimatedCostIdr: totalDistanceM > 15000 ? 9000 : 8000,
     routeLabel: transitLabel,
+    isTransfer: false,
   };
 
   const walk2 = await buildWalkLeg(transitLeg.to, destination);
@@ -628,6 +629,7 @@ async function buildSyntheticCheapestLegs(origin: PlaceResult, destination: Plac
     distanceM: Math.round(transitDistM),
     estimatedCostIdr: 3500,
     routeLabel: 'TransJakarta Koridor Utama',
+    isTransfer: false,
   };
 
   const walk2 = await buildWalkLeg(transitLeg.to, destination);

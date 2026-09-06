@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Check, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -581,10 +581,18 @@ function translateAuthError(message: string, mode: 'signin' | 'signup'): string 
 }
 
 // Login
-export function Login() {
+export function Login({ initialMode = 'signin' }: { initialMode?: 'signin' | 'signup' }) {
   const { user, signIn, signUp } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const location = useLocation();
+
+  const isDaftarPath =
+    location.pathname === '/daftar' ||
+    location.pathname === '/register' ||
+    location.pathname === '/signup';
+  const resolvedMode = isDaftarPath ? 'signup' : initialMode;
+
+  const [mode, setMode] = useState<'signin' | 'signup'>(resolvedMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -592,6 +600,12 @@ export function Login() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setMode(resolvedMode);
+    setError(null);
+    setNotice(null);
+  }, [location.pathname, resolvedMode]);
 
   if (user) return <Navigate to="/" replace />;
 
@@ -791,7 +805,9 @@ export function Login() {
             setError(null);
             setNotice(null);
             setShowPassword(false);
-            setMode(mode === 'signin' ? 'signup' : 'signin');
+            const nextMode = mode === 'signin' ? 'signup' : 'signin';
+            setMode(nextMode);
+            navigate(nextMode === 'signin' ? '/login' : '/daftar');
           }}
           style={{ background: 'none', border: 'none', padding: 0, color: C.primary, fontWeight: 700, cursor: 'pointer', ...bodyFont, fontSize: 14 }}
         >
@@ -800,6 +816,10 @@ export function Login() {
       </p>
     </AuthShell>
   );
+}
+
+export function Register() {
+  return <Login initialMode="signup" />;
 }
 
 /**
