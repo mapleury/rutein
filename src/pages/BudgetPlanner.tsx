@@ -45,7 +45,6 @@ import type { IndonesiaTransportType } from '@/data/indonesiaTransportData';
 import type { PlaceResult } from '@/types/domain.types';
 import type { SavedPlace } from '@/types/database.types';
 
-// RUTEIN Standard Transport Type Icons Mapping
 export const transportIcons: Record<IndonesiaTransportType, React.ComponentType<any>> = {
   transjakarta: Bus,
   bus: Bus,
@@ -65,13 +64,11 @@ export default function BudgetPlanner() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Dynamic user-isolated LocalStorage keys
   const userKey = user ? user.id : 'guest';
   const localStorageBudgetKey = `rutein_applied_budget_${userKey}`;
   const localStorageDestKey = `rutein_budget_destination_${userKey}`;
   const localStorageOrigKey = `rutein_budget_origin_${userKey}`;
 
-  // Location state
   const [origin, setOriginState] = useState<PlaceResult | null>(null);
   const [destination, setDestinationState] = useState<PlaceResult | null>(null);
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
@@ -79,7 +76,6 @@ export default function BudgetPlanner() {
   const [isEditingDestination, setIsEditingDestination] = useState<boolean>(false);
   const [locationWarning, setLocationWarning] = useState<string | null>(null);
 
-  // Input & evaluation state
   const [inputBudget, setInputBudget] = useState<number>(20000);
   const [appliedBudget, setAppliedBudget] = useState<number>(20000);
   const [justApplied, setJustApplied] = useState<boolean>(false);
@@ -87,7 +83,6 @@ export default function BudgetPlanner() {
   const [calculatedCandidates, setCalculatedCandidates] = useState<BudgetRouteCandidate[] | null>(null);
   const [isCalculatingRoutes, setIsCalculatingRoutes] = useState<boolean>(false);
 
-  // Set origin and persist to LocalStorage per user
   const setOrigin = (place: PlaceResult | null) => {
     setOriginState(place);
     if (place) {
@@ -97,7 +92,6 @@ export default function BudgetPlanner() {
     }
   };
 
-  // Set destination and persist to LocalStorage per user
   const setDestination = (place: PlaceResult | null) => {
     setDestinationState(place);
     if (place) {
@@ -107,9 +101,7 @@ export default function BudgetPlanner() {
     }
   };
 
-  // Restore saved state & auto-detect location per user
   useEffect(() => {
-    // 1. Restore saved destination for current user
     const savedDest = localStorage.getItem(localStorageDestKey);
     if (savedDest) {
       try {
@@ -122,7 +114,6 @@ export default function BudgetPlanner() {
       setDestinationState(null);
     }
 
-    // 2. Restore saved origin for current user or fallback to GPS
     const savedOrig = localStorage.getItem(localStorageOrigKey);
     let hasSavedOrigin = false;
     if (savedOrig) {
@@ -151,7 +142,6 @@ export default function BudgetPlanner() {
         .finally(() => setIsDetectingLocation(false));
     }
 
-    // 3. Priority 1: Check LocalStorage first for current user applied budget
     const savedLocal = localStorage.getItem(localStorageBudgetKey);
     let hasLocalBudget = false;
     if (savedLocal) {
@@ -163,7 +153,6 @@ export default function BudgetPlanner() {
       }
     }
 
-    // Priority 2: Fetch last saved budget plan from Supabase backend for user
     if (user) {
       listSavedPlaces(user.id).then(setSavedPlaces).catch(() => {});
 
@@ -185,7 +174,6 @@ export default function BudgetPlanner() {
     }
   }, [user, localStorageBudgetKey, localStorageDestKey, localStorageOrigKey]);
 
-  // Recalculate real routes when origin and destination are set
   useEffect(() => {
     if (origin && destination) {
       setLocationWarning(null);
@@ -241,18 +229,15 @@ export default function BudgetPlanner() {
     }
   }, [origin, destination]);
 
-  // Evaluate candidate routes based on applied budget
   const evaluation = useMemo(() => {
     return evaluateBudgetOptions(appliedBudget, calculatedCandidates || CANDIDATE_JOURNEYS);
   }, [appliedBudget, calculatedCandidates]);
 
-  // Long term projection based on selected budget
   const selectedCost = evaluation.balanced?.route.totalCostIdr || evaluation.cheapest?.route.totalCostIdr || appliedBudget;
   const projection = useMemo(() => {
     return calculateLongTermProjection(selectedCost);
   }, [selectedCost]);
 
-  // Persist budget state to LocalStorage (per user) and Supabase backend
   const persistBudgetState = async (val: number) => {
     setAppliedBudget(val);
     localStorage.setItem(localStorageBudgetKey, val.toString());
@@ -284,7 +269,6 @@ export default function BudgetPlanner() {
           },
         });
       } catch (err) {
-        // Fallback silently
       } finally {
         setIsSavingSupabase(false);
       }
@@ -445,7 +429,6 @@ export default function BudgetPlanner() {
               </label>
 
               {destination && !isEditingDestination ? (
-                /* Selected Active Destination Card */
                 <div
                   style={{
                     background: '#FDF0ED',
@@ -506,7 +489,6 @@ export default function BudgetPlanner() {
                   </button>
                 </div>
               ) : (
-                /* Place Search Input */
                 <PlaceSearchInput
                   value={destination?.label}
                   placeholder="Pilih Tempat Tujuan (misal: Sudirman, Monas, atau Rumah)"

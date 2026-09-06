@@ -11,11 +11,6 @@ import {
 
 type FilterTab = 'semua' | 'aktif' | 'kritis' | 'tol';
 
-// ============================================================
-// Same design tokens, fonts, card shapes, and chip styling as
-// the Profile page, so this screen reads as a continuation of
-// the same brand rather than a different app.
-// ============================================================
 const C = {
   bg: '#FCF4ED',
   surface: '#FFFDF9',
@@ -87,9 +82,7 @@ export default function Disruptions() {
   const [filter, setFilter] = useState<FilterTab>('aktif');
 
   useEffect(() => {
-    // Simulasi pemuatan feed peringatan lalu lintas
     const timer = setTimeout(() => {
-      // Urutkan berdasarkan tingkat keparahan (Kritis -> Tinggi -> Sedang -> Rendah)
       const severityWeight: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
       const sorted = [...INDONESIA_ROAD_DISRUPTIONS].sort((a, b) => severityWeight[b.severity] - severityWeight[a.severity]);
 

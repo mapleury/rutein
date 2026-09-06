@@ -178,7 +178,7 @@ export default function Sidebar({
       .then((p) => {
         if (isMounted) setAvatarUrl(p?.avatar_url || '');
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       isMounted = false;
     };
@@ -202,13 +202,13 @@ export default function Sidebar({
     try {
       const raw = localStorage.getItem('rutein_saved_places');
       if (raw) localItems = JSON.parse(raw);
-    } catch {}
+    } catch { }
 
     let remoteItems: SavedPlace[] = [];
     if (user) {
       try {
         remoteItems = await listSavedPlaces(user.id);
-      } catch {}
+      } catch { }
     }
 
     const combined = [...localItems];
@@ -238,12 +238,12 @@ export default function Sidebar({
         );
         localStorage.setItem('rutein_saved_places', JSON.stringify(filtered));
       }
-    } catch {}
+    } catch { }
 
     if (user && !placeId.startsWith('saved_')) {
       try {
         await deleteSavedPlace(placeId);
-      } catch {}
+      } catch { }
     }
 
     loadAllSavedPlaces();
@@ -406,216 +406,211 @@ export default function Sidebar({
                   )}
                 </button>
 
-              {(!isCollapsed || isMobile) && activeSection === 'operators' && (
-                <div style={accordionContentStyle}>
-                  <div style={treeListStyle}>
-                    {ALL_TRANSPORT_TYPES.map((type) => (
-                      <div key={type} className="op-tree-line">
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => {
-                            onSelectOperator?.(type);
-                            if (isMobile && onCloseMobile) onCloseMobile();
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
+                {(!isCollapsed || isMobile) && activeSection === 'operators' && (
+                  <div style={accordionContentStyle}>
+                    <div style={treeListStyle}>
+                      {ALL_TRANSPORT_TYPES.map((type) => (
+                        <div key={type} className="op-tree-line">
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => {
                               onSelectOperator?.(type);
                               if (isMobile && onCloseMobile) onCloseMobile();
-                            }
-                          }}
-                          className="op-tree-row"
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 10,
-                            padding: '7px 8px',
-                            borderRadius: 8,
-                            cursor: 'pointer',
-                            backgroundColor: 'transparent',
-                            color: '#FFFFFF',
-                            transition: 'background-color 0.15s ease, transform 0.15s ease',
-                          }}
-                          title={`Lihat rute & jadwal ${TRANSPORT_TYPE_LABELS[type]}`}
-                        >
-                          <div
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                onSelectOperator?.(type);
+                                if (isMobile && onCloseMobile) onCloseMobile();
+                              }
+                            }}
+                            className="op-tree-row"
                             style={{
                               display: 'flex',
                               alignItems: 'center',
-                              justifyContent: 'center',
-                              width: 20,
-                              height: 20,
+                              gap: 10,
+                              padding: '7px 8px',
+                              borderRadius: 8,
+                              cursor: 'pointer',
+                              backgroundColor: 'transparent',
                               color: '#FFFFFF',
-                              flexShrink: 0,
+                              transition: 'background-color 0.15s ease, transform 0.15s ease',
                             }}
+                            title={`Lihat rute & jadwal ${TRANSPORT_TYPE_LABELS[type]}`}
                           >
-                            {getOperatorIcon(type)}
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: 20,
+                                height: 20,
+                                color: '#FFFFFF',
+                                flexShrink: 0,
+                              }}
+                            >
+                              {getOperatorIcon(type)}
+                            </div>
+                            <span
+                              style={{
+                                fontSize: 13,
+                                fontWeight: 500,
+                                color: '#FFFFFF',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {TRANSPORT_TYPE_LABELS[type]}
+                            </span>
                           </div>
-                          <span
-                            style={{
-                              fontSize: 13,
-                              fontWeight: 500,
-                              color: '#FFFFFF',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                            }}
-                          >
-                            {TRANSPORT_TYPE_LABELS[type]}
-                          </span>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Saved places — available everywhere */}
-          <div style={sectionWrapperStyle}>
-            <button
-              type="button"
-              onClick={() => toggleSection('saved')}
-              className="side-nav-item"
-              style={sectionHeaderStyle(activeSection === 'saved' && (!isCollapsed || isMobile))}
-              title="Tempat Tersimpan"
-            >
-              <div style={navItemLabelGroup}>
-                <Bookmark size={17} />
-                {(!isCollapsed || isMobile) && <span>Tempat Tersimpan</span>}
-              </div>
-              {(!isCollapsed || isMobile) && (
-                <ChevronDown size={14} style={chevronStyle(activeSection === 'saved')} />
-              )}
-            </button>
-
-            {(!isCollapsed || isMobile) && activeSection === 'saved' && (
-              <div style={accordionContentStyle}>
-                {loadingSaved ? (
-                  <div style={mutedTextStyle}>Memuat…</div>
-                ) : savedPlaces.length === 0 ? (
-                  <div style={mutedTextStyle}>Belum ada tempat tersimpan</div>
-                ) : (
-                  <div style={savedListStyle}>
-                    {savedPlaces.map((place) => {
-                      const isCoord = (str?: string | null) =>
-                        !str ||
-                        str === 'Lokasi Tujuan' ||
-                        str.startsWith('-') ||
-                        /^-?\d+\.\d+/.test(str);
-
-                      let displayName = !isCoord(place.name) ? place.name : '';
-                      let displayAddress = !isCoord(place.address) ? place.address : '';
-
-                      if (!displayName && displayAddress) {
-                        displayName = displayAddress;
-                        displayAddress = '';
-                      }
-                      if (!displayName) {
-                        displayName = 'Rute Tersimpan';
-                        displayAddress = 'Lokasi Terdaftar';
-                      }
-
-                      return (
-                        <div
-                          key={place.id}
-                          onClick={() => {
-                            handleSelectSavedPlace(place, displayName, displayAddress || undefined);
-                            if (isMobile && onCloseMobile) onCloseMobile();
-                          }}
-                          className="side-saved-item"
-                          style={savedItemStyle}
-                          title={`Tampilkan rute ke ${displayName}`}
-                        >
-                          <div style={{ minWidth: 0, flex: 1 }}>
-                            <div style={savedItemName}>{displayName}</div>
-                            {displayAddress && <div style={savedItemAddress}>{displayAddress}</div>}
-                          </div>
-                          <button
-                            type="button"
-                            onClick={(e) => handleDeleteSaved(e, place.id, place.name)}
-                            className="side-delete-btn"
-                            style={deleteBtnStyle}
-                            title="Hapus tempat tersimpan"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
             )}
+
+            {/* Saved places — available everywhere */}
+            <div style={sectionWrapperStyle}>
+              <button
+                type="button"
+                onClick={() => toggleSection('saved')}
+                className="side-nav-item"
+                style={sectionHeaderStyle(activeSection === 'saved' && (!isCollapsed || isMobile))}
+                title="Tempat Tersimpan"
+              >
+                <div style={navItemLabelGroup}>
+                  <Bookmark size={17} />
+                  {(!isCollapsed || isMobile) && <span>Tempat Tersimpan</span>}
+                </div>
+                {(!isCollapsed || isMobile) && (
+                  <ChevronDown size={14} style={chevronStyle(activeSection === 'saved')} />
+                )}
+              </button>
+
+              {(!isCollapsed || isMobile) && activeSection === 'saved' && (
+                <div style={accordionContentStyle}>
+                  {loadingSaved ? (
+                    <div style={mutedTextStyle}>Memuat…</div>
+                  ) : savedPlaces.length === 0 ? (
+                    <div style={mutedTextStyle}>Belum ada tempat tersimpan</div>
+                  ) : (
+                    <div style={savedListStyle}>
+                      {savedPlaces.map((place) => {
+                        const isCoord = (str?: string | null) =>
+                          !str ||
+                          str === 'Lokasi Tujuan' ||
+                          str.startsWith('-') ||
+                          /^-?\d+\.\d+/.test(str);
+
+                        let displayName = !isCoord(place.name) ? place.name : '';
+                        let displayAddress = !isCoord(place.address) ? place.address : '';
+
+                        if (!displayName && displayAddress) {
+                          displayName = displayAddress;
+                          displayAddress = '';
+                        }
+                        if (!displayName) {
+                          displayName = 'Rute Tersimpan';
+                          displayAddress = 'Lokasi Terdaftar';
+                        }
+
+                        return (
+                          <div
+                            key={place.id}
+                            onClick={() => {
+                              handleSelectSavedPlace(place, displayName, displayAddress || undefined);
+                              if (isMobile && onCloseMobile) onCloseMobile();
+                            }}
+                            className="side-saved-item"
+                            style={savedItemStyle}
+                            title={`Tampilkan rute ke ${displayName}`}
+                          >
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div style={savedItemName}>{displayName}</div>
+                              {displayAddress && <div style={savedItemAddress}>{displayAddress}</div>}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteSaved(e, place.id, place.name)}
+                              className="side-delete-btn"
+                              style={deleteBtnStyle}
+                              title="Hapus tempat tersimpan"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Profile footer — avatar treatment matches Profile.tsx */}
-      <div style={footerStyle} ref={profileRef}>
-        {isProfileOpen && (!isCollapsed || isMobile) && (
-          <div className="side-profile-popover" style={profilePopoverStyle}>
-            <Link
-              to="/profile"
-              className="side-popover-item"
-              style={popoverItemStyle}
-              onClick={() => {
-                setIsProfileOpen(false);
-                if (isMobile && onCloseMobile) onCloseMobile();
-              }}
-            >
-              <User size={15} color="#DA362A" />
-              <span>Lihat profil</span>
-            </Link>
-            <button
-              type="button"
-              onClick={handleSignOut}
-              className="side-popover-item"
-              style={{ ...popoverItemStyle, width: '100%', background: 'none', border: 'none', cursor: 'pointer' }}
-            >
-              <LogOut size={15} color="#DA362A" />
-              <span>Keluar dari akun</span>
-            </button>
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={() => (isCollapsed && !isMobile ? navigate('/profile') : setIsProfileOpen((p) => !p))}
-          className="side-profile-btn"
-          style={profileBtnStyle}
-          title={displayName}
-        >
-          <div style={avatarStyle}>
-            {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={displayName}
-                style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 5 }}
-              />
-            ) : (
-              <span style={{ fontSize: 13, fontWeight: 400, color: '#DA362A' }}>{userInitial}</span>
-            )}
-          </div>
-          {(!isCollapsed || isMobile) && (
-            <div style={profileTextGroup}>
-              <span style={userNameStyle}>{displayName}</span>
-              <span style={userSubtextStyle}>Lihat profil</span>
+        {/* Profile footer — avatar treatment matches Profile.tsx */}
+        <div style={footerStyle} ref={profileRef}>
+          {isProfileOpen && (!isCollapsed || isMobile) && (
+            <div className="side-profile-popover" style={profilePopoverStyle}>
+              <Link
+                to="/profile"
+                className="side-popover-item"
+                style={popoverItemStyle}
+                onClick={() => {
+                  setIsProfileOpen(false);
+                  if (isMobile && onCloseMobile) onCloseMobile();
+                }}
+              >
+                <User size={15} color="#DA362A" />
+                <span>Lihat profil</span>
+              </Link>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="side-popover-item"
+                style={{ ...popoverItemStyle, width: '100%', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                <LogOut size={15} color="#DA362A" />
+                <span>Keluar dari akun</span>
+              </button>
             </div>
           )}
-        </button>
-      </div>
-    </aside>
-  </>
+
+          <button
+            type="button"
+            onClick={() => (isCollapsed && !isMobile ? navigate('/profile') : setIsProfileOpen((p) => !p))}
+            className="side-profile-btn"
+            style={profileBtnStyle}
+            title={displayName}
+          >
+            <div style={avatarStyle}>
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 5 }}
+                />
+              ) : (
+                <span style={{ fontSize: 13, fontWeight: 400, color: '#DA362A' }}>{userInitial}</span>
+              )}
+            </div>
+            {(!isCollapsed || isMobile) && (
+              <div style={profileTextGroup}>
+                <span style={userNameStyle}>{displayName}</span>
+                <span style={userSubtextStyle}>Lihat profil</span>
+              </div>
+            )}
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────
-// Injected CSS — hover animation, connector-line tree, and the flipped
-// low-opacity scrollbar. Kept scoped to side-* / op-tree-* class names so it
-// can't leak into the rest of the app.
-// ────────────────────────────────────────────────────────────────────────
 const sidebarStyles = `
   .side-logo-link { display: flex; align-items: center; }
 

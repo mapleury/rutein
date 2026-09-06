@@ -23,14 +23,10 @@ import caraKerjaSvg from '@/assets/images/cara-kerja.svg';
 import merpatiSvg from '@/assets/images/merpati-terbang.svg';
 import trainPeopleSvg from '@/assets/images/train-people.svg';
 
-// --- OFFICIAL REACT BITS COMPONENTS ---
 import { SplitText } from '@/components/ReactBits/SplitText';
 import { BlurText } from '@/components/ReactBits/BlurText';
 import { TiltedCard } from '@/components/ReactBits/TiltedCard';
 
-// --- REACT BITS EXTRAORDINARY HERO ANIMATION COMPONENTS ---
-
-/** 1. Animated Top Train Track SVG (Follows Path Curve & Stations) */
 function AnimatedTrainTrackTop() {
   return (
     <svg width="100%" height="auto" viewBox="0 0 1440 63" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', minWidth: '100vw' }}>
@@ -76,7 +72,6 @@ function AnimatedTrainTrackTop() {
   );
 }
 
-/** 2. Animated Bottom Train Track SVG (Follows Path Curve & Stations) */
 function AnimatedTrainTrackBottom() {
   return (
     <svg width="100%" height="auto" viewBox="0 0 1440 63" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', minWidth: '100vw' }}>
@@ -122,8 +117,7 @@ function AnimatedTrainTrackBottom() {
   );
 }
 
-/** 3. Custom Pointer / Cursor (RUTEIN Transit Pointer) */
-function CustomTransitCursor() {
+function RuteinCustomPointer() {
   const [pos, setPos] = useState({ x: -100, y: -100 });
   const [trailPos, setTrailPos] = useState({ x: -100, y: -100 });
   const [isHovered, setIsHovered] = useState(false);
@@ -195,7 +189,6 @@ function CustomTransitCursor() {
   );
 }
 
-/** 4. Ambient Mesh Glow & Transit Grid BG */
 function AmbientTransitBackground() {
   return (
     <div
@@ -256,8 +249,7 @@ function AmbientTransitBackground() {
   );
 }
 
-/** 5. Ultra-Smooth Silky Scroll & Refresh Entrance */
-function SmoothReveal({
+function SilkyScrollEntrance({
   children,
   delayMs = 0,
   className,
@@ -305,8 +297,7 @@ function SmoothReveal({
   );
 }
 
-/** 6. Animated Counter Component (0 -> 5K+) */
-function AnimatedCounter({ target = 5000, suffix = '+' }: { target?: number; suffix?: string }) {
+function AnimatedCounter({ from = 0, to, duration = 2.5, suffix = '' }: { from?: number; to: number; duration?: number; suffix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -317,13 +308,12 @@ function AnimatedCounter({ target = 5000, suffix = '+' }: { target?: number; suf
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          const duration = 1800;
           const startTime = performance.now();
 
           const update = (now: number) => {
-            const progress = Math.min((now - startTime) / duration, 1);
+            const progress = Math.min((now - startTime) / (duration * 1000), 1);
             const easeProgress = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.floor(easeProgress * target));
+            setCount(Math.floor(from + easeProgress * (to - from)));
 
             if (progress < 1) {
               requestAnimationFrame(update);
@@ -339,7 +329,7 @@ function AnimatedCounter({ target = 5000, suffix = '+' }: { target?: number; suf
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [target]);
+  }, [to, from, duration]);
 
   return (
     <div ref={ref} className="font-jockey" style={{ fontSize: 32, color: '#DA362A', lineHeight: 1 }}>
@@ -355,7 +345,6 @@ export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isEN = lang === 'EN';
 
-  // Manual scroll restoration on page refresh to strictly lock top position (y = 0)
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
@@ -387,10 +376,8 @@ export default function LandingPage() {
         position: 'relative',
       }}
     >
-      {/* Unique Custom Transit Cursor */}
-      <CustomTransitCursor />
+      <RuteinCustomPointer />
 
-      {/* Clean Keyframes & Dynamic Illustrations Animations */}
       <style>{`
         .logo-hover {
           transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
@@ -436,7 +423,6 @@ export default function LandingPage() {
           border-color: rgba(218, 54, 42, 0.4) !important;
         }
 
-        /* --- TRAIN PATH FLOW ANIMATION ALONG EXACT SVG CURVES --- */
         .train-path-flow {
           animation: trainPathMove 4.5s linear infinite;
         }
@@ -457,8 +443,7 @@ export default function LandingPage() {
           100% { opacity: 0.95; transform: scale(1.06); }
         }
 
-        /* --- GIANT CALLOUT DYNAMIC ANIMATIONS --- */
-        @keyframes birdFloat {
+        @keyframes calloutFloat1 {
           0% { transform: translateY(0px) rotate(0deg) scale(1); }
           50% { transform: translateY(-12px) rotate(-4deg) scale(1.06); }
           100% { transform: translateY(0px) rotate(0deg) scale(1); }
@@ -494,7 +479,6 @@ export default function LandingPage() {
           will-change: transform, filter;
         }
 
-        /* --- FOOTER SOCIAL MEDIA HOVER BOUNCE & GLOW --- */
         .footer-social-icon {
           transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s ease, filter 0.2s ease !important;
         }
