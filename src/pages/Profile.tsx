@@ -242,7 +242,7 @@ const sectionLabelStyle: React.CSSProperties = {
   color: C.textMuted,
   marginBottom: 10,
   textTransform: 'uppercase',
-  letterSpacing: '0.08em',
+  letterSpacing: '0.03em',
 };
 
 const avatarCircleStyle: React.CSSProperties = {
@@ -458,7 +458,7 @@ export default function Profile() {
           className="font-jockey profile-fade"
           style={{ fontSize: 'clamp(28px, 7vw, 40px)', margin: '0 0 24px', color: C.text, animationDelay: '0ms' }}
         >
-          Profil
+          Profil Pengguna
         </h1>
 
         {/* Identity with Hover-to-Change Avatar */}
