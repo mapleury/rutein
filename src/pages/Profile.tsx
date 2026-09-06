@@ -2,20 +2,24 @@
 //
 //  - Same design tokens (C), fonts, card shapes, and chip styling as
 //    the auth screens.
-//  - The "Profil perjalanan" section is completely removed; travel profile type 
+//  - The "Profil perjalanan" section is completely removed; travel profile type
 //    is updated exclusively via the hover-and-click interaction on the profile avatar.
 //  - Full name is the only ordinary text input field.
-//  - Avatar/Profile picture handling: Hovering over the avatar circle reveals 
-//    a red overlay with a change icon. Clicking it opens a modal to select 
+//  - Avatar/Profile picture handling: Hovering over the avatar circle reveals
+//    a red overlay with a change icon. Clicking it opens a modal to select
 //    between the three predefined profile options.
-//  - Transport preferences can now be added or removed directly here using interactive chips/modal.
+//  - Transport preferences can be added or removed directly here using interactive chips/modal.
+//  - Saved places can be added, viewed, and removed directly here using a modal
+//    with a name field, category picker, address search, and optional notes.
+//  - Every modal opens and closes with a matching fade/scale animation — the modal
+//    stays mounted for the short exit transition instead of disappearing instantly.
 
 import React, { useEffect, useState } from 'react';
-import { Edit3 } from 'lucide-react';
+import { Home, GraduationCap, Briefcase, MapPin, Trash2, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import PageLoading from '@/components/PageLoading';
+import PlaceSearchInput from '@/components/PlaceSearchInput';
 import { getProfile, updateProfile, getPreferences, upsertPreferences } from '@/services/preferencesService';
-import { listSavedPlaces } from '@/services/savedPlacesService';
+import { listSavedPlaces, createSavedPlace, deleteSavedPlace } from '@/services/savedPlacesService';
 import { listBudgetPlans } from '@/services/budgetService';
 import { TRANSPORT_TYPE_COLOR } from '@/components/transportMarkerIcon';
 import type { OnboardingTransportType, OnboardingProfileType } from '@/services/onboardingService';
@@ -24,7 +28,9 @@ import type {
   SavedPlace,
   BudgetPlan,
   UserPreferences,
+  PlaceCategory,
 } from '@/types/database.types';
+import type { PlaceResult } from '@/types/domain.types';
 
 import profileSchoolSvg from '@/assets/images/profile-school.svg';
 import profileTravelSvg from '@/assets/images/profile-travel.svg';
@@ -70,6 +76,20 @@ const sharedStyles = `
   }
   .avatar-container:hover .avatar-overlay { opacity: 1; }
 
+  /* Modal open/close animations. Both directions are driven inline per
+     modal (via isXModalClosing) so a modal can play its exit transition
+     before it actually unmounts, instead of vanishing instantly. */
+  @keyframes modalBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modalBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes modalContentIn {
+    from { opacity: 0; transform: translateY(-16px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes modalContentOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-10px) scale(0.97); }
+  }
+
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -90,7 +110,6 @@ const sharedStyles = `
     width: 100%;
     max-width: 420px;
     box-sizing: border-box;
-    animation: profileFadeDown 0.25s ease forwards;
   }
 
   .transport-chip-interactive {
@@ -100,6 +119,41 @@ const sharedStyles = `
   .transport-chip-interactive:hover {
     opacity: 0.85;
     transform: translateY(-1px);
+  }
+
+  .delete-place-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 10px;
+    color: ${C.textMuted};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .delete-place-btn:hover {
+    background: rgba(218, 54, 42, 0.10);
+    color: ${C.primary};
+  }
+
+  .modal-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    color: ${C.textMuted};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .modal-close-btn:hover {
+    background: rgba(122, 111, 98, 0.10);
+    color: ${C.text};
   }
 
   @media (max-width: 480px) {
@@ -135,6 +189,17 @@ const ALL_TRANSPORTS: OnboardingTransportType[] = [
   'airport_rail',
   'ferry',
   'terminal',
+];
+
+const PLACE_CATEGORIES: {
+  value: PlaceCategory;
+  label: string;
+  icon: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+}[] = [
+  { value: 'home', label: 'Rumah', icon: Home },
+  { value: 'school', label: 'Sekolah', icon: GraduationCap },
+  { value: 'workplace', label: 'Kantor', icon: Briefcase },
+  { value: 'custom', label: 'Lainnya', icon: MapPin },
 ];
 
 const cardStyle: React.CSSProperties = {
@@ -193,6 +258,18 @@ const avatarCircleStyle: React.CSSProperties = {
   flexShrink: 0,
 };
 
+const MODAL_EXIT_MS = 200;
+
+// Plays a modal's exit animation, then unmounts it once the animation
+// has actually finished — used by every modal on this page.
+function closeWithAnimation(setClosing: (v: boolean) => void, setOpen: (v: boolean) => void) {
+  setClosing(true);
+  window.setTimeout(() => {
+    setOpen(false);
+    setClosing(false);
+  }, MODAL_EXIT_MS);
+}
+
 export default function Profile() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -204,10 +281,23 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  
-  // Modals state
+
+  // Modal open state + a matching "closing" flag per modal, so the exit
+  // animation can play before the modal unmounts.
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isAvatarModalClosing, setIsAvatarModalClosing] = useState(false);
   const [isTransportModalOpen, setIsTransportModalOpen] = useState(false);
+  const [isTransportModalClosing, setIsTransportModalClosing] = useState(false);
+  const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
+  const [isPlaceModalClosing, setIsPlaceModalClosing] = useState(false);
+
+  // Add-a-saved-place form state.
+  const [placeName, setPlaceName] = useState('');
+  const [placeCategory, setPlaceCategory] = useState<PlaceCategory>('custom');
+  const [placeNotes, setPlaceNotes] = useState('');
+  const [pickedPlace, setPickedPlace] = useState<PlaceResult | null>(null);
+  const [savingPlace, setSavingPlace] = useState(false);
+  const [placeError, setPlaceError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -262,7 +352,7 @@ export default function Profile() {
   async function handleSelectProfileChoice(profileType: OnboardingProfileType, iconPath: string) {
     if (!user) return;
     setAvatarUrl(iconPath);
-    setIsAvatarModalOpen(false);
+    closeWithAnimation(setIsAvatarModalClosing, setIsAvatarModalOpen);
     try {
       const [updatedProfile, updatedPrefs] = await Promise.all([
         updateProfile(user.id, { full_name: fullName, avatar_url: iconPath }),
@@ -287,6 +377,65 @@ export default function Profile() {
       setPreferences(updatedPrefs);
     } catch (err) {
       console.error('Failed to update transport preferences', err);
+    }
+  }
+
+  async function refreshPlaces() {
+    if (!user) return;
+    try {
+      const data = await listSavedPlaces(user.id);
+      setPlaces(data || []);
+    } catch (err) {
+      console.error('Failed to refresh saved places', err);
+    }
+  }
+
+  function openPlaceModal() {
+    setPlaceError(null);
+    setIsPlaceModalOpen(true);
+  }
+
+  function closePlaceModal() {
+    closeWithAnimation(setIsPlaceModalClosing, setIsPlaceModalOpen);
+  }
+
+  async function handleCreatePlace() {
+    if (!user) return;
+    if (!placeName.trim() || !pickedPlace) {
+      setPlaceError('Beri nama dan pilih lokasi terlebih dahulu.');
+      return;
+    }
+    setSavingPlace(true);
+    setPlaceError(null);
+    try {
+      await createSavedPlace({
+        userId: user.id,
+        name: placeName.trim(),
+        category: placeCategory,
+        address: pickedPlace.address,
+        latitude: pickedPlace.lat,
+        longitude: pickedPlace.lng,
+        notes: placeNotes.trim() || undefined,
+      });
+      setPlaceName('');
+      setPlaceNotes('');
+      setPickedPlace(null);
+      setPlaceCategory('custom');
+      await refreshPlaces();
+      closePlaceModal();
+    } catch (err) {
+      setPlaceError(err instanceof Error ? err.message : 'Gagal menyimpan tempat.');
+    } finally {
+      setSavingPlace(false);
+    }
+  }
+
+  async function handleDeletePlace(id: string) {
+    try {
+      await deleteSavedPlace(id);
+      setPlaces((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error('Failed to delete saved place', err);
     }
   }
 
@@ -317,8 +466,8 @@ export default function Profile() {
           className="profile-fade"
           style={{ ...cardStyle, marginBottom: 20, display: 'flex', gap: 16, alignItems: 'center', animationDelay: '60ms' }}
         >
-          <div 
-            className="avatar-container" 
+          <div
+            className="avatar-container"
             style={avatarCircleStyle}
             onClick={() => setIsAvatarModalOpen(true)}
             title="Klik untuk mengganti profil"
@@ -394,10 +543,83 @@ export default function Profile() {
           )}
         </div>
 
+        {/* Saved places — add/manage directly here */}
+        <div className="profile-fade" style={{ marginBottom: 20, animationDelay: '240ms' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>Tempat tersimpan</div>
+            <button
+              type="button"
+              onClick={openPlaceModal}
+              style={{ background: 'none', border: 'none', color: C.primary, fontSize: 13, fontWeight: 600, ...bodyFont, cursor: 'pointer', padding: 0 }}
+            >
+              Tambah Tempat +
+            </button>
+          </div>
+          {places.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {places.map((p) => {
+                const meta = PLACE_CATEGORIES.find((c) => c.value === p.category) ?? PLACE_CATEGORIES[3];
+                const Icon = meta.icon;
+                return (
+                  <div
+                    key={p.id}
+                    style={{ ...cardStyle, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 14 }}
+                  >
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 12,
+                        background: 'rgba(218,54,42,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Icon size={18} color={C.primary} strokeWidth={2} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="font-jockey" style={{ fontSize: 15, color: C.text }}>{p.name}</div>
+                      <div
+                        style={{
+                          ...bodyFont,
+                          fontSize: 12,
+                          color: C.textMuted,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {p.address}
+                      </div>
+                      {p.notes && (
+                        <div style={{ ...bodyFont, fontSize: 11, color: C.textMuted, marginTop: 2 }}>{p.notes}</div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      className="delete-place-btn"
+                      onClick={() => handleDeletePlace(p.id)}
+                      title="Hapus tempat"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{ ...cardStyle, ...bodyFont, fontSize: 13, color: C.textMuted }}>
+              Belum ada tempat yang disimpan. Klik "Tambah Tempat +" untuk menambahkan.
+            </div>
+          )}
+        </div>
+
         {/* Editable fields (Name only) */}
         <div
           className="profile-fade"
-          style={{ ...cardStyle, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 14, animationDelay: '240ms' }}
+          style={{ ...cardStyle, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 14, animationDelay: '300ms' }}
         >
           <div>
             <label style={{ ...bodyFont, fontSize: 13, color: C.textMuted, display: 'block', marginBottom: 6 }}>
@@ -426,7 +648,7 @@ export default function Profile() {
         {/* Stats */}
         <div
           className="profile-fade profile-stats"
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, animationDelay: '300ms' }}
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, animationDelay: '360ms' }}
         >
           <div style={{ ...cardStyle, textAlign: 'center' }}>
             <div className="font-jockey" style={{ fontSize: 24, color: C.text }}>{places.length}</div>
@@ -440,9 +662,17 @@ export default function Profile() {
       </div>
 
       {/* Avatar & Travel Profile Selection Modal */}
-      {isAvatarModalOpen && (
-        <div className="modal-backdrop" onClick={() => setIsAvatarModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      {(isAvatarModalOpen || isAvatarModalClosing) && (
+        <div
+          className="modal-backdrop"
+          style={{ animation: `${isAvatarModalClosing ? 'modalBackdropOut' : 'modalBackdropIn'} 0.2s ease forwards` }}
+          onClick={() => closeWithAnimation(setIsAvatarModalClosing, setIsAvatarModalOpen)}
+        >
+          <div
+            className="modal-content"
+            style={{ animation: `${isAvatarModalClosing ? 'modalContentOut 0.2s' : 'modalContentIn 0.25s'} ease forwards` }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="font-jockey" style={{ fontSize: 20, color: C.text, marginBottom: 6 }}>
               Pilih Profil Perjalanan
             </div>
@@ -482,7 +712,7 @@ export default function Profile() {
             <button
               type="button"
               className="font-jockey"
-              onClick={() => setIsAvatarModalOpen(false)}
+              onClick={() => closeWithAnimation(setIsAvatarModalClosing, setIsAvatarModalOpen)}
               style={{ width: '100%', ...buttonStyle, background: 'transparent', color: C.textMuted, border: `1.5px solid ${C.border}` }}
             >
               Batal
@@ -492,16 +722,24 @@ export default function Profile() {
       )}
 
       {/* Transport Selection Modal */}
-      {isTransportModalOpen && (
-        <div className="modal-backdrop" onClick={() => setIsTransportModalOpen(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="font-jockey" style={{ fontSize: 20, color: C.text, marginBottom: 6 }}>
+      {(isTransportModalOpen || isTransportModalClosing) && (
+        <div
+          className="modal-backdrop"
+          style={{ animation: `${isTransportModalClosing ? 'modalBackdropOut' : 'modalBackdropIn'} 0.2s ease forwards` }}
+          onClick={() => closeWithAnimation(setIsTransportModalClosing, setIsTransportModalOpen)}
+        >
+          <div
+            className="modal-content"
+            style={{ animation: `${isTransportModalClosing ? 'modalContentOut 0.2s' : 'modalContentIn 0.25s'} ease forwards` }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="font-jockey" style={{ fontSize: 23, color: C.text, marginBottom: 6 }}>
               Atur Moda Transportasi
             </div>
-            <p style={{ ...bodyFont, fontSize: 13, color: C.textMuted, margin: '0 0 20px' }}>
+            <p style={{ ...bodyFont, fontSize: 13, color: C.textMuted, margin: '0 0 24px' }}>
               Klik moda transportasi untuk menambah atau menghapusnya dari preferensi Anda.
             </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
               {ALL_TRANSPORTS.map((t) => {
                 const isSelected = transportList.includes(t);
                 return (
@@ -541,11 +779,132 @@ export default function Profile() {
             <button
               type="button"
               className="font-jockey"
-              onClick={() => setIsTransportModalOpen(false)}
+              onClick={() => closeWithAnimation(setIsTransportModalClosing, setIsTransportModalOpen)}
               style={{ width: '100%', ...buttonStyle }}
             >
               Selesai
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add Saved Place Modal */}
+      {(isPlaceModalOpen || isPlaceModalClosing) && (
+        <div
+          className="modal-backdrop"
+          style={{ animation: `${isPlaceModalClosing ? 'modalBackdropOut' : 'modalBackdropIn'} 0.2s ease forwards` }}
+          onClick={closePlaceModal}
+        >
+          <div
+            className="modal-content"
+            style={{
+              animation: `${isPlaceModalClosing ? 'modalContentOut 0.2s' : 'modalContentIn 0.25s'} ease forwards`,
+              maxWidth: 460,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+              <div className="font-jockey" style={{ fontSize: 23, color: C.text }}>Tambah Tempat</div>
+              <button type="button" className="modal-close-btn" onClick={closePlaceModal} title="Tutup">
+                <X size={20} />
+              </button>
+            </div>
+            <p style={{ ...bodyFont, fontSize: 13, color: C.textMuted, margin: '0 0 20px' }}>
+              Simpan lokasi yang sering Anda kunjungi agar mudah.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ ...bodyFont, fontSize: 13, color: C.textMuted, display: 'block', marginBottom: 6 }}>
+                  Nama tempat
+                </label>
+                <input
+                  className="profile-input"
+                  style={inputStyle}
+                  value={placeName}
+                  onChange={(e) => setPlaceName(e.target.value)}
+                  placeholder="mis. Rumah, Kantor"
+                />
+              </div>
+
+              <div>
+                <label style={{ ...bodyFont, fontSize: 13, color: C.textMuted, display: 'block', marginBottom: 6 }}>
+                  Kategori
+                </label>
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {PLACE_CATEGORIES.map((c) => {
+                    const Icon = c.icon;
+                    const isSelected = placeCategory === c.value;
+                    return (
+                      <button
+                        key={c.value}
+                        type="button"
+                        className="transport-chip-interactive"
+                        onClick={() => setPlaceCategory(c.value)}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 7,
+                          padding: '9px 14px',
+                          marginTop: 5,
+                          borderRadius: 999,
+                          fontSize: 13,
+                          fontWeight: 600,
+                          ...bodyFont,
+                          border: `1.5px solid ${isSelected ? C.primary : C.border}`,
+                          background: isSelected ? 'rgba(218,54,42,0.10)' : C.surface,
+                          color: isSelected ? C.primary : C.textMuted,
+                        }}
+                      >
+                        <Icon size={14} />
+                        {c.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label style={{ ...bodyFont, fontSize: 13, color: C.textMuted, display: 'block', marginBottom: 6 }}>
+                  Lokasi
+                </label>
+                <PlaceSearchInput placeholder="Cari alamat…" onSelect={setPickedPlace} />
+                {pickedPlace && (
+                  <div style={{ ...bodyFont, fontSize: 12, color: C.textMuted, marginTop: 6 }}>
+                    {pickedPlace.address}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label style={{ ...bodyFont, fontSize: 13, color: C.textMuted, display: 'block', marginBottom: 6 }}>
+                  Catatan (opsional)
+                </label>
+                <input
+                  className="profile-input"
+                  style={inputStyle}
+                  value={placeNotes}
+                  onChange={(e) => setPlaceNotes(e.target.value)}
+                  placeholder="mis. Kode gerbang, pintu masuk"
+                />
+              </div>
+
+              {placeError && (
+                <p style={{ ...bodyFont, fontSize: 13, color: C.primary, margin: 0 }}>{placeError}</p>
+              )}
+
+              <button
+                type="button"
+                className="font-jockey"
+                onClick={handleCreatePlace}
+                disabled={savingPlace}
+                style={{ ...buttonStyle, opacity: savingPlace ? 0.7 : 1, marginTop: 6 }}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = C.primaryHover)}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = C.primary)}
+              >
+                {savingPlace ? 'Menyimpan…' : 'Simpan Tempat'}
+              </button>
+            </div>
           </div>
         </div>
       )}
