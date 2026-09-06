@@ -80,7 +80,7 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 
 ---
 
-## 📸 Demo & Screenshot
+## Demo & Screenshot
 
 ### Live Demo
 
@@ -111,7 +111,7 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 
 ---
 
-## 🛠️ Teknologi
+## Teknologi
 
 ### Tech Stack
 
@@ -293,17 +293,6 @@ npm run lint
 | **Quan** | Sign Up / Sign In, User Preferences, Profile, Saved Places, Backend & System Architecture, Deployment & Submission |
 | **Syakir** | Landing Page, Transport Schedule, Budget Planner, Confused Mode, Tutorial Penggunaan Web |
 | **Nael** | Interactive Map, Dashboard, Route Comparison, Multi-Transit Routes, Live Disruption, Design System, App Design Mockup |
-
----
-
-## Progress & To-Do
-
-- [x] README.md Update — *Quan*
-- [ ] Finish Design System — *Nael*
-- [ ] App Design Mockup — *Nael*
-- [ ] Deployment & Submission — *Quan*
-- [ ] Tutorial Cara Menggunakan Web — *Syakir*
-- [ ] Code Cleanup (hapus catatan AI & minimalkan error) — *Syakir*
 
 ---
 
