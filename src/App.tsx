@@ -20,7 +20,7 @@ import Profile from '@/pages/Profile';
 
 import { MobileTopBar } from '@/components/MobileNav';
 
-const MAP_PATHS = ['/dashboard', '/map', '/'];
+const MAP_PATHS = ['/dashboard', '/map'];
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -83,7 +83,7 @@ export default function App() {
         <SidebarMapProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<AppLayout><MapDashboard /></AppLayout>} />
+              <Route path="/" element={<Navigate to="/beranda" replace />} />
               <Route path="/beranda" element={<LandingPage />} />
               <Route path="/landing" element={<Navigate to="/beranda" replace />} />
               <Route path="/logout" element={<LogoutHandler />} />
