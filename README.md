@@ -15,7 +15,7 @@
 
 ---
 
-## 📋 Daftar Isi
+## Daftar Isi
 
 - [Tentang Proyek](#-tentang-proyek)
 - [Fitur Unggulan](#-fitur-unggulan)
@@ -30,7 +30,7 @@
 
 ---
 
-## 👥 Tim Developer
+## Tim Developer
 
 | Nama | Peran | GitHub |
 |------|-------|--------|
@@ -40,7 +40,7 @@
 
 ---
 
-## 🎯 Tentang Proyek
+## Tentang Proyek
 
 ### Latar Belakang
 
