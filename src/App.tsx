@@ -15,7 +15,6 @@ import Schedule from '@/pages/Schedule';
 import Disruptions from '@/pages/Disruptions';
 import ConfusedMode from '@/pages/ConfusedMode';
 import SavedPlaces from '@/pages/SavedPlaces';
-import Preferences from '@/pages/Preferences';
 import Profile from '@/pages/Profile';
 
 function AppLayout({ children }: { children: React.ReactNode }) {
@@ -51,7 +50,6 @@ export default function App() {
             <Route path="/disruption" element={<AppLayout><Disruptions /></AppLayout>} />
             <Route path="/confused" element={<AppLayout><ConfusedMode /></AppLayout>} />
             <Route path="/places" element={<AppLayout><SavedPlaces /></AppLayout>} />
-            <Route path="/preferences" element={<AppLayout><Preferences /></AppLayout>} />
             <Route path="/profile" element={<AppLayout><Profile /></AppLayout>} />
           </Routes>
         </BrowserRouter>

@@ -16,6 +16,9 @@ import bintangSvg from '@/assets/images/bintang.svg';
 import tentang1Svg from '@/assets/images/tentang1.svg';
 import tentang2Svg from '@/assets/images/tentang2.svg';
 import tentang3Svg from '@/assets/images/tentang3.svg';
+import tentang1EngSvg from '@/assets/images/tentang1-eng.svg';
+import tentang2EngSvg from '@/assets/images/tentang2-eng.svg';
+import tentang3EngSvg from '@/assets/images/tentang3-eng.svg';
 import caraKerjaSvg from '@/assets/images/cara-kerja.svg';
 import merpatiSvg from '@/assets/images/merpati-terbang.svg';
 import trainPeopleSvg from '@/assets/images/train-people.svg';
@@ -347,8 +350,10 @@ function AnimatedCounter({ target = 5000, suffix = '+' }: { target?: number; suf
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const { lang } = useLanguage();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isEN = lang === 'EN';
 
   // Manual scroll restoration on page refresh to strictly lock top position (y = 0)
   useEffect(() => {
@@ -571,7 +576,7 @@ export default function LandingPage() {
           }}
           onMouseOver={(e) => (e.currentTarget.style.transform = 'scale(1.08)')}
           onMouseOut={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-          title="Kembali ke Atas"
+          title={isEN ? 'Back to Top' : 'Kembali ke Atas'}
         >
           <Home size={19} color="#FFFFFF" />
         </button>
@@ -603,7 +608,7 @@ export default function LandingPage() {
               whiteSpace: 'nowrap',
             }}
           >
-            Tentang
+            {isEN ? 'About' : 'Tentang'}
           </button>
 
           <button
@@ -621,7 +626,7 @@ export default function LandingPage() {
               whiteSpace: 'nowrap',
             }}
           >
-            Cara Kerja
+            {isEN ? 'How It Works' : 'Cara Kerja'}
           </button>
 
           <button
@@ -640,7 +645,7 @@ export default function LandingPage() {
               boxShadow: '0 2px 8px rgba(218, 54, 42, 0.25)',
             }}
           >
-            {user ? 'Dashboard' : 'Mulai'}
+            {user ? 'Dashboard' : isEN ? 'Get Started' : 'Mulai'}
           </button>
 
           <LanguageSwitcher />
@@ -675,7 +680,7 @@ export default function LandingPage() {
             boxShadow: '0 4px 14px rgba(218, 54, 42, 0.35)',
             color: '#FFFFFF',
           }}
-          title="Ke Atas"
+          title={isEN ? 'To Top' : 'Ke Atas'}
         >
           <Home size={19} color="#FFFFFF" />
         </button>
@@ -695,7 +700,7 @@ export default function LandingPage() {
             boxShadow: '0 4px 14px rgba(218, 54, 42, 0.35)',
             color: '#FFFFFF',
           }}
-          title="Menu Navigasi"
+          title={isEN ? 'Navigation Menu' : 'Menu Navigasi'}
         >
           {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
@@ -733,7 +738,7 @@ export default function LandingPage() {
                 cursor: 'pointer',
               }}
             >
-              Tentang
+              {isEN ? 'About' : 'Tentang'}
             </button>
 
             <button
@@ -750,7 +755,7 @@ export default function LandingPage() {
                 cursor: 'pointer',
               }}
             >
-              Cara Kerja
+              {isEN ? 'How It Works' : 'Cara Kerja'}
             </button>
 
             <button
@@ -771,8 +776,12 @@ export default function LandingPage() {
                 boxShadow: '0 4px 12px rgba(218, 54, 42, 0.3)',
               }}
             >
-              {user ? 'Dashboard' : 'Mulai'}
+              {user ? 'Dashboard' : isEN ? 'Get Started' : 'Mulai'}
             </button>
+
+            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 4 }}>
+              <LanguageSwitcher />
+            </div>
           </div>
         )}
       </div>
@@ -808,6 +817,7 @@ export default function LandingPage() {
           {/* Hero Text Column with Exact Line Formatting like Image 3 */}
           <div className="hero-text-col" style={{ zIndex: 2 }}>
             <h1
+              key={`hero-title-${lang}`}
               className="font-jockey"
               style={{
                 fontSize: 'clamp(34px, 4.8vw, 60px)',
@@ -819,21 +829,21 @@ export default function LandingPage() {
               }}
             >
               <SplitText
-                text="Navigasi transportasi"
+                text={isEN ? 'Public transit' : 'Navigasi transportasi'}
                 delay={25}
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)', filter: 'blur(6px)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)', filter: 'blur(0px)' }}
               />
               <br />
               <SplitText
-                text="publik,"
+                text={isEN ? 'navigation,' : 'publik,'}
                 delay={35}
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)', filter: 'blur(6px)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)', filter: 'blur(0px)' }}
               />
               {'\u00A0'}
               <SplitText
-                text="tanpa ribet."
+                text={isEN ? 'made simple.' : 'tanpa ribet.'}
                 delay={45}
                 style={{ color: '#DA362A' }}
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,20px,0)', filter: 'blur(6px)' }}
@@ -841,9 +851,13 @@ export default function LandingPage() {
               />
             </h1>
 
-            <div style={{ marginBottom: 32, maxWidth: 540, fontSize: 'clamp(14px, 1.4vw, 16px)', lineHeight: 1.65, color: '#4A4A4A' }}>
+            <div key={`hero-desc-${lang}`} style={{ marginBottom: 32, maxWidth: 540, fontSize: 'clamp(14px, 1.4vw, 16px)', lineHeight: 1.65, color: '#4A4A4A' }}>
               <BlurText
-                text="RUTEIN membantu kamu merencanakan perjalanan dengan transportasi publik berdasarkan waktu, biaya, dan preferensi perjalanan, lalu memandumu secara real-time sampai tujuan."
+                text={
+                  isEN
+                    ? 'RUTEIN helps you plan public transit journeys tailored to your time, budget, and travel preferences, guiding you in real time to your destination.'
+                    : 'RUTEIN membantu kamu merencanakan perjalanan dengan transportasi publik berdasarkan waktu, biaya, dan preferensi perjalanan, lalu memandumu secara real-time sampai tujuan.'
+                }
                 delay={25}
               />
             </div>
@@ -865,7 +879,7 @@ export default function LandingPage() {
                   boxShadow: '0 6px 20px rgba(218, 54, 42, 0.35)',
                 }}
               >
-                Mulai Perjalanan
+                {isEN ? 'Start Journey' : 'Mulai Perjalanan'}
               </button>
             </div>
 
@@ -961,7 +975,7 @@ export default function LandingPage() {
                 }}
               >
                 <img src={jalanKakiSvg} alt="Jalan Kaki" style={{ height: 28, width: 28, objectFit: 'contain' }} />
-                <span style={{ fontSize: 10, fontWeight: 700, color: '#4A4A4A' }}>Jalan Kaki</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#4A4A4A' }}>{isEN ? 'Walking' : 'Jalan Kaki'}</span>
               </div>
             </div>
 
@@ -969,7 +983,11 @@ export default function LandingPage() {
             <div className="tagline-star-row" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#666666' }}>
               <img src={bintangSvg} alt="Star" style={{ width: 14, height: 14 }} />
               <span>
-                Satu tujuan. <strong>Banyak cara</strong> untuk sampai.
+                {isEN ? (
+                  <>One destination. <strong>Countless ways</strong> to get there.</>
+                ) : (
+                  <>Satu tujuan. <strong>Banyak cara</strong> untuk sampai.</>
+                )}
               </span>
             </div>
           </div>
@@ -1021,9 +1039,19 @@ export default function LandingPage() {
                 margin: 0,
               }}
             >
-              Kami mudahkan
-              <br />
-              <span style={{ color: '#DA362A' }}>perjalananmu!</span>
+              {isEN ? (
+                <>
+                  We make your
+                  <br />
+                  <span style={{ color: '#DA362A' }}>journey easier!</span>
+                </>
+              ) : (
+                <>
+                  Kami mudahkan
+                  <br />
+                  <span style={{ color: '#DA362A' }}>perjalananmu!</span>
+                </>
+              )}
             </h2>
           </div>
 
@@ -1060,9 +1088,19 @@ export default function LandingPage() {
             <div>
               <AnimatedCounter target={5000} suffix="+" />
               <div style={{ fontSize: 13, color: '#555555', fontWeight: 700, fontFamily: 'var(--font-inter)', whiteSpace: 'nowrap' }}>
-                Rute Transportasi
-                <br />
-                Terhubung
+                {isEN ? (
+                  <>
+                    Connected Transit
+                    <br />
+                    Routes
+                  </>
+                ) : (
+                  <>
+                    Rute Transportasi
+                    <br />
+                    Terhubung
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -1090,16 +1128,26 @@ export default function LandingPage() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 210, flexShrink: 0 }}>
-                  <img src={tentang1Svg} alt="Transit Lebih Mudah" style={{ width: '100%', maxHeight: 195, height: 'auto', objectFit: 'contain' }} />
+                  <img src={isEN ? tentang1EngSvg : tentang1Svg} alt={isEN ? 'Seamless transit transfers' : 'Transit Lebih Mudah'} style={{ width: '100%', maxHeight: 195, height: 'auto', objectFit: 'contain' }} />
                 </div>
                 <div style={{ marginTop: 28, textAlign: 'center', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <h3 className="font-jockey" style={{ fontSize: 26, color: '#1E1E1E', margin: '0 0 12px 0', lineHeight: 1.15, minHeight: 62, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    Transit lebih mudah
+                    {isEN ? 'Seamless transit transfers' : 'Transit lebih mudah'}
                   </h3>
                   <p style={{ fontSize: 15, color: '#666666', lineHeight: 1.65, margin: 0, fontFamily: 'var(--font-inter)' }}>
-                    Gabungkan beberapa moda transportasi
-                    <br />
-                    publik dalam satu perjalanan
+                    {isEN ? (
+                      <>
+                        Combine multiple public transit
+                        <br />
+                        modes in a single trip
+                      </>
+                    ) : (
+                      <>
+                        Gabungkan beberapa moda transportasi
+                        <br />
+                        publik dalam satu perjalanan
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -1126,18 +1174,38 @@ export default function LandingPage() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 210, flexShrink: 0 }}>
-                  <img src={tentang2Svg} alt="Bandingkan Sebelum Berangkat" style={{ width: '100%', maxHeight: 195, height: 'auto', objectFit: 'contain' }} />
+                  <img src={isEN ? tentang2EngSvg : tentang2Svg} alt={isEN ? 'Compare Before You Depart' : 'Bandingkan Sebelum Berangkat'} style={{ width: '100%', maxHeight: 195, height: 'auto', objectFit: 'contain' }} />
                 </div>
                 <div style={{ marginTop: 28, textAlign: 'center', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <h3 className="font-jockey" style={{ fontSize: 26, color: '#1E1E1E', margin: '0 0 12px 0', lineHeight: 1.15, minHeight: 62, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    Bandingkan sebelum
-                    <br />
-                    berangkat
+                    {isEN ? (
+                      <>
+                        Compare before
+                        <br />
+                        you depart
+                      </>
+                    ) : (
+                      <>
+                        Bandingkan sebelum
+                        <br />
+                        berangkat
+                      </>
+                    )}
                   </h3>
                   <p style={{ fontSize: 15, color: '#666666', lineHeight: 1.65, margin: 0, fontFamily: 'var(--font-inter)' }}>
-                    Lihat waktu, biaya, dan jumlah transit
-                    <br />
-                    sebelum memilih perjalanan
+                    {isEN ? (
+                      <>
+                        Check duration, fares, and transit
+                        <br />
+                        before choosing your route
+                      </>
+                    ) : (
+                      <>
+                        Lihat waktu, biaya, dan jumlah transit
+                        <br />
+                        sebelum memilih perjalanan
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -1164,16 +1232,26 @@ export default function LandingPage() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 210, flexShrink: 0 }}>
-                  <img src={tentang3Svg} alt="Tahu Kondisi Perjalanan" style={{ width: '100%', maxHeight: 195, height: 'auto', objectFit: 'contain' }} />
+                  <img src={isEN ? tentang3EngSvg : tentang3Svg} alt={isEN ? 'Know Travel Conditions' : 'Tahu Kondisi Perjalanan'} style={{ width: '100%', maxHeight: 195, height: 'auto', objectFit: 'contain' }} />
                 </div>
                 <div style={{ marginTop: 28, textAlign: 'center', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <h3 className="font-jockey" style={{ fontSize: 26, color: '#1E1E1E', margin: '0 0 12px 0', lineHeight: 1.15, minHeight: 62, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    Tahu Kondisi Perjalanan
+                    {isEN ? 'Know Travel Conditions' : 'Tahu Kondisi Perjalanan'}
                   </h3>
                   <p style={{ fontSize: 15, color: '#666666', lineHeight: 1.65, margin: 0, fontFamily: 'var(--font-inter)' }}>
-                    Pantau jadwal dan informasi perjalanan
-                    <br />
-                    sebelum kamu berangkat
+                    {isEN ? (
+                      <>
+                        Check schedules and travel updates
+                        <br />
+                        before you head out
+                      </>
+                    ) : (
+                      <>
+                        Pantau jadwal dan informasi perjalanan
+                        <br />
+                        sebelum kamu berangkat
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -1198,23 +1276,43 @@ export default function LandingPage() {
             <div style={{ position: 'relative', height: 95, marginBottom: 0 }}>
               <div style={{ position: 'absolute', left: '-60px', bottom: 8, width: 300, textAlign: 'center' }}>
                 <h4 className="font-jockey" style={{ color: '#DA362A', fontSize: 26, margin: 0, lineHeight: 1.15, letterSpacing: '0.01em' }}>
-                  Masukkan Tujuan
+                  {isEN ? 'Enter Destination' : 'Masukkan Tujuan'}
                 </h4>
               </div>
 
               <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: 0, width: 380, textAlign: 'center' }}>
                 <h4 className="font-jockey" style={{ color: '#DA362A', fontSize: 26, margin: 0, lineHeight: 1.15, letterSpacing: '0.01em' }}>
-                  RUTEIN carikan pilihan
-                  <br />
-                  perjalanan
+                  {isEN ? (
+                    <>
+                      RUTEIN finds best
+                      <br />
+                      routes
+                    </>
+                  ) : (
+                    <>
+                      RUTEIN carikan pilihan
+                      <br />
+                      perjalanan
+                    </>
+                  )}
                 </h4>
               </div>
 
               <div style={{ position: 'absolute', right: '-60px', bottom: 8, width: 300, textAlign: 'center' }}>
                 <h4 className="font-jockey" style={{ color: '#DA362A', fontSize: 26, margin: 0, lineHeight: 1.15, letterSpacing: '0.01em' }}>
-                  Pilih dan mulai
-                  <br />
-                  perjalanan
+                  {isEN ? (
+                    <>
+                      Choose & start
+                      <br />
+                      journey
+                    </>
+                  ) : (
+                    <>
+                      Pilih dan mulai
+                      <br />
+                      perjalanan
+                    </>
+                  )}
                 </h4>
               </div>
             </div>
@@ -1226,29 +1324,63 @@ export default function LandingPage() {
             <div style={{ position: 'relative', height: 125, marginTop: 18 }}>
               <div style={{ position: 'absolute', left: '-60px', top: 0, width: 300, textAlign: 'center' }}>
                 <p style={{ fontSize: 17, color: '#4A4A4A', margin: 0, lineHeight: 1.45, fontWeight: 500, fontFamily: 'var(--font-inter)' }}>
-                  Pilih lokasi awal dan
-                  <br />
-                  tujuan akhir kamu
+                  {isEN ? (
+                    <>
+                      Choose your starting point and
+                      <br />
+                      final destination
+                    </>
+                  ) : (
+                    <>
+                      Pilih lokasi awal dan
+                      <br />
+                      tujuan akhir kamu
+                    </>
+                  )}
                 </p>
               </div>
 
               <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', top: 0, width: 380, textAlign: 'center' }}>
                 <p style={{ fontSize: 17, color: '#4A4A4A', margin: 0, lineHeight: 1.45, fontWeight: 500, fontFamily: 'var(--font-inter)' }}>
-                  Kami hitung rute terbaik
-                  <br />
-                  berdasarkan waktu, biaya,
-                  <br />
-                  transit, dan kondisi live
+                  {isEN ? (
+                    <>
+                      We calculate optimal routes
+                      <br />
+                      based on time, fares,
+                      <br />
+                      transfers, and live conditions
+                    </>
+                  ) : (
+                    <>
+                      Kami hitung rute terbaik
+                      <br />
+                      berdasarkan waktu, biaya,
+                      <br />
+                      transit, dan kondisi live
+                    </>
+                  )}
                 </p>
               </div>
 
               <div style={{ position: 'absolute', right: '-60px', top: 0, width: 300, textAlign: 'center' }}>
                 <p style={{ fontSize: 17, color: '#4A4A4A', margin: 0, lineHeight: 1.45, fontWeight: 500, fontFamily: 'var(--font-inter)' }}>
-                  Pilih rute favoritmu dan
-                  <br />
-                  berangkat dengan
-                  <br />
-                  percaya diri
+                  {isEN ? (
+                    <>
+                      Pick your favorite route and
+                      <br />
+                      depart with complete
+                      <br />
+                      confidence
+                    </>
+                  ) : (
+                    <>
+                      Pilih rute favoritmu dan
+                      <br />
+                      berangkat dengan
+                      <br />
+                      percaya diri
+                    </>
+                  )}
                 </p>
               </div>
             </div>
@@ -1286,10 +1418,10 @@ export default function LandingPage() {
               </div>
               <div>
                 <h4 className="font-jockey" style={{ color: '#DA362A', fontSize: 20, margin: '0 0 4px 0' }}>
-                  Masukkan Tujuan
+                  {isEN ? 'Enter Destination' : 'Masukkan Tujuan'}
                 </h4>
                 <p style={{ fontSize: 14, color: '#4A4A4A', margin: 0, fontFamily: 'var(--font-inter)' }}>
-                  Pilih lokasi awal dan tujuan akhir kamu
+                  {isEN ? 'Choose your starting point and final destination' : 'Pilih lokasi awal dan tujuan akhir kamu'}
                 </p>
               </div>
             </div>
@@ -1325,10 +1457,12 @@ export default function LandingPage() {
               </div>
               <div>
                 <h4 className="font-jockey" style={{ color: '#DA362A', fontSize: 20, margin: '0 0 4px 0' }}>
-                  RUTEIN carikan pilihan perjalanan
+                  {isEN ? 'RUTEIN finds best routes' : 'RUTEIN carikan pilihan perjalanan'}
                 </h4>
                 <p style={{ fontSize: 14, color: '#4A4A4A', margin: 0, fontFamily: 'var(--font-inter)' }}>
-                  Kami hitung rute terbaik berdasarkan waktu, biaya, transit, dan kondisi live
+                  {isEN
+                    ? 'We calculate optimal routes based on time, fares, transfers, and live conditions'
+                    : 'Kami hitung rute terbaik berdasarkan waktu, biaya, transit, dan kondisi live'}
                 </p>
               </div>
             </div>
@@ -1364,10 +1498,12 @@ export default function LandingPage() {
               </div>
               <div>
                 <h4 className="font-jockey" style={{ color: '#DA362A', fontSize: 20, margin: '0 0 4px 0' }}>
-                  Pilih dan mulai perjalanan
+                  {isEN ? 'Choose & start journey' : 'Pilih dan mulai perjalanan'}
                 </h4>
                 <p style={{ fontSize: 14, color: '#4A4A4A', margin: 0, fontFamily: 'var(--font-inter)' }}>
-                  Pilih rute favoritmu dan berangkat dengan percaya diri
+                  {isEN
+                    ? 'Pick your favorite route and depart with complete confidence'
+                    : 'Pilih rute favoritmu dan berangkat dengan percaya diri'}
                 </p>
               </div>
             </div>
@@ -1387,6 +1523,7 @@ export default function LandingPage() {
             </span>
             <span className="font-jockey" style={{ fontSize: 'clamp(46px, 8.5vw, 108px)', color: '#DA362A', lineHeight: 0.95 }}>
               <SplitText
+                key={`callout-rutein-${lang}`}
                 text="Rutein"
                 delay={50}
                 animationFrom={{ opacity: 0, transform: 'translate3d(0, 30px, 0)', filter: 'blur(8px)' }}
@@ -1399,7 +1536,8 @@ export default function LandingPage() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, flexWrap: 'wrap', marginBottom: -4 }}>
             <span className="font-jockey" style={{ fontSize: 'clamp(42px, 8vw, 100px)', color: '#1E1E1E', lineHeight: 0.95 }}>
               <BlurText
-                text="perjalananmu"
+                key={`callout-journey-${lang}`}
+                text={isEN ? 'your journey,' : 'perjalananmu'}
                 delay={40}
               />
             </span>
@@ -1422,9 +1560,10 @@ export default function LandingPage() {
               />
             </span>
             <span className="font-jockey" style={{ fontSize: 'clamp(42px, 8vw, 100px)', color: '#1E1E1E', lineHeight: 0.95 }}>
-              biar{' '}
+              {isEN ? 'made ' : 'biar '}
               <SplitText
-                text="gampang."
+                key={`callout-easy-${lang}`}
+                text={isEN ? 'effortless.' : 'gampang.'}
                 delay={60}
                 style={{ color: '#DA362A', fontStyle: 'italic' }}
                 animationFrom={{ opacity: 0, transform: 'translate3d(0, 30px, 0)', filter: 'blur(8px)' }}
@@ -1450,7 +1589,7 @@ export default function LandingPage() {
                 boxShadow: '0 8px 24px rgba(218, 54, 42, 0.4)',
               }}
             >
-              Mulai Perjalanan
+              {isEN ? 'Start Journey' : 'Mulai Perjalanan'}
             </button>
           </div>
         </SmoothReveal>
@@ -1499,9 +1638,19 @@ export default function LandingPage() {
             <div>
               <img src={logoRuteinSvg} alt="Rutein Logo" style={{ height: 38, objectFit: 'contain', marginBottom: 14 }} />
               <p style={{ fontSize: 13, color: '#555555', margin: 0, lineHeight: 1.55, fontFamily: 'var(--font-inter)' }}>
-                Temukan rute. Pilih perjalanan.
-                <br />
-                Sampai tujuan
+                {isEN ? (
+                  <>
+                    Find routes. Choose your trip.
+                    <br />
+                    Arrive with ease
+                  </>
+                ) : (
+                  <>
+                    Temukan rute. Pilih perjalanan.
+                    <br />
+                    Sampai tujuan
+                  </>
+                )}
               </p>
             </div>
 
@@ -1511,14 +1660,14 @@ export default function LandingPage() {
                 className="font-jockey"
                 style={{ color: '#1E1E1E', background: 'none', border: 'none', padding: 0, fontSize: 20, letterSpacing: '0.02em', cursor: 'pointer', textAlign: 'left' }}
               >
-                Tentang
+                {isEN ? 'About' : 'Tentang'}
               </button>
               <button
                 onClick={() => scrollToSection('cara-kerja')}
                 className="font-jockey"
                 style={{ color: '#1E1E1E', background: 'none', border: 'none', padding: 0, fontSize: 20, letterSpacing: '0.02em', cursor: 'pointer', textAlign: 'left' }}
               >
-                Cara Kerja
+                {isEN ? 'How It Works' : 'Cara Kerja'}
               </button>
               <button
                 onClick={() => navigate(user ? '/dashboard' : '/login')}
@@ -1534,13 +1683,13 @@ export default function LandingPage() {
                   textAlign: 'left',
                 }}
               >
-                Mulai
+                {user ? 'Dashboard' : isEN ? 'Get Started' : 'Mulai'}
               </button>
             </div>
 
             <div>
               <h4 className="font-jockey" style={{ fontSize: 18, color: '#1E1E1E', margin: '0 0 14px 0', letterSpacing: '0.02em' }}>
-                Ikuti Perjalanan Kami !
+                {isEN ? 'Follow Our Journey!' : 'Ikuti Perjalanan Kami !'}
               </h4>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <a href="#" className="footer-social-icon" style={{ color: '#1E1E1E', textDecoration: 'none', display: 'flex', alignItems: 'center' }} title="Instagram">
@@ -1570,18 +1719,18 @@ export default function LandingPage() {
 
             <div>
               <h4 className="font-jockey" style={{ fontSize: 18, color: '#1E1E1E', margin: '0 0 14px 0', letterSpacing: '0.02em' }}>
-                Dapatkan Informasi Perjalanan Terbaru !
+                {isEN ? 'Get the Latest Travel Updates!' : 'Dapatkan Informasi Perjalanan Terbaru !'}
               </h4>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  alert('Terima kasih sudah mendaftar!');
+                  alert(isEN ? 'Thank you for subscribing!' : 'Terima kasih sudah mendaftar!');
                 }}
                 style={{ display: 'flex', maxWidth: 360 }}
               >
                 <input
                   type="email"
-                  placeholder="Masukkan email kamu"
+                  placeholder={isEN ? 'Enter your email' : 'Masukkan email kamu'}
                   required
                   className="footer-input-focus"
                   style={{

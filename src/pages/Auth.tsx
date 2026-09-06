@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { Check, AlertTriangle } from 'lucide-react';
+import { Check, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   saveTransportPreference,
@@ -226,13 +226,6 @@ function AuthLogoLink({ delay = '0ms' }: { delay?: string }) {
   );
 }
 
-/**
- * Styled message banner used for both hard errors ("email atau password
- * salah") and softer informational notices (e.g. "cek email kamu").
- * `tone="error"` gets a firmer shake-in and warning icon; `tone="info"`
- * is the same shape without the shake, so success-ish copy doesn't read
- * as alarming.
- */
 function AuthAlert({ children, tone = 'error' }: { children: React.ReactNode; tone?: 'error' | 'info' }) {
   return (
     <div
@@ -287,9 +280,64 @@ const buttonStyle: React.CSSProperties = {
   transition: 'background-color 0.15s ease',
 };
 
-// ============================================================
-// LOGIN / SIGN UP
-// ============================================================
+function translateAuthError(message: string, mode: 'signin' | 'signup'): string {
+  const msg = (message || '').toLowerCase();
+  if (
+    msg.includes('invalid login credentials') ||
+    msg.includes('invalid credentials') ||
+    msg.includes('invalid_grant') ||
+    msg.includes('user not found')
+  ) {
+    return 'Email atau kata sandi yang Anda masukkan salah. Silakan periksa kembali.';
+  }
+  if (
+    msg.includes('user already registered') ||
+    msg.includes('already registered') ||
+    msg.includes('already exists') ||
+    msg.includes('unique constraint')
+  ) {
+    return 'Email ini sudah terdaftar. Silakan masuk menggunakan akun Anda atau gunakan email lain.';
+  }
+  if (
+    msg.includes('password should be at least') ||
+    msg.includes('password is too short') ||
+    msg.includes('weak password')
+  ) {
+    return 'Kata sandi minimal harus terdiri dari 6 karakter.';
+  }
+  if (msg.includes('email not confirmed')) {
+    return 'Email belum dikonfirmasi. Silakan periksa kotak masuk atau folder spam email Anda.';
+  }
+  if (
+    msg.includes('invalid format') ||
+    msg.includes('validate email') ||
+    msg.includes('valid email') ||
+    msg.includes('email address')
+  ) {
+    return 'Format alamat email tidak valid (contoh: nama@domain.com).';
+  }
+  if (
+    msg.includes('rate limit') ||
+    msg.includes('too many requests') ||
+    msg.includes('over_email_send_rate_limit')
+  ) {
+    return 'Terlalu banyak percobaan. Silakan tunggu beberapa saat sebelum mencoba lagi.';
+  }
+  if (
+    msg.includes('network') ||
+    msg.includes('fetch') ||
+    msg.includes('failed to fetch') ||
+    msg.includes('connection')
+  ) {
+    return 'Gagal terhubung ke server. Periksa koneksi internet Anda.';
+  }
+  if (mode === 'signin') {
+    return 'Gagal masuk. Silakan periksa kembali email dan kata sandi Anda.';
+  }
+  return 'Gagal membuat akun. Silakan periksa kembali data pendaftaran Anda dan coba lagi.';
+}
+
+// Login
 export function Login() {
   const { user, signIn, signUp } = useAuth();
   const navigate = useNavigate();
@@ -297,22 +345,65 @@ export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   if (user) return <Navigate to="/" replace />;
 
+  function validateForm(): string | null {
+    if (mode === 'signup') {
+      const trimmedName = fullName.trim();
+      if (!trimmedName) {
+        return 'Nama lengkap wajib diisi.';
+      }
+      if (trimmedName.length < 2) {
+        return 'Nama lengkap minimal harus terdiri dari 2 karakter.';
+      }
+    }
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      return 'Alamat email wajib diisi.';
+    }
+
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(trimmedEmail)) {
+      return 'Format email tidak valid (contoh: nama@gmail.com).';
+    }
+
+    if (!password) {
+      return 'Kata sandi wajib diisi.';
+    }
+
+    if (password.length < 6) {
+      return 'Kata sandi minimal harus terdiri dari 6 karakter.';
+    }
+
+    return null;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setNotice(null);
+
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setSubmitting(true);
-    const result = mode === 'signin' ? await signIn(email, password) : await signUp(email, password, fullName);
+    const result =
+      mode === 'signin'
+        ? await signIn(email.trim(), password)
+        : await signUp(email.trim(), password, fullName.trim());
 
     if (result.error) {
       setSubmitting(false);
-      setError(result.error.message);
+      setError(translateAuthError(result.error.message, mode));
       return;
     }
 
@@ -347,21 +438,23 @@ export function Login() {
         className="font-jockey auth-fade"
         style={{ fontSize: 'clamp(30px, 8vw, 46px)', margin: '0 0 34px', color: C.text, animationDelay: '40ms' }}
       >
-        {mode === 'signin' ? 'Login Rutein' : 'Daftar Rutein'}
+        {mode === 'signin' ? 'Masuk Rutein' : 'Daftar Rutein'}
       </h1>
 
       {/* key={mode} forces every field below to fully remount on each
           Masuk/Daftar toggle, so the whole form fades down together and
           consistently. */}
-      <form key={mode} onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <form key={mode} noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
         {mode === 'signup' && (
           <input
             className="auth-input auth-fade"
             style={{ ...inputStyle, animationDelay: '0ms' }}
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e) => {
+              setFullName(e.target.value);
+              if (error) setError(null);
+            }}
             placeholder="Nama lengkap"
-            required
           />
         )}
         <input
@@ -369,20 +462,54 @@ export function Login() {
           style={{ ...inputStyle, animationDelay: mode === 'signup' ? '60ms' : '0ms' }}
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (error) setError(null);
+          }}
           placeholder="Email"
-          required
         />
-        <input
-          className="auth-input auth-fade"
-          style={{ ...inputStyle, animationDelay: mode === 'signup' ? '120ms' : '60ms' }}
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          minLength={6}
-          required
-        />
+        <div style={{ position: 'relative', width: '100%' }}>
+          <input
+            className="auth-input auth-fade"
+            style={{
+              ...inputStyle,
+              paddingRight: 56,
+              animationDelay: mode === 'signup' ? '120ms' : '60ms',
+            }}
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (error) setError(null);
+            }}
+            placeholder="Kata sandi"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Lihat kata sandi'}
+            style={{
+              position: 'absolute',
+              right: 18,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              padding: 6,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: '#7A6F62',
+              borderRadius: '50%',
+              transition: 'color 0.15s ease',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.color = C.primary)}
+            onMouseOut={(e) => (e.currentTarget.style.color = '#7A6F62')}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
         {error && <AuthAlert tone="error">{error}</AuthAlert>}
         {notice && <AuthAlert tone="info">{notice}</AuthAlert>}
@@ -411,6 +538,7 @@ export function Login() {
           onClick={() => {
             setError(null);
             setNotice(null);
+            setShowPassword(false);
             setMode(mode === 'signin' ? 'signup' : 'signin');
           }}
           style={{ background: 'none', border: 'none', padding: 0, color: C.primary, fontWeight: 700, cursor: 'pointer', ...bodyFont, fontSize: 14 }}
