@@ -366,6 +366,7 @@ export default function MapPage() {
           onMove={(evt) => setViewState(evt.viewState)}
           onMoveEnd={handleMoveEnd}
           onClick={handleMapClick}
+          attributionControl={false}
           mapStyle={baseLayer === 'satellite' ? SATELLITE_STYLE : getMapStyle()}
           style={{ width: '100%', height: '100%' }}
         >

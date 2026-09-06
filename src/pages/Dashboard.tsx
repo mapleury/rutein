@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import PlaceSearchInput from '@/components/PlaceSearchInput';
 import { listRecentDestinations, listSavedPlaces, addRecentDestination } from '@/services/savedPlacesService';
 import { getActiveDisruptions } from '@/services/transportService';
@@ -10,6 +11,7 @@ import type { PlaceResult } from '@/types/domain.types';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { lang, t } = useLanguage();
   const navigate = useNavigate();
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
   const [recentDestinations, setRecentDestinations] = useState<RecentDestination[]>([]);
@@ -68,27 +70,31 @@ export default function Dashboard() {
     navigate('/routes', { state: { destination: place } });
   }
 
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'User';
+
   return (
     <div className="container" style={{ paddingTop: 28, paddingBottom: 80 }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 'clamp(28px, 4.5vw, 36px)', color: 'var(--color-text)', marginBottom: 6 }}>
-          Where are we headed?
+          {lang === 'ID' ? `Mau ke mana hari ini, ${userName}?` : `Where are we headed today, ${userName}?`}
         </h1>
         <p style={{ color: 'var(--color-text-muted)', marginTop: 0, fontSize: 14 }}>
-          Search a destination, or pick up where you left off.
+          {lang === 'ID'
+            ? 'Cari lokasi tujuan atau pilih dari rute favoritmu.'
+            : 'Search a destination, or pick up where you left off.'}
         </p>
       </div>
 
       <div className="card" style={{ marginBottom: 24, background: '#FFFFFF', border: '1.5px solid var(--color-border)', borderRadius: 16, padding: '20px' }}>
-        <label className="label" style={{ color: 'var(--color-text-muted)', marginBottom: 8 }}>Search destination</label>
-        <PlaceSearchInput placeholder="Where do you want to go?" onSelect={handleDestinationSelect} />
+        <label className="label" style={{ color: 'var(--color-text-muted)', marginBottom: 8 }}>{t('search.destination')}</label>
+        <PlaceSearchInput placeholder={t('search.placeholder')} onSelect={handleDestinationSelect} />
       </div>
 
       <div style={quickGrid}>
-        <QuickAction label="Route Comparison" icon="⇄" onClick={() => navigate('/routes')} />
-        <QuickAction label="Budget Planner" icon="฿" onClick={() => navigate('/budget')} />
-        <QuickAction label="Live Map" icon="⌖" onClick={() => navigate('/map')} />
-        <QuickAction label="Confused Mode" icon="?" onClick={() => navigate('/confused')} />
+        <QuickAction label={t('nav.routes')} icon="⇄" onClick={() => navigate('/routes')} />
+        <QuickAction label={t('nav.budget')} icon="฿" onClick={() => navigate('/budget')} />
+        <QuickAction label={t('nav.map')} icon="⌖" onClick={() => navigate('/map')} />
+        <QuickAction label={t('nav.ask_ai')} icon="?" onClick={() => navigate('/confused')} />
       </div>
 
       {error && <p style={{ color: 'var(--color-danger)' }}>{error}</p>}

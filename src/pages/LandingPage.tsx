@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { Home, Menu, X } from 'lucide-react';
 
 import logoRuteinSvg from '@/assets/images/logo-rutein.svg';
@@ -640,6 +642,8 @@ export default function LandingPage() {
           >
             {user ? 'Dashboard' : 'Mulai'}
           </button>
+
+          <LanguageSwitcher />
         </div>
       </div>
 

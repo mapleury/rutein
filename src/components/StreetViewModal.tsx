@@ -16,30 +16,32 @@ export default function StreetViewModal({ point, locationLabel, onClose }: Props
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Viewer | null>(null);
   const [state, setState] = useState<ModalState>('loading');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [useGoogleFallback, setUseGoogleFallback] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
+    const token = import.meta.env.VITE_MAPILLARY_TOKEN as string;
+    if (!token || token === 'ISI_TOKEN_MAPILLARY') {
+      setUseGoogleFallback(true);
+      setState('ready');
+      return;
+    }
+
     findNearestImage(point).then((result: MapillaryLookupResult) => {
       if (cancelled) return;
 
-      if (result.status === 'missing_token') {
-        setState('missing_token');
+      if (result.status === 'missing_token' || result.status === 'error') {
+        setUseGoogleFallback(true);
+        setState('ready');
         return;
       }
       if (result.status === 'not_found') {
-        setState('not_found');
-        return;
-      }
-      if (result.status === 'error') {
-        setState('error');
-        setErrorMessage(result.message);
+        setUseGoogleFallback(true);
+        setState('ready');
         return;
       }
 
-      // result.status === 'found'
-      const token = import.meta.env.VITE_MAPILLARY_TOKEN as string;
       if (!containerRef.current) return;
 
       try {
@@ -50,9 +52,9 @@ export default function StreetViewModal({ point, locationLabel, onClose }: Props
         });
         viewerRef.current = viewer;
         setState('ready');
-      } catch (err) {
-        setState('error');
-        setErrorMessage(err instanceof Error ? err.message : 'Could not load the street-level viewer.');
+      } catch {
+        setUseGoogleFallback(true);
+        setState('ready');
       }
     });
 
@@ -69,47 +71,29 @@ export default function StreetViewModal({ point, locationLabel, onClose }: Props
       <div style={modal}>
         <div style={header}>
           <div>
-            <strong style={{ fontSize: 14 }}>{locationLabel ?? 'Street-level view'}</strong>
-            {state === 'ready' && (
-              <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>Drag to look around · scroll to zoom</div>
-            )}
+            <strong style={{ fontSize: 14 }}>{locationLabel ?? 'Street View 360°'}</strong>
+            <div style={{ fontSize: 11, color: '#666' }}>Tampilan panorama 360° tingkat jalan untuk lokasi perjalanan</div>
           </div>
           <button onClick={onClose} style={closeBtn}>✕ Close</button>
         </div>
 
         <div style={viewerArea}>
           {state === 'loading' && (
-            <div style={centeredMessage}>Searching for nearby street imagery…</div>
+            <div style={centeredMessage}>Searching for nearby 360° street imagery…</div>
           )}
 
-          {state === 'missing_token' && (
-            <div style={centeredMessage}>
-              <p style={{ margin: 0 }}>Street imagery isn't configured yet.</p>
-              <p style={{ margin: '8px 0 0', fontSize: 12, color: 'var(--color-text-muted)' }}>
-                Add a free Mapillary client token to <code>VITE_MAPILLARY_TOKEN</code> in your <code>.env</code> file.
-              </p>
-            </div>
+          {useGoogleFallback ? (
+            <iframe
+              src={`https://maps.google.com/maps?q=${point.lat},${point.lng}&layer=c&cbll=${point.lat},${point.lng}&cbp=12,0,0,0,0&output=svembed`}
+              width="100%"
+              height="100%"
+              style={{ border: 0, width: '100%', height: '100%' }}
+              allowFullScreen
+              title="Street View 360"
+            />
+          ) : (
+            <div ref={containerRef} style={{ ...viewerCanvas, display: state === 'ready' ? 'block' : 'none' }} />
           )}
-
-          {state === 'not_found' && (
-            <div style={centeredMessage}>
-              <p style={{ margin: 0 }}>No street imagery available here.</p>
-              <p style={{ margin: '8px 0 0', fontSize: 12, color: 'var(--color-text-muted)' }}>
-                Try selecting another nearby location.
-              </p>
-            </div>
-          )}
-
-          {state === 'error' && (
-            <div style={centeredMessage}>
-              <p style={{ margin: 0, color: 'var(--color-danger)' }}>Couldn't load street imagery.</p>
-              {errorMessage && <p style={{ margin: '8px 0 0', fontSize: 12, color: 'var(--color-text-muted)' }}>{errorMessage}</p>}
-            </div>
-          )}
-
-          {/* Always rendered (hidden until ready) so mapillary-js has a
-              mounted DOM node to attach to before the image is found. */}
-          <div ref={containerRef} style={{ ...viewerCanvas, display: state === 'ready' ? 'block' : 'none' }} />
         </div>
       </div>
     </div>

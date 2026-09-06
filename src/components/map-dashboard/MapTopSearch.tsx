@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, SlidersHorizontal, ArrowUpDown, X, Navigation, Footprints, Car, DollarSign } from 'lucide-react';
+import { Search, SlidersHorizontal, ArrowUpDown, X, Navigation, Footprints, Car, DollarSign, Check } from 'lucide-react';
 import { searchPlaces, debounce } from '@/services/geocodingService';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { TRANSPORT_TYPE_LABELS, type IndonesiaTransportType } from '@/data/indonesiaTransportData';
+import { TRANSPORT_TYPE_COLOR } from '@/components/transportMarkerIcon';
 import type { PlaceResult } from '@/types/domain.types';
+
+const ALL_TRANSPORT_TYPES = Object.keys(TRANSPORT_TYPE_LABELS) as IndonesiaTransportType[];
 
 interface MapTopSearchProps {
   onSelectPlace: (place: PlaceResult) => void;
@@ -10,6 +15,9 @@ interface MapTopSearchProps {
   onChangeTravelMode: (mode: 'walk' | 'ojek' | 'transit') => void;
   budgetPreference: 'cheapest' | 'fastest' | 'efficient';
   onChangeBudgetPreference: (pref: 'cheapest' | 'fastest' | 'efficient') => void;
+  activeTypes?: Set<IndonesiaTransportType>;
+  onToggleType?: (type: IndonesiaTransportType) => void;
+  onShowAllTypes?: () => void;
 }
 
 export default function MapTopSearch({
@@ -19,7 +27,11 @@ export default function MapTopSearch({
   onChangeTravelMode,
   budgetPreference,
   onChangeBudgetPreference,
+  activeTypes,
+  onToggleType,
+  onShowAllTypes,
 }: MapTopSearchProps) {
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [originQuery, setOriginQuery] = useState('');
   const [results, setResults] = useState<PlaceResult[]>([]);
@@ -96,7 +108,7 @@ export default function MapTopSearch({
           <div style={singleSearchRow}>
             <Search size={18} color="#DA362A" style={{ flexShrink: 0 }} />
             <input
-              placeholder="Cari lokasi atau tujuan..."
+              placeholder={t('search.placeholder')}
               value={query}
               onChange={(e) => {
                 setActiveInput('dest');
@@ -119,10 +131,10 @@ export default function MapTopSearch({
             <button
               onClick={() => setIsRouteMode(true)}
               style={routeModeToggleBtn}
-              title="Cari Rute A ke B"
+              title={t('search.route_btn')}
             >
               <Navigation size={14} />
-              <span>Rute</span>
+              <span>{t('search.route_btn')}</span>
             </button>
           </div>
         ) : (
@@ -266,6 +278,48 @@ export default function MapTopSearch({
                 </button>
               </div>
             </div>
+
+            {/* Map Transport Marker Filter */}
+            {onToggleType && (
+              <div style={{ ...filterGroupStyle, marginTop: 14, paddingTop: 10, borderTop: '1px solid #F0F0F0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <label style={filterLabelStyle}>Filter Transport Peta</label>
+                  {onShowAllTypes && (
+                    <button
+                      type="button"
+                      onClick={onShowAllTypes}
+                      style={{ fontSize: 10, fontWeight: 700, color: '#DA362A', background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                      Pilih Semua
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  {ALL_TRANSPORT_TYPES.map((type) => {
+                    const isChecked = activeTypes?.has(type);
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => onToggleType(type)}
+                        style={filterChoiceBtn(!!isChecked)}
+                      >
+                        <span
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: '50%',
+                            background: TRANSPORT_TYPE_COLOR[type],
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span>{TRANSPORT_TYPE_LABELS[type]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

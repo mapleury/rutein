@@ -10,7 +10,6 @@ import {
   Sparkles,
   User,
   Bookmark,
-  Settings,
   LogOut,
   ChevronDown,
   Menu,
@@ -18,10 +17,13 @@ import {
   Home,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import logoRuteinSvg from '@/assets/images/logo-rutein.svg';
 
 export default function NavBar() {
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -58,12 +60,11 @@ export default function NavBar() {
   const userInitial = displayName.charAt(0).toUpperCase();
 
   const NAV_LINKS = [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/map', label: 'Peta', icon: Map },
-    { to: '/routes', label: 'Rute', icon: ArrowRightLeft },
-    { to: '/schedule', label: 'Jadwal', icon: Clock },
-    { to: '/budget', label: 'Budget', icon: Wallet },
-    { to: '/disruptions', label: 'Peringatan', icon: AlertTriangle },
+    { to: '/dashboard', label: t('nav.map'), icon: Map },
+    { to: '/routes', label: t('nav.routes'), icon: ArrowRightLeft },
+    { to: '/schedule', label: t('nav.schedule'), icon: Clock },
+    { to: '/budget', label: t('nav.budget'), icon: Wallet },
+    { to: '/disruptions', label: t('nav.disruptions'), icon: AlertTriangle },
   ];
 
   return (
@@ -79,42 +80,44 @@ export default function NavBar() {
           <nav className="desktop-nav" style={centerNav}>
             {NAV_LINKS.map((item) => {
               const Icon = item.icon;
+              const isItemActive =
+                item.to === '/dashboard' || item.to === '/map'
+                  ? location.pathname === '/dashboard' || location.pathname === '/map' || location.pathname === '/'
+                  : location.pathname === item.to || location.pathname.startsWith(item.to + '/');
+
               return (
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  end={item.to === '/dashboard'}
-                  style={({ isActive }) => ({
+                  style={{
                     ...navLinkStyle,
-                    color: isActive ? '#DA362A' : '#5C5248',
-                    backgroundColor: isActive ? 'rgba(218, 54, 42, 0.08)' : 'transparent',
-                    fontWeight: isActive ? 700 : 500,
-                  })}
+                    color: isItemActive ? '#DA362A' : '#5C5248',
+                    backgroundColor: isItemActive ? 'rgba(218, 54, 42, 0.08)' : 'transparent',
+                    fontWeight: isItemActive ? 700 : 500,
+                  }}
                 >
-                  {({ isActive }) => (
-                    <>
-                      <Icon size={16} strokeWidth={isActive ? 2.4 : 1.9} color={isActive ? '#DA362A' : '#7A6F62'} />
-                      <span>{item.label}</span>
-                      {isActive && (
-                        <span
-                          style={{
-                            width: 5,
-                            height: 5,
-                            borderRadius: '50%',
-                            background: '#DA362A',
-                            marginLeft: 1,
-                          }}
-                        />
-                      )}
-                    </>
+                  <Icon size={16} strokeWidth={isItemActive ? 2.4 : 1.9} color={isItemActive ? '#DA362A' : '#7A6F62'} />
+                  <span>{item.label}</span>
+                  {isItemActive && (
+                    <span
+                      style={{
+                        width: 5,
+                        height: 5,
+                        borderRadius: '50%',
+                        background: '#DA362A',
+                        marginLeft: 1,
+                      }}
+                    />
                   )}
                 </NavLink>
               );
             })}
           </nav>
 
-          {/* RIGHT: Tanya AI CTA + User Profile Dropdown */}
+          {/* RIGHT: Language Switcher + Tanya AI CTA + User Profile Dropdown */}
           <div style={rightActions}>
+            <LanguageSwitcher />
+
             {/* Tanya AI Hero Feature Button */}
             <NavLink
               to="/confused"
@@ -129,7 +132,7 @@ export default function NavBar() {
               title="Buka Asisten Navigasi AI Rutein"
             >
               <Sparkles size={15} color="#FFFFFF" strokeWidth={2.4} />
-              <span>Tanya AI</span>
+              <span>{t('nav.ask_ai')}</span>
             </NavLink>
 
             {/* User Profile Pill Button */}
@@ -181,7 +184,7 @@ export default function NavBar() {
                       onClick={() => setIsProfileOpen(false)}
                     >
                       <User size={15} color="#DA362A" />
-                      <span>Profil Saya</span>
+                      <span>{t('nav.profile')}</span>
                     </Link>
                     <Link
                       to="/places"
@@ -189,23 +192,7 @@ export default function NavBar() {
                       onClick={() => setIsProfileOpen(false)}
                     >
                       <Bookmark size={15} color="#DA362A" />
-                      <span>Tempat Tersimpan</span>
-                    </Link>
-                    <Link
-                      to="/preferences"
-                      style={dropdownItem}
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      <Settings size={15} color="#DA362A" />
-                      <span>Preferensi Rute</span>
-                    </Link>
-                    <Link
-                      to="/"
-                      style={dropdownItem}
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      <Home size={15} color="#DA362A" />
-                      <span>Halaman Utama</span>
+                      <span>{t('nav.saved_places')}</span>
                     </Link>
                   </div>
 
@@ -428,18 +415,6 @@ export default function NavBar() {
               </Link>
 
               <Link
-                to="/preferences"
-                style={mobileSheetCard}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Settings size={18} color="#DA362A" />
-                  <strong>Preferensi</strong>
-                </div>
-                <span style={{ fontSize: 11, color: '#7A6F62' }}>Setelan Perjalanan</span>
-              </Link>
-
-              <Link
                 to="/profile"
                 style={mobileSheetCard}
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -537,8 +512,10 @@ const rightActions: React.CSSProperties = {
 const aiCtaButton: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
+  justifyContent: 'center',
   gap: 6,
-  padding: '7px 16px',
+  height: 32,
+  padding: '0 14px',
   borderRadius: 999,
   color: '#FFFFFF',
   fontSize: 13,
@@ -547,6 +524,7 @@ const aiCtaButton: React.CSSProperties = {
   letterSpacing: '0.01em',
   transition: 'all 0.18s ease',
   cursor: 'pointer',
+  boxSizing: 'border-box',
 };
 
 const profileButton: React.CSSProperties = {

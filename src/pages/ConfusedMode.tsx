@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import logoRuteinSvg from '@/assets/images/logo-rutein.svg';
+import merpatiSvg from '@/assets/images/merpati-terbang.svg';
 import {
   Sparkles,
   Navigation2,
@@ -30,22 +32,24 @@ import { useReverseGeocodedLocation } from '@/hooks/useReverseGeocodedLocation';
 import { useNearbyContext } from '@/hooks/useNearbyContext';
 import { useRestoredNavigationContext } from '@/hooks/useRestoredNavigationContext';
 import { useConfusedModeChat } from '@/hooks/useConfusedModeChat';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { buildConfusedModeAIContext } from '@/lib/buildConfusedModeAIContext';
 import { detectNavigationIntent } from '@/lib/detectNavigationIntent';
 import { resolveNavigationForQuery } from '@/lib/resolveNavigationForQuery';
 import { AssistantMessageContent } from '@/components/AssistantMessageContent';
 
-const QUICK_ACTIONS_INDONESIAN = [
-  { text: '📍 Saya ada di mana sekarang?', icon: MapPin },
-  { text: '🏠 Bagaimana cara pulang ke Rumah?', icon: Home },
-  { text: '💼 Rute terbaik ke Kantor / Sekolah', icon: Briefcase },
-  { text: '⚡ Cari rute paling cepat', icon: Zap },
-  { text: '💰 Cari rute paling hemat', icon: PiggyBank },
-];
-
 export default function ConfusedMode() {
   const { user } = useAuth();
+  const { lang, t } = useLanguage();
   const navigate = useNavigate();
+
+  const QUICK_ACTIONS = [
+    { text: t('quick.where_am_i'), icon: MapPin },
+    { text: t('quick.home_route'), icon: Home },
+    { text: t('quick.office_route'), icon: Briefcase },
+    { text: t('quick.fastest_route'), icon: Zap },
+    { text: t('quick.cheapest_route'), icon: PiggyBank },
+  ];
   const { position, loading: locationLoading, error: locationError } = useCurrentLocation();
   const { address, addressVerified, loading: addressLoading } = useReverseGeocodedLocation(position);
   const {
@@ -196,7 +200,17 @@ export default function ConfusedMode() {
           zIndex: 40,
         }}
       >
-        <div style={{ padding: 18, borderBottom: '1.5px solid #E5D5C5' }}>
+        {/* Sidebar Brand Header */}
+        <div style={{ padding: '16px 18px 12px', borderBottom: '1.5px solid #E5D5C5', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Link to="/dashboard" style={{ display: 'flex', alignItems: 'center' }} title="Rutein Dashboard">
+            <img src={logoRuteinSvg} alt="Rutein" style={{ height: 26, width: 'auto' }} />
+          </Link>
+          <span style={{ fontSize: 11, fontWeight: 700, background: '#FDF0ED', color: '#DA362A', padding: '3px 9px', borderRadius: 999, border: '1px solid rgba(218,54,42,0.2)' }}>
+            Tanya AI
+          </span>
+        </div>
+
+        <div style={{ padding: 14, borderBottom: '1.5px solid #E5D5C5' }}>
           {/* New Chat Button */}
           <button
             type="button"
@@ -219,14 +233,14 @@ export default function ConfusedMode() {
               transition: 'all 0.15s ease',
             }}
           >
-            <Plus size={18} /> Chat Baru
+            <Plus size={18} /> {t('ai.new_chat')}
           </button>
         </div>
 
         {/* Chat Sessions History List */}
         <div style={{ flex: 1, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: '#666666', textTransform: 'uppercase', paddingLeft: 8, paddingBottom: 4 }}>
-            Riwayat Percakapan ({sessions.length})
+            {t('ai.history_title')} ({sessions.length})
           </span>
 
           {sessions.map((session) => {
@@ -378,7 +392,7 @@ export default function ConfusedMode() {
                   gap: 6,
                 }}
               >
-                <CheckCircle2 size={13} /> AI RUTEIN Aktif
+                <img src={merpatiSvg} alt="AI Rutein" style={{ height: 14, width: 'auto', objectFit: 'contain' }} /> AI RUTEIN Aktif
               </span>
               <span
                 style={{
@@ -444,20 +458,20 @@ export default function ConfusedMode() {
                   }}
                 >
                   <h3 className="font-jockey" style={{ fontSize: 22, color: '#1E1E1E', margin: '0 0 8px 0' }}>
-                    Butuh bantuan memilih rute?
+                    {t('ai.welcome_title')}
                   </h3>
                   <p style={{ margin: 0, fontSize: 14, color: '#4A4A4A', lineHeight: 1.6, fontFamily: 'var(--font-inter)' }}>
-                    Cukup tanyakan lokasi tempat tujuanmu, atau pilih pertanyaan cepat di bawah. RUTEIN akan menganalisis posisi GPS kamu, halte/stasiun terdekat, tarif, serta preferensi transit secara otomatis.
+                    {t('ai.welcome_desc')}
                   </p>
                 </div>
 
                 <span style={{ fontSize: 13, color: '#666666', display: 'block', marginBottom: 10, fontWeight: 600 }}>
-                  {nearbyBlocking ? 'Memuat data peta terdekat…' : 'Pilih Pertanyaan Cepat:'}
+                  {nearbyBlocking ? t('common.loading') : t('ai.quick_questions_title')}
                 </span>
 
                 {/* Quick Action Chips */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
-                  {QUICK_ACTIONS_INDONESIAN.map((action) => {
+                  {QUICK_ACTIONS.map((action) => {
                     const IconComp = action.icon;
                     return (
                       <button

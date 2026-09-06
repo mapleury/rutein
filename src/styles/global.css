@@ -1,52 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Aileron:ital,wght@0,400;0,600;0,700;1,400&family=Jockey+One&family=Inter:wght@400;600;700&display=swap');
+
 :root {
-  /* Rutein custom colors requested by user */
+  /* Rutein Core Brand Palette */
   --color-main-red: #DA362A;
   --color-bg-light: #FCF4ED;
   --color-text-dark: #1E1E1E;
 
-  /* Rutein palette aligned with Landing Page */
   --color-bg: #FCF4ED;
-  --color-surface: #FFFFFF;
+  --color-surface: #FFFDF9;
   --color-surface-raised: #FDF0ED;
-  --color-border: #E5D5C5;
+  --color-border: #B7A897;
   --color-text: #1E1E1E;
   --color-text-muted: #7A6F62;
   --color-primary: #DA362A;
-  --color-primary-dim: #B82A1F;
+  --color-primary-dim: #C22B20;
   --color-teal: #0D9488;
   --color-amber: #D97706;
   --color-danger: #DA362A;
   --color-success: #16A34A;
 
-  /* Fonts */
+  /* Typography */
   --font-jockey: 'Jockey One', cursive, sans-serif;
-  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-aileron: 'Aileron', 'Inter', system-ui, sans-serif;
+  --font-inter: 'Aileron', 'Inter', system-ui, sans-serif;
   --font-display: var(--font-jockey);
-  --font-body: var(--font-inter);
+  --font-body: var(--font-aileron);
 
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
 
-  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.28);
+  --shadow-card: 0 4px 16px rgba(218, 54, 42, 0.06), 0 2px 6px rgba(0, 0, 0, 0.04);
 
-  /* Map Dashboard — sidebar (dari palette yang diberikan, tanpa warna dark/navy) */
-  --color-sidebar: #C94535;
-  --color-sidebar-hover: rgba(251, 244, 238, 0.10);
-  --color-sidebar-active-bg: #FBF4EE;
-  --color-sidebar-text: #FFFFFF;
-  --color-sidebar-text-muted: #C4BBBB;
+  /* Map Dashboard — Sidebar Panel (Warna Primary Red #DA362A + Aksesori Krem) */
+  --color-sidebar: #DA362A;
+  --color-sidebar-hover: rgba(255, 253, 249, 0.15);
+  --color-sidebar-active-bg: #FFFDF9;
+  --color-sidebar-active-text: #DA362A;
+  --color-sidebar-text: #FFFDF9;
+  --color-sidebar-text-muted: #F5E6DA;
+  --color-sidebar-scroll: #FCF4ED;
 
-  /* Map Dashboard — floating panels di atas basemap (terang) */
-  --shadow-floating: 0 12px 32px rgba(0, 0, 0, 0.4);
+  /* Map Dashboard — floating panels & overlays */
+  --shadow-floating: 0 12px 32px rgba(0, 0, 0, 0.25);
 
-  /* Map Dashboard — z-index scale, jangan ada lagi z-index angka manual di komponen baru */
+  /* Map Dashboard — z-index scale */
   --z-map-controls: 10;
   --z-panel: 20;
   --z-popover: 30;
   --z-modal: 40;
 
-  /* Map Dashboard — ukuran komponen tetap */
+  /* Map Dashboard — ukuran komponen */
   --sidebar-width: 260px;
   --sidebar-width-collapsed: 64px;
   --popover-width: 280px;
@@ -189,8 +193,21 @@ button {
   padding: 24px 20px 80px;
 }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: #D5C5B5; border-radius: 6px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
+
+/* Custom cream scrollbar for sidebar panel */
+aside ::-webkit-scrollbar-thumb,
+.sidebar-panel ::-webkit-scrollbar-thumb {
+  background: var(--color-sidebar-scroll, #FCF4ED);
+  border-radius: 6px;
+}
+aside ::-webkit-scrollbar-thumb:hover,
+.sidebar-panel ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface, #FFFDF9);
+}
 
 @media (max-width: 640px) {
   .container { padding: 16px 14px 90px; }
@@ -418,4 +435,52 @@ button {
     margin-bottom: 32px !important;
   }
 }
+
+/* Hide MapLibre Attribution (i) Control */
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-bottom-right {
+  display: none !important;
+}
+
+/* Card Slide Up Fade Animation */
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Loading Dots Bouncing Animation */
+@keyframes dotBounce {
+  0%, 80%, 100% {
+    transform: scale(0.5);
+    opacity: 0.3;
+  }
+  40% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.loading-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 2px;
+  background-color: var(--color-primary, #DA362A);
+  border-radius: 50%;
+  animation: dotBounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dot:nth-child(2) { animation-delay: -0.16s; }
+.loading-dot:nth-child(3) { animation-delay: 0s; }
 

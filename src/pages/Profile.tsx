@@ -11,7 +11,9 @@
 //  - Transport preferences can now be added or removed directly here using interactive chips/modal.
 
 import React, { useEffect, useState } from 'react';
+import { Edit3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import PageLoading from '@/components/PageLoading';
 import { getProfile, updateProfile, getPreferences, upsertPreferences } from '@/services/preferencesService';
 import { listSavedPlaces } from '@/services/savedPlacesService';
 import { listBudgetPlans } from '@/services/budgetService';
@@ -208,24 +210,39 @@ export default function Profile() {
   const [isTransportModalOpen, setIsTransportModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
-    (async () => {
-      const [p, prefs, savedPlaces, budgetPlans] = await Promise.all([
-        getProfile(user.id),
-        getPreferences(user.id),
-        listSavedPlaces(user.id),
-        listBudgetPlans(user.id),
-      ]);
-      if (p) {
-        setProfile(p);
-        setFullName(p.full_name ?? '');
-        setAvatarUrl(p.avatar_url ?? '');
-      }
-      setPreferences(prefs);
-      setPlaces(savedPlaces);
-      setPlans(budgetPlans);
+    if (!user) {
       setLoading(false);
+      return;
+    }
+    let isMounted = true;
+    (async () => {
+      try {
+        const [p, prefs, savedPlaces, budgetPlans] = await Promise.all([
+          getProfile(user.id).catch(() => null),
+          getPreferences(user.id).catch(() => null),
+          listSavedPlaces(user.id).catch(() => []),
+          listBudgetPlans(user.id).catch(() => []),
+        ]);
+        if (!isMounted) return;
+        if (p) {
+          setProfile(p);
+          setFullName(p.full_name ?? user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? '');
+          setAvatarUrl(p.avatar_url ?? '');
+        } else {
+          setFullName(user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? '');
+        }
+        setPreferences(prefs);
+        setPlaces(savedPlaces || []);
+        setPlans(budgetPlans || []);
+      } catch {
+        // Fallback
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     })();
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   async function handleSave() {

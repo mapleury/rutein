@@ -13,12 +13,11 @@ export const TRANSPORT_TYPE_COLOR: Record<IndonesiaTransportType, string> = {
   airport_rail: '#0EA5E9',
   ferry: '#06B6D4',
   terminal: '#64748B',
-  other: '#90A0BE',
 };
 
 type IconComponent = React.ComponentType<any>;
 
-const TRANSPORT_TYPE_ICON: Record<IndonesiaTransportType, IconComponent> = {
+const TRANSPORT_TYPE_ICON: Record<Exclude<IndonesiaTransportType, 'other'>, IconComponent> = {
   transjakarta: Bus,
   bus: Bus,
   krl: TrainFront,
@@ -28,7 +27,6 @@ const TRANSPORT_TYPE_ICON: Record<IndonesiaTransportType, IconComponent> = {
   airport_rail: PlaneTakeoff,
   ferry: Ship,
   terminal: Building2,
-  other: MapPin,
 };
 
 interface Props {

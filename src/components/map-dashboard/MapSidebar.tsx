@@ -6,32 +6,70 @@ import {
   ChevronDown,
   Sliders,
   Bookmark,
-  Settings,
   User,
   Check,
-  MapPin,
   Globe,
+  Trash2,
+  Bus,
+  TrainFront,
+  Train,
+  TramFront,
+  TrainTrack,
+  Plane,
+  Ship,
 } from 'lucide-react';
 import {
   TRANSPORT_TYPE_LABELS,
   type IndonesiaTransportType,
 } from '@/data/indonesiaTransportData';
 import { TRANSPORT_TYPE_COLOR } from '@/components/transportMarkerIcon';
-import { listSavedPlaces } from '@/services/savedPlacesService';
+import { listSavedPlaces, deleteSavedPlace } from '@/services/savedPlacesService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import type { SavedPlace } from '@/types/database.types';
+import logoRuteinSvg from '@/assets/images/logo-rutein.svg';
+import logoNonTextSvg from '@/assets/images/logo-nontext.svg';
 
 const ALL_TRANSPORT_TYPES = Object.keys(
   TRANSPORT_TYPE_LABELS
 ) as IndonesiaTransportType[];
 
-type ActiveSection = 'operators' | 'stops' | 'saved' | null;
+function getOperatorIcon(type: IndonesiaTransportType) {
+  const iconProps = { size: 19, color: '#FFFFFF', strokeWidth: 2.2 };
+  switch (type) {
+    case 'transjakarta':
+      return <Bus {...iconProps} />;
+    case 'bus':
+      return <TramFront {...iconProps} />;
+    case 'krl':
+      return <TrainFront {...iconProps} />;
+    case 'mrt':
+      return <TrainTrack {...iconProps} />;
+    case 'lrt':
+      return <TramFront {...iconProps} />;
+    case 'train':
+      return <Train {...iconProps} />;
+    case 'airport_rail':
+      return <Plane {...iconProps} />;
+    case 'ferry':
+      return <Ship {...iconProps} />;
+    case 'terminal':
+      return <Bus {...iconProps} />;
+    default:
+      return <Bus {...iconProps} />;
+  }
+}
+
+type ActiveSection = 'operators' | 'saved' | null;
 
 interface MapSidebarProps {
   activeTypes: Set<IndonesiaTransportType>;
   onToggleType: (type: IndonesiaTransportType) => void;
   onShowAllTypes: () => void;
-  onSelectSavedPlace: (lat: number, lng: number) => void;
+  onSelectSavedPlace: (lat: number, lng: number, name?: string, address?: string) => void;
+  onSelectOperator?: (type: IndonesiaTransportType) => void;
+  savedPlacesTrigger?: number;
 }
 
 export default function MapSidebar({
@@ -39,13 +77,15 @@ export default function MapSidebar({
   onToggleType,
   onShowAllTypes,
   onSelectSavedPlace,
+  onSelectOperator,
+  savedPlacesTrigger = 0,
 }: MapSidebarProps) {
   const { user } = useAuth();
+  const { lang, t } = useLanguage();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeSection, setActiveSection] = useState<ActiveSection>('operators');
   const [savedPlaces, setSavedPlaces] = useState<SavedPlace[]>([]);
   const [loadingSaved, setLoadingSaved] = useState(false);
-  const [lang, setLang] = useState<'ID' | 'EN'>('ID');
 
   const userName =
     user?.user_metadata?.full_name ||
@@ -53,14 +93,62 @@ export default function MapSidebar({
     user?.email?.split('@')[0] ||
     'Nael Muna';
 
-  useEffect(() => {
-    if (!user) return;
+  const loadAllSavedPlaces = async () => {
     setLoadingSaved(true);
-    listSavedPlaces(user.id)
-      .then(setSavedPlaces)
-      .catch(() => setSavedPlaces([]))
-      .finally(() => setLoadingSaved(false));
-  }, [user]);
+
+    // 1. Get local storage items
+    let localItems: SavedPlace[] = [];
+    try {
+      const raw = localStorage.getItem('rutein_saved_places');
+      if (raw) localItems = JSON.parse(raw);
+    } catch {}
+
+    // 2. Get Supabase items if logged in
+    let remoteItems: SavedPlace[] = [];
+    if (user) {
+      try {
+        remoteItems = await listSavedPlaces(user.id);
+      } catch {}
+    }
+
+    // Merge without duplicates by name
+    const combined = [...localItems];
+    for (const remote of remoteItems) {
+      if (!combined.some((item) => item.name === remote.name)) {
+        combined.push(remote);
+      }
+    }
+
+    setSavedPlaces(combined);
+    setLoadingSaved(false);
+  };
+
+  useEffect(() => {
+    loadAllSavedPlaces();
+  }, [user, savedPlacesTrigger]);
+
+  const handleDeleteSaved = async (e: React.MouseEvent, placeId: string, placeName: string) => {
+    e.stopPropagation();
+
+    // Remove from local storage
+    try {
+      const raw = localStorage.getItem('rutein_saved_places');
+      if (raw) {
+        const items = JSON.parse(raw);
+        const filtered = items.filter((item: any) => item.id !== placeId && item.name !== placeName);
+        localStorage.setItem('rutein_saved_places', JSON.stringify(filtered));
+      }
+    } catch {}
+
+    // Remove from Supabase if real DB id
+    if (user && !placeId.startsWith('saved_')) {
+      try {
+        await deleteSavedPlace(placeId);
+      } catch {}
+    }
+
+    loadAllSavedPlaces();
+  };
 
   const toggleSection = (section: ActiveSection) => {
     if (isCollapsed) {
@@ -73,27 +161,28 @@ export default function MapSidebar({
 
   return (
     <aside style={sidebarContainer(isCollapsed)}>
-      {/* Header / Brand & ID/EN Toggle & Expand/Collapse */}
+      {/* Header / Brand Logo & ID/EN Toggle & Expand/Collapse */}
       <div style={headerStyle(isCollapsed)}>
-        {!isCollapsed && (
+        {!isCollapsed ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={brandText}>Rutein</span>
-            {/* Language Switcher Pill */}
-            <div style={langSwitchContainer}>
-              <button
-                style={langBtnStyle(lang === 'ID')}
-                onClick={() => setLang('ID')}
-              >
-                ID
-              </button>
-              <button
-                style={langBtnStyle(lang === 'EN')}
-                onClick={() => setLang('EN')}
-              >
-                EN
-              </button>
-            </div>
+            <Link to="/dashboard" style={{ display: 'flex', alignItems: 'center' }} title="Rutein Dashboard">
+              <img
+                src={logoRuteinSvg}
+                alt="Rutein"
+                style={{ height: 26, width: 'auto', filter: 'brightness(0) invert(1)' }}
+              />
+            </Link>
+            {/* Global Language Switcher Pill */}
+            <LanguageSwitcher variant="white" size="sm" />
           </div>
+        ) : (
+          <Link to="/dashboard" style={{ display: 'flex', alignItems: 'center' }} title="Rutein Dashboard">
+            <img
+              src={logoNonTextSvg}
+              alt="Rutein"
+              style={{ height: 24, width: 'auto', filter: 'brightness(0) invert(1)' }}
+            />
+          </Link>
         )}
 
         <button
@@ -107,16 +196,16 @@ export default function MapSidebar({
 
       {/* Main Navigation Sections */}
       <div style={contentStyle}>
-        {/* Operators Section */}
+        {/* Operators Sub-menu Navigation Section */}
         <div style={sectionWrapperStyle}>
           <button
             onClick={() => toggleSection('operators')}
             style={navItemStyle(activeSection === 'operators' && !isCollapsed)}
-            title="Operators"
+            title={t('sidebar.operators')}
           >
             <div style={navItemLabelGroup}>
               <Sliders size={18} />
-              {!isCollapsed && <span>Operators</span>}
+              {!isCollapsed && <span>{t('sidebar.operators')}</span>}
             </div>
             {!isCollapsed && (
               <ChevronDown
@@ -133,53 +222,35 @@ export default function MapSidebar({
             <div style={accordionContentStyle}>
               <div style={operatorsListStyle}>
                 {ALL_TRANSPORT_TYPES.map((type) => {
-                  const isChecked = activeTypes.has(type);
                   return (
-                    <label key={type} style={operatorRowStyle}>
-                      <input
-                        type="checkbox"
-                        checked={isChecked}
-                        onChange={() => onToggleType(type)}
-                        style={checkboxStyle}
-                      />
-                      <span
-                        style={{
-                          width: 10,
-                          height: 10,
-                          borderRadius: '50%',
-                          background: TRANSPORT_TYPE_COLOR[type],
-                          flexShrink: 0,
-                        }}
-                      />
-                      <span style={operatorLabelStyle}>{TRANSPORT_TYPE_LABELS[type]}</span>
-                    </label>
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => onSelectOperator?.(type)}
+                      style={operatorSubmenuRowStyle}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            width: 22,
+                            height: 22,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {getOperatorIcon(type)}
+                        </div>
+                        <span style={operatorLabelStyle}>{TRANSPORT_TYPE_LABELS[type]}</span>
+                      </div>
+                      <ChevronRight size={14} color="rgba(251, 244, 238, 0.5)" />
+                    </button>
                   );
                 })}
               </div>
-
-              <button onClick={onShowAllTypes} style={showAllBtnStyle}>
-                <Check size={14} /> Show All
-              </button>
             </div>
           )}
-        </div>
-
-        {/* Transit Stops Section (Disabled / Held) */}
-        <div style={sectionWrapperStyle}>
-          <button
-            style={disabledNavItemStyle}
-            title="Transit Stops (Hold / Coming Soon)"
-          >
-            <div style={navItemLabelGroup}>
-              <MapPin size={18} />
-              {!isCollapsed && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span>Transit Stops</span>
-                  <span style={comingSoonBadge}>Hold</span>
-                </div>
-              )}
-            </div>
-          </button>
         </div>
 
         {/* Saved Places Section */}
@@ -187,11 +258,11 @@ export default function MapSidebar({
           <button
             onClick={() => toggleSection('saved')}
             style={navItemStyle(activeSection === 'saved' && !isCollapsed)}
-            title="Saved Places"
+            title={t('sidebar.saved_places')}
           >
             <div style={navItemLabelGroup}>
               <Bookmark size={18} />
-              {!isCollapsed && <span>Saved Places</span>}
+              {!isCollapsed && <span>{t('sidebar.saved_places')}</span>}
             </div>
             {!isCollapsed && (
               <ChevronDown
@@ -207,22 +278,83 @@ export default function MapSidebar({
           {!isCollapsed && activeSection === 'saved' && (
             <div style={accordionContentStyle}>
               {loadingSaved ? (
-                <div style={mutedTextStyle}>Loading saved places...</div>
+                <div style={mutedTextStyle}>{t('sidebar.loading_saved')}</div>
               ) : savedPlaces.length === 0 ? (
-                <div style={mutedTextStyle}>No saved places found.</div>
+                <div style={mutedTextStyle}>{t('sidebar.no_saved')}</div>
               ) : (
                 <div style={savedListStyle}>
-                  {savedPlaces.map((place) => (
-                    <button
-                      key={place.id}
-                      onClick={() => onSelectSavedPlace(place.latitude, place.longitude)}
-                      style={savedItemStyle}
-                      title={place.name}
-                    >
-                      <div style={savedItemName}>{place.name}</div>
-                      {place.address && <div style={savedItemAddress}>{place.address}</div>}
-                    </button>
-                  ))}
+                  {savedPlaces.map((place) => {
+                    const isCoord = (str?: string | null) =>
+                      !str ||
+                      str === 'Lokasi Tujuan' ||
+                      str.startsWith('-') ||
+                      /^-?\d+\.\d+/.test(str);
+
+                    let displayName = !isCoord(place.name) ? place.name : '';
+                    let displayAddress = !isCoord(place.address) ? place.address : '';
+
+                    if (!displayName && displayAddress) {
+                      displayName = displayAddress;
+                      displayAddress = '';
+                    }
+
+                    if (!displayName) {
+                      if (place.latitude < -6.15 && place.latitude > -6.25 && place.longitude > 106.65 && place.longitude < 106.8) {
+                        displayName = 'Rute Perjalanan - Tangerang';
+                        displayAddress = 'Tangerang, Banten';
+                      } else if (place.latitude < -6.1 && place.latitude > -6.25 && place.longitude > 106.8 && place.longitude < 106.9) {
+                        displayName = 'Rute Perjalanan - Jakarta';
+                        displayAddress = 'DKI Jakarta';
+                      } else {
+                        displayName = 'Rute Perjalanan Tersimpan';
+                        displayAddress = 'Lokasi Terdaftar';
+                      }
+                    }
+
+                    return (
+                      <div
+                        key={place.id}
+                        onClick={() =>
+                          onSelectSavedPlace(
+                            place.latitude,
+                            place.longitude,
+                            displayName,
+                            displayAddress || undefined
+                          )
+                        }
+                        style={{
+                          ...savedItemStyle,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 8,
+                        }}
+                        title={`Tampilkan rute ke ${displayName}`}
+                      >
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={savedItemName}>{displayName}</div>
+                          {displayAddress && <div style={savedItemAddress}>{displayAddress}</div>}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteSaved(e, place.id, place.name)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'var(--color-sidebar-text-muted)',
+                            cursor: 'pointer',
+                            padding: 4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          title="Hapus rute tersimpan"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -232,16 +364,8 @@ export default function MapSidebar({
 
       {/* Footer Anchored at the VERY Bottom */}
       <div style={bottomFooterStyle}>
-        {/* Settings Link */}
-        <Link to="/preferences" style={navLinkItemStyle} title="Settings">
-          <div style={navItemLabelGroup}>
-            <Settings size={18} />
-            {!isCollapsed && <span>Settings</span>}
-          </div>
-        </Link>
-
         {/* Profile Link with Avatar/User Name */}
-        <Link to="/profile" style={profileLinkStyle} title="Profile">
+        <Link to="/profile" style={profileLinkStyle} title={t('nav.profile')}>
           <div style={navItemLabelGroup}>
             <div style={avatarStyle}>
               <User size={14} color="var(--color-sidebar-text)" />
@@ -249,7 +373,7 @@ export default function MapSidebar({
             {!isCollapsed && (
               <div style={profileTextGroup}>
                 <span style={userNameStyle}>{userName}</span>
-                <span style={userSubtextStyle}>View Profile</span>
+                <span style={userSubtextStyle}>{t('sidebar.view_profile')}</span>
               </div>
             )}
           </div>
@@ -302,7 +426,7 @@ const langSwitchContainer: React.CSSProperties = {
 const langBtnStyle = (isActive: boolean): React.CSSProperties => ({
   border: 'none',
   background: isActive ? 'var(--color-sidebar-active-bg)' : 'transparent',
-  color: isActive ? '#C94535' : 'var(--color-sidebar-text)',
+  color: isActive ? 'var(--color-sidebar-active-text)' : 'var(--color-sidebar-text)',
   borderRadius: 12,
   padding: '2px 7px',
   fontSize: 10,
@@ -346,12 +470,12 @@ const navItemStyle = (isActive: boolean): React.CSSProperties => ({
   padding: '10px 14px',
   border: 'none',
   borderRadius: 8,
-  backgroundColor: isActive ? 'var(--color-sidebar-hover)' : 'transparent',
-  color: 'var(--color-sidebar-text)',
+  backgroundColor: isActive ? 'var(--color-sidebar-active-bg)' : 'transparent',
+  color: isActive ? 'var(--color-sidebar-active-text)' : 'var(--color-sidebar-text)',
   fontSize: 14,
   fontWeight: 600,
   cursor: 'pointer',
-  transition: 'background-color 0.15s ease',
+  transition: 'all 0.15s ease',
 });
 
 const disabledNavItemStyle: React.CSSProperties = {
@@ -461,12 +585,18 @@ const operatorsListStyle: React.CSSProperties = {
   overflowY: 'auto',
 };
 
-const operatorRowStyle: React.CSSProperties = {
+const operatorSubmenuRowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: 10,
+  justifyContent: 'space-between',
+  padding: '8px 10px',
+  borderRadius: 8,
+  background: 'transparent',
+  border: 'none',
+  width: '100%',
   cursor: 'pointer',
-  padding: '4px 0',
+  transition: 'background-color 0.15s ease',
+  textAlign: 'left',
 };
 
 const checkboxStyle: React.CSSProperties = {
