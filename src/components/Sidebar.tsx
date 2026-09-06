@@ -624,9 +624,10 @@ const sidebarContainer = (isCollapsed: boolean): React.CSSProperties => ({
   flexDirection: 'column',
   transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
   zIndex: 'var(--z-panel)' as any,
-  boxShadow: '4px 0 16px rgba(0, 0, 0, 0.25)',
+  boxShadow: '4px 0 16px rgba(0, 0, 0, 0.15)',
   userSelect: 'none',
   flexShrink: 0,
+  borderRadius: '0 24px 24px 0',
 });
 
 const headerStyle = (isCollapsed: boolean): React.CSSProperties => ({
