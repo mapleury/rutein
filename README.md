@@ -1,7 +1,7 @@
 <div align="center">
 <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/images/rutein-1.png" alt="Landing Page" width="800"/>
 
-  [![Live Demo](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-live-demo.svg)](https://[URL_DEMO])
+  [![Live Demo](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-live-demo.svg)](https://www.youtube.com/watch?v=joQlO1Zzllo)
 [![GitHub](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-github.svg)](https://github.com/syakirahh8/rutein)
 [![License](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-license.svg)](LICENSE)
 [![Read Tutorial](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-tutorial.svg)](https://docs.google.com/document/d/1rMp5Zca_7DdN39zzVLBruC6fr0wa5XWCYjBjwOXN7Lk/edit?usp=sharing)
@@ -86,7 +86,7 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 
 ### Live Demo
 
-🔗 **[Kunjungi Website](https://[URL_DEMO])**
+🔗 **[Kunjungi Website](https://rutein-map-pi.vercel.app/)**
 
 ### Screenshot Aplikasi
 <div align="center">
@@ -117,7 +117,7 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 
 ### Video Demo
 
-📹 **[Link Video Demo](https://[URL_VIDEO])** _(opsional)_
+📹 **[Link Video Demo](https://www.youtube.com/watch?v=joQlO1Zzllo)** _(opsional)_
 
 ---
 
