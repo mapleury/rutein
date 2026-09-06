@@ -185,33 +185,117 @@ Version Ctrl : Git & GitHub
 
 ### System Architecture
 
-```
 [Browser / React SPA]
-        │
-        ├── PlaceSearchInput / MapPage  ──►  Nominatim (Geocoding & Reverse Geocoding)
-        ├── MapPage                     ──►  OpenFreeMap (tiles) / Esri (satellite)
-        ├── StreetViewModal             ──►  Mapillary API (street-level imagery)
-        ├── ConfusedMode                ──►  Supabase Edge Function ──►  AI Model
-        └── Auth / Data (Places, Budget,
-            Preferences, Disruptions)   ──►  Supabase (Postgres + Auth)
-```
+│
+├── PlaceSearchInput / MapPage ──► Nominatim (Geocoding & Reverse Geocoding)
+├── MapPage ──► OpenFreeMap (tiles) / Esri (satellite)
+├── StreetViewModal ──► Mapillary API (street-level imagery)
+├── ConfusedMode ──► Supabase Edge Function ──► AI Model
+└── Auth / Data (Places, Budget,
+Preferences, Disruptions) ──► Supabase (Postgres + Auth)
+
 
 ### Folder Structure
 
-```
 project-root/
+├── scripts/ # Skrip build/utility proyek
 ├── src/
-│   ├── components/     # Komponen UI yang dapat dipakai ulang (NavBar, PlaceSearchInput, dsb.)
-│   ├── pages/           # Halaman aplikasi (Dashboard, MapPage, RouteComparison, dsb.)
-│   ├── hooks/           # Custom hooks (lokasi, geocoding, nearby context, dsb.)
-│   ├── services/        # Pemanggilan API/Supabase (routeService, geocodingService, dsb.)
-│   ├── lib/              # Fungsi murni pembantu (pembangun konteks AI, deteksi intent, dsb.)
-│   ├── contexts/        # React Context (AuthContext)
-│   ├── data/             # Dataset statis yang dikurasi (transportasi & gangguan lalu lintas Indonesia)
-│   ├── types/            # Definisi TypeScript
-│   └── assets/           # Ilustrasi & aset visual landing page
-└── public/               # Aset statis
-```
+│ ├── assets/ # Ilustrasi & aset visual landing page
+│ │ ├── badges/
+│ │ ├── docs/
+│ │ ├── images/
+│ │ └── videos/
+│ │
+│ ├── components/ # Komponen UI yang dapat dipakai ulang
+│ │ ├── map-dashboard/ # Sub-komponen khusus MapDashboard
+│ │ │ ├── MapPointControls.tsx
+│ │ │ ├── MapRouteDetailBar.tsx
+│ │ │ └── MapTopSearch.tsx
+│ │ ├── ReactBits/
+│ │ ├── AssistantMessageContent.tsx
+│ │ ├── LanguageSwitcher.tsx
+│ │ ├── LiveGpsModal.tsx
+│ │ ├── MobileNav.tsx
+│ │ ├── PageLoading.tsx
+│ │ ├── PlaceSearchInput.tsx
+│ │ ├── ProtectedRoute.tsx
+│ │ ├── RouteOptionCard.tsx
+│ │ ├── Sidebar.tsx
+│ │ ├── StreetViewModal.tsx
+│ │ ├── TransportFilter.tsx
+│ │ └── transportMarkerIcon.tsx
+│ │
+│ ├── contexts/ # React Context
+│ │ ├── AuthContext.tsx
+│ │ ├── LanguageContext.tsx
+│ │ └── SidebarMapContext.tsx
+│ │
+│ ├── data/ # Dataset statis yang dikurasi (transportasi & gangguan lalu lintas Indonesia)
+│ │ ├── indonesiaRoadDisruption.ts
+│ │ ├── indonesiaTransportData.ts
+│ │ └── transportationScheduledata.ts
+│ │
+│ ├── hooks/ # Custom hooks (lokasi, geocoding, nearby context, dsb.)
+│ │ ├── useConfusedModeChat.ts
+│ │ ├── useCurrentLocation.ts
+│ │ ├── useNearbyContext.ts
+│ │ ├── useRestoredNavigationContext.ts
+│ │ └── useReverseGeocodedLocation.ts
+│ │
+│ ├── lib/ # Fungsi murni pembantu (pembangun konteks AI, deteksi intent, dsb.)
+│ │ ├── buildConfusedModeAIContext.ts
+│ │ ├── detectNavigationIntent.ts
+│ │ ├── resolveNavigationForQuery.ts
+│ │ └── supabaseClient.ts
+│ │
+│ ├── pages/ # Halaman aplikasi
+│ │ ├── Auth.tsx
+│ │ ├── BudgetPlanner.tsx
+│ │ ├── ConfusedMode.tsx
+│ │ ├── Dashboard.tsx
+│ │ ├── Disruptions.tsx
+│ │ ├── LandingPage.tsx
+│ │ ├── MapDashboard.tsx
+│ │ ├── MapPage.tsx
+│ │ ├── Profile.tsx
+│ │ ├── RouteDetail.tsx
+│ │ ├── SavedPlaces.tsx
+│ │ └── Schedule.tsx
+│ │
+│ ├── services/ # Pemanggilan API/Supabase
+│ │ ├── authService.ts
+│ │ ├── budgetEvaluator.ts
+│ │ ├── budgetService.ts
+│ │ ├── confusedModeService.ts
+│ │ ├── disruptionService.ts
+│ │ ├── geocodingService.ts
+│ │ ├── locationService.ts
+│ │ ├── mapillaryService.ts
+│ │ ├── mapService.ts
+│ │ ├── onboardingService.ts
+│ │ ├── preferencesService.ts
+│ │ ├── routeService.ts
+│ │ ├── savedPlacesService.ts
+│ │ ├── supabaseService.ts
+│ │ └── transportService.ts
+│ │
+│ ├── styles/
+│ │ └── global.css
+│ │
+│ ├── translations/
+│ │ └── index.ts
+│ │
+│ ├── types/ # Definisi TypeScript
+│ │ ├── confusedMode.types.ts
+│ │ ├── database.types.ts
+│ │ └── domain.types.ts
+│ │
+│ ├── App.tsx
+│ ├── main.tsx
+│ └── vite-env.d.ts
+│
+└── public/ # Aset statis
+
 
 ---
 
