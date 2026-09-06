@@ -12,6 +12,8 @@ import {
   X,
   Footprints,
   Bike,
+  Clock,
+  Repeat,
 } from 'lucide-react';
 import type { DirectionsResult } from '@/services/mapService';
 import type { PlaceResult, GeoPoint } from '@/types/domain.types';
@@ -126,6 +128,7 @@ export default function MapRouteDetailBar({
   };
 
   const handleNextToPhase2 = () => {
+
     if (!selectedCategory && routeOptions.length > 0) {
       const prefCategory: RouteCategory = budgetPreference === 'fastest' ? 'hurry' : (budgetPreference as RouteCategory);
       const defaultCat = routeOptions.find((o) => o.category === prefCategory)
@@ -152,7 +155,6 @@ export default function MapRouteDetailBar({
     >
       <style>{routeDetailStyles}</style>
 
-      {/* Mobile drag handle indicator */}
       <div className="route-drag-handle" />
 
       <div style={headerRowStyle}>
@@ -175,7 +177,9 @@ export default function MapRouteDetailBar({
       {loading ? (
         <div style={statusTextStyle}>Menghitung rute perjalanan...</div>
       ) : phase === 1 ? (
+
         <div style={expandedContentStyle}>
+
           <div style={categoryGridStyle}>
             {loadingOptions ? (
               <div style={statusTextStyle}>Memuat opsi perbandingan rute...</div>
@@ -223,9 +227,15 @@ export default function MapRouteDetailBar({
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#6B7280', marginTop: 4 }}>
-                      <span>🕒 {formatDuration(opt.totalDurationS)}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Clock size={12} />
+                        {formatDuration(opt.totalDurationS)}
+                      </span>
                       <span>•</span>
-                      <span>🔄 {transitText}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        < Repeat size={12} />
+                        {transitText}
+                      </span>
                     </div>
                   </button>
                 );

@@ -200,17 +200,23 @@ Version Ctrl : Git & GitHub
 
 ```
 project-root/
+├── scripts/                # Skrip build/utility proyek
 ├── src/
-│   ├── components/     # Komponen UI yang dapat dipakai ulang (NavBar, PlaceSearchInput, dsb.)
-│   ├── pages/           # Halaman aplikasi (Dashboard, MapPage, RouteComparison, dsb.)
-│   ├── hooks/           # Custom hooks (lokasi, geocoding, nearby context, dsb.)
-│   ├── services/        # Pemanggilan API/Supabase (routeService, geocodingService, dsb.)
-│   ├── lib/              # Fungsi murni pembantu (pembangun konteks AI, deteksi intent, dsb.)
-│   ├── contexts/        # React Context (AuthContext)
-│   ├── data/             # Dataset statis yang dikurasi (transportasi & gangguan lalu lintas Indonesia)
-│   ├── types/            # Definisi TypeScript
-│   └── assets/           # Ilustrasi & aset visual landing page
-└── public/               # Aset statis
+│   ├── assets/              # badges, docs, images, videos
+│   ├── components/          # Komponen UI (termasuk map-dashboard/, ReactBits/)
+│   ├── contexts/            # AuthContext, LanguageContext, SidebarMapContext
+│   ├── data/                # Dataset statis transportasi & gangguan lalu lintas Indonesia
+│   ├── hooks/                # Custom hooks (lokasi, geocoding, nearby context, dsb.)
+│   ├── lib/                  # Fungsi pembantu (AI context builder, intent detection, dsb.)
+│   ├── pages/                # Halaman aplikasi (Dashboard, MapPage, RouteDetail, dsb.)
+│   ├── services/             # Pemanggilan API/Supabase
+│   ├── styles/                # global.css
+│   ├── translations/          # index.ts
+│   ├── types/                 # Definisi TypeScript
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── vite-env.d.ts
+└── public/                    # Aset statis
 ```
 
 ---

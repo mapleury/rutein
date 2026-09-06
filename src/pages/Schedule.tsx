@@ -104,7 +104,7 @@ export default function Schedule() {
       label: station.name,
       address: `${station.name}, ${station.city}`,
     };
-    navigate('/routes', { state: { origin: originPlace } });
+    navigate('/dashboard', { state: { origin: originPlace } });
   };
 
   return (
