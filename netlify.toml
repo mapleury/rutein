@@ -1,0 +1,5 @@
+[build.environment]
+  # VITE_GEOCODING_PROVIDER is a non-sensitive provider identifier (e.g. "nominatim"),
+  # not a secret. Its value coincidentally matches the "nominatim.openstreetmap.org"
+  # domain used in src/services/geocodingService.ts, which trips secrets scanning.
+  SECRETS_SCAN_OMIT_KEYS = "VITE_GEOCODING_PROVIDER"
