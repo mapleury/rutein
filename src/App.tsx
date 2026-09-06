@@ -96,8 +96,6 @@ export default function App() {
               <Route path="/onboarding/profile" element={<ProfileSelect />} />
               <Route path="/dashboard" element={<AppLayout><MapDashboard /></AppLayout>} />
               <Route path="/map" element={<AppLayout><MapDashboard /></AppLayout>} />
-              <Route path="/routes" element={<AppLayout><RouteComparison /></AppLayout>} />
-              <Route path="/routes/:searchId" element={<AppLayout><RouteDetail /></AppLayout>} />
               <Route path="/budget" element={<AppLayout><BudgetPlanner /></AppLayout>} />
               <Route path="/schedule" element={<AppLayout><Schedule /></AppLayout>} />
               <Route path="/disruptions" element={<AppLayout><Disruptions /></AppLayout>} />

@@ -272,7 +272,6 @@ export default function Sidebar({
 
   const NAV_ITEMS = [
     { to: '/dashboard', label: t('nav.map') || 'Peta', icon: MapIcon },
-    { to: '/routes', label: t('nav.routes') || 'Rute', icon: ArrowRightLeft },
     { to: '/schedule', label: t('nav.schedule') || 'Jadwal Transportasi', icon: Clock },
     { to: '/budget', label: t('nav.budget') || 'Anggaran', icon: Wallet },
     { to: '/disruptions', label: t('nav.disruptions') || 'Peringatan', icon: AlertTriangle },

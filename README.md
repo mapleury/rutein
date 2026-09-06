@@ -1,15 +1,14 @@
 <div align="center">
+<img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/images/rutein-1.png" alt="Landing Page" width="800"/>
 
-  # RUTEIN
-  ### Navigasi transportasi publik, tanpa ribet.
-
-  [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_Site-success?style=for-the-badge)](https://[URL_DEMO])
-  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://[URL_REPO])
-  [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+  [![Live Demo](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-live-demo.svg)](https://[URL_DEMO])
+[![GitHub](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-github.svg)](https://[URL_REPO])
+[![License](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-license.svg)](LICENSE)
+[![Read Tutorial](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-tutorial.svg)](https://[URL_TUTORIAL])
 
   **Submission for ITECHNO CUP 2026 - Web Development**
 
-  **By Tim CEO, CTO, CMO**
+  **By Tim CEO, CTO, CMO**  
 
 </div>
 
@@ -41,6 +40,9 @@
 ---
 
 ## Tentang Proyek
+
+<img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/About-App.png" alt="Landing Page" width="800"/>
+
 
 ### Latar Belakang
 
@@ -80,28 +82,36 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 
 ---
 
-## 📸 Demo & Screenshot
+## Demo & Screenshot
 
 ### Live Demo
 
 🔗 **[Kunjungi Website](https://[URL_DEMO])**
 
 ### Screenshot Aplikasi
-
 <div align="center">
-  <img src="[URL_SCREENSHOT_LANDING]" alt="Landing Page" width="800"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Landing-Page.png" alt="Landing Page" width="100%"/>
   <p><em>Landing Page - Perkenalan RUTEIN</em></p>
 
-  <img src="[URL_SCREENSHOT_DASHBOARD]" alt="Dashboard" width="800"/>
-  <p><em>Dashboard - Titik awal perencanaan perjalanan</em></p>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Login-Page.png" alt="Login Page" width="100%"/>
+  <p><em>Login/Sign In - Masuk ke akun RUTEIN</em></p>
 
-  <img src="[URL_SCREENSHOT_MAP]" alt="Interactive Map" width="800"/>
-  <p><em>Peta Interaktif - Filter transportasi, mode satelit, dan street view</em></p>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Map-Dashboard-Page.png" alt="Dashboard & Map" width="100%"/>
+  <p><em>Dashboard & Peta Interaktif - Titik awal perencanaan perjalanan</em></p>
 
-  <img src="[URL_SCREENSHOT_ROUTES]" alt="Route Comparison" width="800"/>
-  <p><em>Route Comparison - Efficient, Cheapest, dan Hurry</em></p>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Schedule-Page.png" alt="Transport Schedule" width="100%"/>
+  <p><em>Transport Schedule - Jadwal keberangkatan real-time</em></p>
 
-  <img src="[URL_SCREENSHOT_CONFUSED]" alt="Confused Mode" width="800"/>
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Disruption-Page.png" alt="Disruption Alerts" width="100%"/>
+  <p><em>Live Disruption Alerts - Info gangguan lalu lintas</em></p>
+
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Budget-Page.png" alt="Budget Planner" width="100%"/>
+  <p><em>Budget Planner - Estimasi biaya transportasi</em></p>
+
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Profile-Page.png" alt="Profile Page" width="100%"/>
+  <p><em>Profile - Preferensi & tempat favorit</em></p>
+
+  <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/docs/Chatbot-Page.png" alt="Confused Mode" width="100%"/>
   <p><em>Confused Mode - Asisten navigasi berbasis AI</em></p>
 </div>
 
@@ -111,7 +121,7 @@ Menggunakan transportasi publik di kota-kota besar Indonesia seperti Jakarta ser
 
 ---
 
-## 🛠️ Teknologi
+## Teknologi
 
 ### Tech Stack
 
@@ -290,20 +300,9 @@ npm run lint
 
 | Anggota | Fitur yang Dikerjakan |
 |---------|------------------------|
-| **Quan** | Sign Up / Sign In, User Preferences, Profile, Saved Places, Backend & System Architecture, Deployment & Submission |
-| **Syakir** | Landing Page, Transport Schedule, Budget Planner, Confused Mode, Tutorial Penggunaan Web |
+| **Quan** | Sign Up / Sign In, User Preferences, Profile, Saved Places, Backend & System Architecture, |
+| **Syakirah** | Landing Page, Transport Schedule, Budget Planner, Confused Mode, Tutorial Penggunaan Web |
 | **Nael** | Interactive Map, Dashboard, Route Comparison, Multi-Transit Routes, Live Disruption, Design System, App Design Mockup |
-
----
-
-## Progress & To-Do
-
-- [x] README.md Update — *Quan*
-- [ ] Finish Design System — *Nael*
-- [ ] App Design Mockup — *Nael*
-- [ ] Deployment & Submission — *Quan*
-- [ ] Tutorial Cara Menggunakan Web — *Syakir*
-- [ ] Code Cleanup (hapus catatan AI & minimalkan error) — *Syakir*
 
 ---
 
