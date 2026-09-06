@@ -2,9 +2,9 @@
 <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/images/rutein-1.png" alt="Landing Page" width="800"/>
 
   [![Live Demo](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-live-demo.svg)](https://[URL_DEMO])
-[![GitHub](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-github.svg)](https://[URL_REPO])
+[![GitHub](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-github.svg)](https://github.com/syakirahh8/rutein)
 [![License](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-license.svg)](LICENSE)
-[![Read Tutorial](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-tutorial.svg)](https://[URL_TUTORIAL])
+[![Read Tutorial](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-tutorial.svg)](https://docs.google.com/document/d/1rMp5Zca_7DdN39zzVLBruC6fr0wa5XWCYjBjwOXN7Lk/edit?usp=sharing)
 
   **Submission for ITECHNO CUP 2026 - Web Development**
 
