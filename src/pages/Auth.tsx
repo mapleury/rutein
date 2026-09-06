@@ -92,19 +92,158 @@ const sharedStyles = `
     border-radius: 8px;
   }
 
-  /* ---------------- Responsive ---------------- */
-  .auth-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .auth-shell-inner { width: 100%; }
-
-  @media (max-width: 520px) {
-    .auth-actions { flex-direction: column; }
-    .auth-actions > button { width: 100%; }
-    .profile-option { width: 100% !important; max-width: 260px; }
-    .chip-row { gap: 8px !important; }
+  /* ---------------- Responsive Styles (Mobile, Tablet, Desktop) ---------------- */
+  .auth-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
   }
 
-  @media (max-width: 360px) {
-    .auth-input { padding: 14px 20px !important; font-size: 15px !important; }
+  .auth-shell-inner {
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .transport-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: clamp(9px, 2.2vw, 11px) clamp(14px, 3.5vw, 18px);
+    border-radius: 999px;
+    font-size: clamp(13px, 2.8vw, 14px);
+    font-weight: 600;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .profiles-container {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .profile-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 172px;
+    padding: 26px 16px;
+    border-radius: 22px;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .profile-option-img {
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+  }
+
+  .profile-option-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Tablet (541px - 768px) */
+  @media (min-width: 541px) and (max-width: 768px) {
+    .profiles-container {
+      gap: 12px !important;
+    }
+    .profile-option {
+      width: clamp(140px, 26vw, 168px) !important;
+      padding: 22px 12px !important;
+      border-radius: 18px !important;
+    }
+    .profile-option-img {
+      width: 58px !important;
+      height: 58px !important;
+      margin-bottom: 10px !important;
+    }
+  }
+
+  /* Mobile (<= 540px) */
+  @media (max-width: 540px) {
+    .auth-actions {
+      flex-direction: column-reverse !important;
+      gap: 10px !important;
+    }
+    .auth-actions > button {
+      width: 100% !important;
+      min-width: 100% !important;
+    }
+    .chip-row {
+      gap: 8px !important;
+    }
+    .transport-chip {
+      padding: 8px 14px !important;
+      font-size: 13px !important;
+    }
+    .profiles-container {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+    .profile-option {
+      width: 100% !important;
+      max-width: 380px !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      text-align: left !important;
+      padding: 12px 16px !important;
+      gap: 14px !important;
+      border-radius: 16px !important;
+    }
+    .profile-option-img {
+      width: 48px !important;
+      height: 48px !important;
+      margin-bottom: 0 !important;
+    }
+    .profile-option-info {
+      align-items: flex-start !important;
+      text-align: left !important;
+      min-width: 0;
+    }
+    .profile-option-info strong {
+      font-size: 18px !important;
+    }
+    .profile-option-info span {
+      font-size: 12px !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .auth-input {
+      padding: 13px 18px !important;
+      font-size: 15px !important;
+    }
+    .profile-option {
+      padding: 10px 14px !important;
+      gap: 10px !important;
+    }
+    .profile-option-img {
+      width: 42px !important;
+      height: 42px !important;
+    }
   }
 `;
 
@@ -177,11 +316,12 @@ function AuthShell({
         position: 'relative',
         minHeight: '100vh',
         width: '100%',
-        overflow: 'hidden',
+        overflowY: 'auto',
+        overflowX: 'hidden',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 'clamp(16px, 6vw, 40px) 20px',
+        padding: 'clamp(20px, 4vh, 44px) clamp(16px, 4vw, 24px)',
         boxSizing: 'border-box',
       }}
     >
@@ -217,11 +357,11 @@ function AuthLogoLink({ delay = '0ms' }: { delay?: string }) {
     <button
       type="button"
       className="auth-logo-link auth-fade"
-      style={{ marginBottom: 22, animationDelay: delay }}
+      style={{ marginBottom: 'clamp(16px, 3vw, 22px)', animationDelay: delay }}
       onClick={() => navigate('/')}
       aria-label="Kembali ke halaman utama Rutein"
     >
-      <img src={rutinLogo} alt="Rutein" style={{ height: 34, width: 'auto', display: 'block' }} />
+      <img src={rutinLogo} alt="Rutein" style={{ height: 'clamp(28px, 6vw, 34px)', width: 'auto', display: 'block' }} />
     </button>
   );
 }
@@ -258,26 +398,28 @@ function AuthAlert({ children, tone = 'error' }: { children: React.ReactNode; to
 const inputStyle: React.CSSProperties = {
   width: '100%',
   boxSizing: 'border-box',
-  padding: '18px 26px',
+  padding: 'clamp(14px, 3.5vw, 18px) clamp(18px, 4.5vw, 26px)',
   borderRadius: 999,
   border: `1.5px solid ${C.border}`,
   background: C.surface,
   color: C.text,
   fontSize: 16,
   fontFamily: "'Aileron', sans-serif",
+  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
 };
 
 const buttonStyle: React.CSSProperties = {
   width: '100%',
-  padding: '16px 0',
+  padding: 'clamp(14px, 3.5vw, 16px) 0',
   borderRadius: 16,
   border: 'none',
   background: C.primary,
   color: '#FFFFFF',
-  fontSize: 18,
+  fontSize: 'clamp(16px, 3.8vw, 18px)',
   letterSpacing: '0.02em',
   cursor: 'pointer',
-  transition: 'background-color 0.15s ease',
+  transition: 'background-color 0.15s ease, transform 0.1s ease',
+  boxSizing: 'border-box',
 };
 
 function translateAuthError(message: string, mode: 'signin' | 'signup'): string {
@@ -436,7 +578,7 @@ export function Login() {
 
       <h1
         className="font-jockey auth-fade"
-        style={{ fontSize: 'clamp(30px, 8vw, 46px)', margin: '0 0 34px', color: C.text, animationDelay: '40ms' }}
+        style={{ fontSize: 'clamp(28px, 7vw, 44px)', margin: '0 0 clamp(20px, 4vw, 34px)', color: C.text, animationDelay: '40ms' }}
       >
         {mode === 'signin' ? 'Masuk Rutein' : 'Daftar Rutein'}
       </h1>
@@ -444,7 +586,7 @@ export function Login() {
       {/* key={mode} forces every field below to fully remount on each
           Masuk/Daftar toggle, so the whole form fades down together and
           consistently. */}
-      <form key={mode} noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <form key={mode} noValidate onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(14px, 2.5vw, 18px)' }}>
         {mode === 'signup' && (
           <input
             className="auth-input auth-fade"
@@ -642,11 +784,11 @@ export function TransportPreference() {
       <h1 className="font-jockey auth-fade" style={{ fontSize: 'clamp(24px, 6vw, 34px)', margin: '8px 0 12px', color: C.text, animationDelay: '60ms' }}>
         Kamu biasa naik apa?
       </h1>
-      <p className="auth-fade" style={{ ...bodyFont, color: C.textMuted, marginBottom: 34, fontSize: 14, animationDelay: '120ms' }}>
+      <p className="auth-fade" style={{ ...bodyFont, color: C.textMuted, marginBottom: 'clamp(20px, 4vw, 34px)', fontSize: 'clamp(13px, 2.8vw, 14px)', animationDelay: '120ms' }}>
         Pilih moda transportasi favoritmu — boleh lebih dari satu.
       </p>
 
-      <div className="chip-row" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
+      <div className="chip-row">
         {TRANSPORT_OPTIONS.map((opt, i) => {
           const active = selected.has(opt.value);
           const dot = TRANSPORT_TYPE_COLOR[opt.value] ?? C.primary;
@@ -655,28 +797,19 @@ export function TransportPreference() {
               key={opt.value}
               type="button"
               onClick={() => toggle(opt.value)}
-              className="chip-grow"
+              className="chip-grow transport-chip"
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '10px 18px',
-                borderRadius: 999,
-                fontSize: 14,
-                fontWeight: 600,
                 fontFamily: "'Aileron', sans-serif",
-                cursor: 'pointer',
-                transition: 'transform 0.15s ease, background 0.15s ease, border-color 0.15s ease',
-                animationDelay: `${i * 70}ms`,
+                animationDelay: `${i * 50}ms`,
                 border: `1.5px solid ${active ? C.primary : C.border}`,
                 background: active ? 'rgba(218,54,42,0.10)' : C.surface,
                 color: active ? C.primary : C.text,
                 transform: active ? 'scale(1.04)' : 'scale(1)',
               }}
             >
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: dot, display: 'inline-block' }} />
-              {opt.label}
-              {active && <Check size={14} strokeWidth={3} />}
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: dot, display: 'inline-block', flexShrink: 0 }} />
+              <span>{opt.label}</span>
+              {active && <Check size={14} strokeWidth={3} style={{ flexShrink: 0 }} />}
             </button>
           );
         })}
@@ -688,7 +821,7 @@ export function TransportPreference() {
         </div>
       )}
 
-      <div className="auth-actions" style={{ marginTop: 36 }}>
+      <div className="auth-actions" style={{ marginTop: 'clamp(24px, 4.5vw, 36px)' }}>
         <button
           type="button"
           onClick={() => navigate('/onboarding/profile')}
@@ -702,6 +835,7 @@ export function TransportPreference() {
             background: 'transparent',
             color: C.text,
             cursor: 'pointer',
+            boxSizing: 'border-box',
           }}
         >
           Nanti saja
@@ -711,7 +845,14 @@ export function TransportPreference() {
           onClick={handleNext}
           disabled={saving}
           className="font-jockey"
-          style={{ ...buttonStyle, fontSize: 15, width: 'auto', minWidth: 150, padding: '14px 32px', opacity: saving ? 0.7 : 1 }}
+          style={{
+            ...buttonStyle,
+            fontSize: 15,
+            width: 'auto',
+            minWidth: 150,
+            padding: '14px 32px',
+            opacity: saving ? 0.7 : 1,
+          }}
           onMouseOver={(e) => (e.currentTarget.style.backgroundColor = C.primaryHover)}
           onMouseOut={(e) => (e.currentTarget.style.backgroundColor = C.primary)}
         >
@@ -763,11 +904,11 @@ export function ProfileSelect() {
       <h1 className="font-jockey auth-fade" style={{ fontSize: 'clamp(24px, 6vw, 34px)', margin: '8px 0 12px', color: C.text, animationDelay: '60ms' }}>
         Profil mana yang paling cocok buatmu?
       </h1>
-      <p className="auth-fade" style={{ ...bodyFont, color: C.textMuted, marginBottom: 36, fontSize: 14, animationDelay: '120ms' }}>
+      <p className="auth-fade" style={{ ...bodyFont, color: C.textMuted, marginBottom: 'clamp(20px, 4vw, 36px)', fontSize: 'clamp(13px, 2.8vw, 14px)', animationDelay: '120ms' }}>
         Ini membantu RUTEIN memahami gaya perjalananmu — boleh dilewati.
       </p>
 
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div className="profiles-container">
         {PROFILES.map((p, i) => {
           const active = selected === p.value;
           return (
@@ -777,30 +918,24 @@ export function ProfileSelect() {
               onClick={() => setSelected(p.value)}
               className="profile-fly-in profile-option"
               style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                width: 168,
-                padding: '28px 16px',
-                borderRadius: 22,
-                cursor: 'pointer',
-                transition: 'transform 0.2s ease, background 0.2s ease, border-color 0.2s ease',
-                animationDelay: `${i * 140}ms`,
+                animationDelay: `${i * 120}ms`,
                 border: `1.5px solid ${active ? C.primary : C.border}`,
                 background: active ? 'rgba(218,54,42,0.10)' : C.surface,
-                transform: active ? 'translateY(-6px) scale(1.03)' : 'translateY(0) scale(1)',
+                transform: active ? 'scale(1.03)' : 'scale(1)',
+                boxShadow: active ? '0 4px 16px rgba(218, 54, 42, 0.14)' : 'none',
               }}
             >
               <img
                 src={p.icon}
                 alt={p.label}
-                className={active ? 'profile-icon-bounce' : undefined}
-                style={{ width: 72, height: 72, objectFit: 'contain', marginBottom: 12 }}
+                className={`profile-option-img ${active ? 'profile-icon-bounce' : ''}`}
               />
-              <strong className="font-jockey" style={{ fontSize: 20, color: C.text }}>
-                {p.label}
-              </strong>
-              <span style={{ ...bodyFont, fontSize: 12, color: C.textMuted, marginTop: 4 }}>{p.sub}</span>
+              <div className="profile-option-info">
+                <strong className="font-jockey" style={{ fontSize: 20, color: C.text }}>
+                  {p.label}
+                </strong>
+                <span style={{ ...bodyFont, fontSize: 12, color: C.textMuted, marginTop: 4 }}>{p.sub}</span>
+              </div>
             </button>
           );
         })}
@@ -812,7 +947,7 @@ export function ProfileSelect() {
         </div>
       )}
 
-      <div className="auth-actions" style={{ marginTop: 36 }}>
+      <div className="auth-actions" style={{ marginTop: 'clamp(24px, 4.5vw, 36px)' }}>
         <button
           type="button"
           onClick={() => finish(null)}
@@ -826,6 +961,7 @@ export function ProfileSelect() {
             background: 'transparent',
             color: C.text,
             cursor: 'pointer',
+            boxSizing: 'border-box',
           }}
         >
           Nanti saja
