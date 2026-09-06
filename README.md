@@ -4,6 +4,7 @@
   [![Live Demo](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-live-demo.svg)](https://[URL_DEMO])
 [![GitHub](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-github.svg)](https://[URL_REPO])
 [![License](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-license.svg)](LICENSE)
+[![Read Tutorial](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-tutorial.svg)](https://[URL_TUTORIAL])
 
   **Submission for ITECHNO CUP 2026 - Web Development**
 
