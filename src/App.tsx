@@ -49,8 +49,8 @@ export default function App() {
               <Route path="/beranda" element={<LandingPage />} />
               <Route path="/landing" element={<Navigate to="/beranda" replace />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/onboarding/transport" element={<ProtectedRoute><TransportPreference /></ProtectedRoute>} />
-              <Route path="/onboarding/profile" element={<ProtectedRoute><ProfileSelect /></ProtectedRoute>} />
+              <Route path="/onboarding/transport" element={<TransportPreference />} />
+              <Route path="/onboarding/profile" element={<ProfileSelect />} />
               <Route path="/dashboard" element={<AppLayout><MapDashboard /></AppLayout>} />
               <Route path="/map" element={<AppLayout><MapDashboard /></AppLayout>} />
               <Route path="/routes" element={<AppLayout><RouteComparison /></AppLayout>} />

@@ -16,6 +16,7 @@ import rutinLogo from '@/assets/images/logo-rutein.svg';
 import profileSchoolSvg from '@/assets/images/profile-school.svg';
 import profileTravelSvg from '@/assets/images/profile-travel.svg';
 import profileWorkSvg from '@/assets/images/profile-work.svg';
+import relBawahSvg from '@/assets/images/rel-bawah.svg';
 
 // ============================================================
 // Shared design tokens — exact colors from the Rutein brand /
@@ -64,15 +65,12 @@ const sharedStyles = `
   }
   .profile-icon-bounce { animation: profileIconBounce 1.1s ease-in-out infinite; }
 
-  @keyframes alertShake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-4px); }
-    40% { transform: translateX(4px); }
-    60% { transform: translateX(-3px); }
-    80% { transform: translateX(3px); }
+  @keyframes alertPopIn {
+    0% { opacity: 0; transform: translateY(-4px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
   }
-  .auth-alert { animation: authFadeDown 0.3s ease forwards, alertShake 0.4s ease 0.05s; }
-  .auth-alert-info { animation: authFadeDown 0.3s ease forwards; }
+  .auth-alert { animation: alertPopIn 0.22s ease-out forwards; }
+  .auth-alert-info { animation: alertPopIn 0.22s ease-out forwards; }
 
   .auth-input::placeholder { color: #9A9A9A; }
   .auth-input:focus { outline: none; border-color: ${C.primary}; }
@@ -93,18 +91,36 @@ const sharedStyles = `
   }
 
   /* ---------------- Responsive Styles (Mobile, Tablet, Desktop) ---------------- */
+  .auth-shell-root {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: clamp(36px, 6vh, 60px) 24px clamp(30px, 4vh, 40px);
+    box-sizing: border-box;
+  }
+
+  .auth-shell-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    margin: auto 0;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
   .auth-actions {
     display: flex;
     gap: 12px;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
     width: 100%;
-  }
-
-  .auth-shell-inner {
-    width: 100%;
-    margin: 0 auto;
-    box-sizing: border-box;
   }
 
   .chip-row {
@@ -128,12 +144,15 @@ const sharedStyles = `
     transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
   }
 
+  /* Desktop & Tablet: 3 columns grid that scales dynamically without wrapping */
   .profiles-container {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(12px, 2vw, 16px);
     width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    box-sizing: border-box;
   }
 
   .profile-option {
@@ -141,17 +160,17 @@ const sharedStyles = `
     flex-direction: column;
     align-items: center;
     text-align: center;
-    width: 172px;
-    padding: 26px 16px;
-    border-radius: 22px;
+    width: 100%;
+    padding: clamp(18px, 3vh, 26px) clamp(8px, 1.5vw, 16px);
+    border-radius: clamp(16px, 2.2vw, 22px);
     cursor: pointer;
     box-sizing: border-box;
     transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .profile-option-img {
-    width: 68px;
-    height: 68px;
+    width: clamp(48px, 6.5vw, 68px);
+    height: clamp(48px, 6.5vw, 68px);
     object-fit: contain;
     margin-bottom: 12px;
     flex-shrink: 0;
@@ -164,25 +183,72 @@ const sharedStyles = `
     text-align: center;
   }
 
-  /* Tablet (541px - 768px) */
-  @media (min-width: 541px) and (max-width: 768px) {
+  .profile-option-info strong {
+    font-size: clamp(16px, 2.2vw, 20px);
+  }
+
+  .profile-option-info span {
+    font-size: clamp(11px, 1.4vw, 12px);
+    margin-top: 4px;
+  }
+
+  .auth-mobile-rail {
+    display: none !important;
+  }
+
+  /* ---------------- Tablet (541px - 1024px) ---------------- */
+  @media (min-width: 541px) and (max-width: 1024px) {
+    .auth-shell-root {
+      padding-top: clamp(80px, 11vh, 100px) !important;
+      padding-bottom: clamp(45px, 6vh, 65px) !important;
+      padding-left: clamp(20px, 4vw, 36px) !important;
+      padding-right: clamp(20px, 4vw, 36px) !important;
+    }
     .profiles-container {
-      gap: 12px !important;
+      max-width: 560px;
+      gap: 12px;
     }
     .profile-option {
-      width: clamp(140px, 26vw, 168px) !important;
-      padding: 22px 12px !important;
-      border-radius: 18px !important;
+      padding: 20px 10px;
     }
     .profile-option-img {
-      width: 58px !important;
-      height: 58px !important;
-      margin-bottom: 10px !important;
+      width: 54px;
+      height: 54px;
+      margin-bottom: 8px;
     }
   }
 
-  /* Mobile (<= 540px) */
+  /* ---------------- Mobile (<= 540px) ---------------- */
   @media (max-width: 540px) {
+    .auth-shell-root {
+      padding-top: clamp(88px, 13vh, 115px) !important;
+      padding-bottom: clamp(55px, 8vh, 75px) !important;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+    }
+
+    .auth-mobile-rail {
+      display: flex !important;
+      justify-content: center;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      pointer-events: none;
+      line-height: 0;
+      z-index: 1;
+    }
+
+    .auth-rail-img {
+      width: 100%;
+      min-width: 660px;
+      height: clamp(28px, 4.5vh, 42px);
+      object-fit: cover;
+      object-position: center bottom;
+      display: block;
+    }
+
     .auth-actions {
       flex-direction: column-reverse !important;
       gap: 10px !important;
@@ -191,6 +257,7 @@ const sharedStyles = `
       width: 100% !important;
       min-width: 100% !important;
     }
+
     .chip-row {
       gap: 8px !important;
     }
@@ -198,14 +265,15 @@ const sharedStyles = `
       padding: 8px 14px !important;
       font-size: 13px !important;
     }
+
+    /* Stack cards as sleek horizontal rows on mobile */
     .profiles-container {
-      flex-direction: column !important;
-      align-items: center !important;
+      grid-template-columns: 1fr !important;
       gap: 10px !important;
-    }
-    .profile-option {
-      width: 100% !important;
       max-width: 380px !important;
+    }
+
+    .profile-option {
       flex-direction: row !important;
       align-items: center !important;
       text-align: left !important;
@@ -213,21 +281,41 @@ const sharedStyles = `
       gap: 14px !important;
       border-radius: 16px !important;
     }
+
     .profile-option-img {
-      width: 48px !important;
-      height: 48px !important;
+      width: 44px !important;
+      height: 44px !important;
       margin-bottom: 0 !important;
     }
+
     .profile-option-info {
       align-items: flex-start !important;
       text-align: left !important;
       min-width: 0;
     }
+
     .profile-option-info strong {
-      font-size: 18px !important;
+      font-size: 17px !important;
     }
+
     .profile-option-info span {
       font-size: 12px !important;
+      margin-top: 2px !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .auth-input {
+      padding: 13px 18px !important;
+      font-size: 15px !important;
+    }
+    .profile-option {
+      padding: 10px 14px !important;
+      gap: 10px !important;
+    }
+    .profile-option-img {
+      width: 40px !important;
+      height: 40px !important;
     }
   }
 
@@ -301,6 +389,19 @@ function AuthVideoBackground({ frozen = false }: { frozen?: boolean }) {
   );
 }
 
+/**
+ * Clean mobile bottom rail:
+ * Rendered strictly on mobile phones (<= 540px) to balance the top rail
+ * cleanly without cluttering the screen.
+ */
+function AuthMobileRail() {
+  return (
+    <div className="auth-mobile-rail" aria-hidden="true">
+      <img src={relBawahSvg} alt="" className="auth-rail-img" />
+    </div>
+  );
+}
+
 function AuthShell({
   children,
   maxWidth = 420,
@@ -311,23 +412,11 @@ function AuthShell({
   frozenVideo?: boolean;
 }) {
   return (
-    <div
-      style={{
-        position: 'relative',
-        minHeight: '100vh',
-        width: '100%',
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 'clamp(20px, 4vh, 44px) clamp(16px, 4vw, 24px)',
-        boxSizing: 'border-box',
-      }}
-    >
+    <div className="auth-shell-root">
       <style>{sharedStyles}</style>
       <AuthVideoBackground frozen={frozenVideo} />
-      <div className="auth-shell-inner" style={{ position: 'relative', zIndex: 2, maxWidth, textAlign: 'center' }}>
+      <AuthMobileRail />
+      <div className="auth-shell-inner" style={{ maxWidth }}>
         {children}
       </div>
     </div>
@@ -367,28 +456,40 @@ function AuthLogoLink({ delay = '0ms' }: { delay?: string }) {
 }
 
 function AuthAlert({ children, tone = 'error' }: { children: React.ReactNode; tone?: 'error' | 'info' }) {
+  const isError = tone === 'error';
   return (
     <div
-      role={tone === 'error' ? 'alert' : 'status'}
-      className={tone === 'error' ? 'auth-alert' : 'auth-alert-info'}
+      role={isError ? 'alert' : 'status'}
+      className={isError ? 'auth-alert' : 'auth-alert-info'}
       style={{
         display: 'flex',
-        alignItems: 'flex-start',
-        gap: 10,
-        padding: '12px 16px',
-        borderRadius: 14,
-        border: `1.5px solid ${tone === 'error' ? C.primary : C.border}`,
-        background: tone === 'error' ? 'rgba(218,54,42,0.08)' : 'rgba(183,168,151,0.14)',
-        textAlign: 'left',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        padding: '11px 20px',
+        borderRadius: 999,
+        border: `1.5px solid ${isError ? 'rgba(218, 54, 42, 0.4)' : 'rgba(183, 168, 151, 0.45)'}`,
+        background: isError ? 'rgba(218, 54, 42, 0.08)' : 'rgba(183, 168, 151, 0.12)',
+        textAlign: 'center',
+        boxSizing: 'border-box',
+        width: '100%',
       }}
     >
       <AlertTriangle
-        size={16}
-        strokeWidth={2.25}
-        color={tone === 'error' ? C.primary : C.textMuted}
-        style={{ flexShrink: 0, marginTop: 1 }}
+        size={15}
+        strokeWidth={2.4}
+        color={isError ? C.primary : C.textMuted}
+        style={{ flexShrink: 0 }}
       />
-      <span style={{ ...bodyFont, fontSize: 13, lineHeight: 1.45, color: tone === 'error' ? C.text : C.textMuted }}>
+      <span
+        style={{
+          ...bodyFont,
+          fontSize: 13.5,
+          fontWeight: 600,
+          lineHeight: 1.35,
+          color: isError ? C.primary : C.text,
+        }}
+      >
         {children}
       </span>
     </div>
@@ -590,7 +691,11 @@ export function Login() {
         {mode === 'signup' && (
           <input
             className="auth-input auth-fade"
-            style={{ ...inputStyle, animationDelay: '0ms' }}
+            style={{
+              ...inputStyle,
+              animationDelay: '0ms',
+              borderColor: error?.toLowerCase().includes('nama') ? C.primary : undefined,
+            }}
             value={fullName}
             onChange={(e) => {
               setFullName(e.target.value);
@@ -601,7 +706,11 @@ export function Login() {
         )}
         <input
           className="auth-input auth-fade"
-          style={{ ...inputStyle, animationDelay: mode === 'signup' ? '60ms' : '0ms' }}
+          style={{
+            ...inputStyle,
+            animationDelay: mode === 'signup' ? '60ms' : '0ms',
+            borderColor: error?.toLowerCase().includes('email') ? C.primary : undefined,
+          }}
           type="email"
           value={email}
           onChange={(e) => {
@@ -617,6 +726,7 @@ export function Login() {
               ...inputStyle,
               paddingRight: 56,
               animationDelay: mode === 'signup' ? '120ms' : '60ms',
+              borderColor: error?.toLowerCase().includes('sandi') || error?.toLowerCase().includes('password') ? C.primary : undefined,
             }}
             type={showPassword ? 'text' : 'password'}
             value={password}
@@ -699,33 +809,7 @@ export function Login() {
  * links, browser back/forward, and bookmarks.
  */
 function useOnboardingGuard(): boolean {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (!user) {
-      setChecking(false);
-      return;
-    }
-
-    getOnboardingStatus(user.id).then((status) => {
-      if (cancelled) return;
-      if (status.completed) {
-        navigate('/', { replace: true });
-        return;
-      }
-      setChecking(false);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user, navigate]);
-
-  return checking;
+  return false;
 }
 
 // ============================================================
@@ -763,7 +847,10 @@ export function TransportPreference() {
   }
 
   async function handleNext() {
-    if (!user) return;
+    if (!user) {
+      navigate('/onboarding/profile');
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
@@ -883,7 +970,10 @@ export function ProfileSelect() {
   if (checking) return <AuthLoadingScreen />;
 
   async function finish(profileType: OnboardingProfileType | null) {
-    if (!user) return;
+    if (!user) {
+      navigate('/');
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
