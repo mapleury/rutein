@@ -1,19 +1,3 @@
-// Profile page — same design as the auth/onboarding flow.
-//
-//  - Same design tokens (C), fonts, card shapes, and chip styling as
-//    the auth screens.
-//  - The "Profil perjalanan" section is completely removed; travel profile type
-//    is updated exclusively via the hover-and-click interaction on the profile avatar.
-//  - Full name is the only ordinary text input field.
-//  - Avatar/Profile picture handling: Hovering over the avatar circle reveals
-//    a red overlay with a change icon. Clicking it opens a modal to select
-//    between the three predefined profile options.
-//  - Transport preferences can be added or removed directly here using interactive chips/modal.
-//  - Saved places can be added, viewed, and removed directly here using a modal
-//    with a name field, category picker, address search, and optional notes.
-//  - Every modal opens and closes with a matching fade/scale animation — the modal
-//    stays mounted for the short exit transition instead of disappearing instantly.
-
 import React, { useEffect, useState } from 'react';
 import { Home, GraduationCap, Briefcase, MapPin, Trash2, X, LucideIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,11 +20,6 @@ import profileSchoolSvg from '@/assets/images/profile-school.svg';
 import profileTravelSvg from '@/assets/images/profile-travel.svg';
 import profileWorkSvg from '@/assets/images/profile-work.svg';
 
-// ============================================================
-// Shared design tokens — copied verbatim from the auth page so
-// this screen reads as a continuation of the same brand, not a
-// different app.
-// ============================================================
 const C = {
   bg: '#FCF4ED',
   surface: '#FFFDF9',
@@ -76,9 +55,6 @@ const sharedStyles = `
   }
   .avatar-container:hover .avatar-overlay { opacity: 1; }
 
-  /* Modal open/close animations. Both directions are driven inline per
-     modal (via isXModalClosing) so a modal can play its exit transition
-     before it actually unmounts, instead of vanishing instantly. */
   @keyframes modalBackdropIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes modalBackdropOut { from { opacity: 1; } to { opacity: 0; } }
   @keyframes modalContentIn {
@@ -260,8 +236,6 @@ const avatarCircleStyle: React.CSSProperties = {
 
 const MODAL_EXIT_MS = 200;
 
-// Plays a modal's exit animation, then unmounts it once the animation
-// has actually finished — used by every modal on this page.
 function closeWithAnimation(setClosing: (v: boolean) => void, setOpen: (v: boolean) => void) {
   setClosing(true);
   window.setTimeout(() => {
@@ -282,8 +256,6 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Modal open state + a matching "closing" flag per modal, so the exit
-  // animation can play before the modal unmounts.
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const [isAvatarModalClosing, setIsAvatarModalClosing] = useState(false);
   const [isTransportModalOpen, setIsTransportModalOpen] = useState(false);
@@ -291,7 +263,6 @@ export default function Profile() {
   const [isPlaceModalOpen, setIsPlaceModalOpen] = useState(false);
   const [isPlaceModalClosing, setIsPlaceModalClosing] = useState(false);
 
-  // Add-a-saved-place form state.
   const [placeName, setPlaceName] = useState('');
   const [placeCategory, setPlaceCategory] = useState<PlaceCategory>('custom');
   const [placeNotes, setPlaceNotes] = useState('');
@@ -325,7 +296,6 @@ export default function Profile() {
         setPlaces(savedPlaces || []);
         setPlans(budgetPlans || []);
       } catch {
-        // Fallback
       } finally {
         if (isMounted) setLoading(false);
       }

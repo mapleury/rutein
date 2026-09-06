@@ -64,13 +64,11 @@ export default function MapDashboard() {
   const [baseLayer, setBaseLayer] = useState<BaseLayer>('street');
   const [popupTarget, setPopupTarget] = useState<'user' | 'place' | null>(null);
 
-  // Directions state
   const [directions, setDirections] = useState<DirectionsResult | null>(null);
   const [loadingDirections, setLoadingDirections] = useState(false);
   const [travelMode, setTravelMode] = useState<'walk' | 'ojek' | 'transit'>('ojek');
   const [budgetPreference, setBudgetPreference] = useState<'cheapest' | 'fastest' | 'efficient'>('efficient');
 
-  // Saved places trigger & Toast Notification state
   const [savedPlacesTrigger, setSavedPlacesTrigger] = useState(0);
   const [toast, setToast] = useState<{ type: 'warning' | 'success' | 'error'; message: string } | null>(null);
   const [showRouteDisruptionNotif, setShowRouteDisruptionNotif] = useState(true);
@@ -89,14 +87,12 @@ export default function MapDashboard() {
 
   const itineraryOption = (routerLocation.state as { option?: RouteOption } | null)?.option ?? null;
 
-  // Active transport operator filters
   const [activeTypes, setActiveTypes] = useState<Set<IndonesiaTransportType>>(new Set(ALL_TRANSPORT_TYPES));
   const [selectedOperatorForSchedule, setSelectedOperatorForSchedule] = useState<IndonesiaTransportType | null>(null);
   const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
   const [hoveredStopId, setHoveredStopId] = useState<string | null>(null);
   const [hoveredDisruptionId, setHoveredDisruptionId] = useState<string | null>(null);
 
-  // Street view modal state
   const [pendingStreetViewPoint, setPendingStreetViewPoint] = useState<GeoPoint | null>(null);
   const [streetViewPoint, setStreetViewPoint] = useState<GeoPoint | null>(null);
 
@@ -106,7 +102,6 @@ export default function MapDashboard() {
     zoom: 14,
   });
 
-  // GPS Location fetch
   useEffect(() => {
     if (!isGeolocationSupported()) return;
     getCurrentPosition()
@@ -114,13 +109,11 @@ export default function MapDashboard() {
       .catch(() => {});
   }, []);
 
-  // Fly to user location initially
   useEffect(() => {
     if (itineraryOption || !userLocation || !mapRef.current) return;
     mapRef.current.flyTo({ center: [userLocation.lng, userLocation.lat], zoom: 14, duration: 800 });
   }, [userLocation, itineraryOption]);
 
-  // Directions calculation effect
   useEffect(() => {
     const origin = userLocation || JAKARTA_CENTER;
     if (itineraryOption || !selectedPlace) {
@@ -168,7 +161,6 @@ export default function MapDashboard() {
     };
   }, [userLocation, selectedPlace, travelMode, itineraryOption]);
 
-  // Fit bounds if itinerary option passed
   useEffect(() => {
     if (!itineraryOption || !mapRef.current) return;
     const allPoints = itineraryOption.legs.flatMap((leg) => legCoordinates(leg));
@@ -399,9 +391,6 @@ const OPERATOR_SCHEDULE_MOCK: Record<
     [pendingStreetViewPoint]
   );
 
-  // Publish live map state to the globally-mounted Sidebar (rendered once
-  // by AppLayout) instead of rendering a sidebar inside this page — that's
-  // what was causing the duplicate sidebar on /dashboard, /map, and /.
   usePublishSidebarMapControls({
     activeTypes,
     onToggleType: toggleType,
@@ -590,7 +579,6 @@ const OPERATOR_SCHEDULE_MOCK: Record<
           baseLayer={baseLayer}
         />
 
-        {/* 4. Bottom Container: Operator Schedule Overview Card OR Route Detail Bar (Single Container, No Stacking) */}
         {selectedOperatorForSchedule ? (
           <div
             className="map-operator-schedule-card"

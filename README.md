@@ -2,9 +2,9 @@
 <img src="https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/images/rutein-1.png" alt="Landing Page" width="800"/>
 
   [![Live Demo](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-live-demo.svg)](https://[URL_DEMO])
-[![GitHub](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-github.svg)](https://[URL_REPO])
+[![GitHub](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-github.svg)](https://github.com/syakirahh8/rutein)
 [![License](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-license.svg)](LICENSE)
-[![Read Tutorial](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-tutorial.svg)](https://[URL_TUTORIAL])
+[![Read Tutorial](https://raw.githubusercontent.com/syakirahh8/rutein/master/src/assets/badges/badge-tutorial.svg)](https://docs.google.com/document/d/1rMp5Zca_7DdN39zzVLBruC6fr0wa5XWCYjBjwOXN7Lk/edit?usp=sharing)
 
   **Submission for ITECHNO CUP 2026 - Web Development**
 
@@ -200,17 +200,23 @@ Version Ctrl : Git & GitHub
 
 ```
 project-root/
+├── scripts/                # Skrip build/utility proyek
 ├── src/
-│   ├── components/     # Komponen UI yang dapat dipakai ulang (NavBar, PlaceSearchInput, dsb.)
-│   ├── pages/           # Halaman aplikasi (Dashboard, MapPage, RouteComparison, dsb.)
-│   ├── hooks/           # Custom hooks (lokasi, geocoding, nearby context, dsb.)
-│   ├── services/        # Pemanggilan API/Supabase (routeService, geocodingService, dsb.)
-│   ├── lib/              # Fungsi murni pembantu (pembangun konteks AI, deteksi intent, dsb.)
-│   ├── contexts/        # React Context (AuthContext)
-│   ├── data/             # Dataset statis yang dikurasi (transportasi & gangguan lalu lintas Indonesia)
-│   ├── types/            # Definisi TypeScript
-│   └── assets/           # Ilustrasi & aset visual landing page
-└── public/               # Aset statis
+│   ├── assets/              # badges, docs, images, videos
+│   ├── components/          # Komponen UI (termasuk map-dashboard/, ReactBits/)
+│   ├── contexts/            # AuthContext, LanguageContext, SidebarMapContext
+│   ├── data/                # Dataset statis transportasi & gangguan lalu lintas Indonesia
+│   ├── hooks/                # Custom hooks (lokasi, geocoding, nearby context, dsb.)
+│   ├── lib/                  # Fungsi pembantu (AI context builder, intent detection, dsb.)
+│   ├── pages/                # Halaman aplikasi (Dashboard, MapPage, RouteDetail, dsb.)
+│   ├── services/             # Pemanggilan API/Supabase
+│   ├── styles/                # global.css
+│   ├── translations/          # index.ts
+│   ├── types/                 # Definisi TypeScript
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── vite-env.d.ts
+└── public/                    # Aset statis
 ```
 
 ---

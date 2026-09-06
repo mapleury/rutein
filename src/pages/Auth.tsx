@@ -18,12 +18,6 @@ import profileTravelSvg from '@/assets/images/profile-travel.svg';
 import profileWorkSvg from '@/assets/images/profile-work.svg';
 import relBawahSvg from '@/assets/images/rel-bawah.svg';
 
-// ============================================================
-// Shared design tokens — exact colors from the Rutein brand /
-// landing page (cream background, red accent), used across
-// Login, TransportPreference, and ProfileSelect so the whole
-// auth + onboarding flow reads as one continuous experience.
-// ============================================================
 const C = {
   bg: '#FCF4ED',
   surface: '#FFFDF9',
@@ -335,18 +329,6 @@ const sharedStyles = `
   }
 `;
 
-/**
- * Background video used on every auth/onboarding screen.
- *
- * `frozen = false` (Login): the video autoplays once, no `loop`, so it
- * naturally settles on its final frame once playback finishes.
- *
- * `frozen = true` (TransportPreference / ProfileSelect): the video is
- * never played — as soon as its metadata loads we jump straight to the
- * last frame and pause, so it renders as a static "already finished"
- * backdrop the instant these screens mount, matching what the user sees
- * right after logging in / signing up.
- */
 function AuthVideoBackground({ frozen = false }: { frozen?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -389,11 +371,6 @@ function AuthVideoBackground({ frozen = false }: { frozen?: boolean }) {
   );
 }
 
-/**
- * Clean mobile bottom rail:
- * Rendered strictly on mobile phones (<= 540px) to balance the top rail
- * cleanly without cluttering the screen.
- */
 function AuthMobileRail() {
   return (
     <div className="auth-mobile-rail" aria-hidden="true">
@@ -423,9 +400,6 @@ function AuthShell({
   );
 }
 
-/** Small centered loading state shown while we check onboarding status,
- * so the onboarding form never flashes before an already-onboarded user
- * gets redirected home. */
 function AuthLoadingScreen() {
   return (
     <AuthShell frozenVideo>
@@ -434,12 +408,6 @@ function AuthLoadingScreen() {
   );
 }
 
-/**
- * Small clickable brand mark shown above the Login heading. Takes the
- * user back to the marketing landing page — kept as its own component
- * so it can be dropped onto other auth-adjacent screens later without
- * duplicating the markup/behavior.
- */
 function AuthLogoLink({ delay = '0ms' }: { delay?: string }) {
   const navigate = useNavigate();
   return (
@@ -580,7 +548,6 @@ function translateAuthError(message: string, mode: 'signin' | 'signup'): string 
   return 'Gagal membuat akun. Silakan periksa kembali data pendaftaran Anda dan coba lagi.';
 }
 
-// Login
 export function Login({ initialMode = 'signin' }: { initialMode?: 'signin' | 'signup' }) {
   const { user, signIn, signUp } = useAuth();
   const navigate = useNavigate();
@@ -668,7 +635,6 @@ const emailPattern =
 
   setSubmitting(false);
 
-  // TEMPORARY: show the actual Supabase error
   setError(result.error.message);
 
   return;
@@ -684,10 +650,6 @@ if (mode === 'signup') {
   navigate('/onboarding/transport');
   return;
 }
-    // Sign in: only send returning users through onboarding if they
-    // genuinely haven't finished it yet (checked against the real
-    // `user_preferences.onboarding_completed_at` column, not client
-    // auth metadata, which nothing in the app ever sets).
     try {
       const status = result.user ? await getOnboardingStatus(result.user.id) : { completed: false };
       navigate(status.completed ? '/' : '/onboarding/transport');
@@ -831,19 +793,10 @@ export function Register() {
   return <Login initialMode="signup" />;
 }
 
-/**
- * Shared guard for the two onboarding screens: if the signed-in user has
- * already finished onboarding (real DB check, not metadata), redirect
- * home immediately instead of showing the form again — covers direct
- * links, browser back/forward, and bookmarks.
- */
 function useOnboardingGuard(): boolean {
   return false;
 }
 
-// ============================================================
-// ONBOARDING · STEP 1 — TRANSPORT PREFERENCE
-// ============================================================
 const TRANSPORT_OPTIONS: { value: OnboardingTransportType; label: string }[] = [
   { value: 'transjakarta', label: 'TransJakarta' },
   { value: 'bus', label: 'Bus Kota' },
@@ -979,9 +932,6 @@ export function TransportPreference() {
   );
 }
 
-// ============================================================
-// ONBOARDING · STEP 2 — PROFILE SELECT
-// ============================================================
 const PROFILES: { value: OnboardingProfileType; label: string; sub: string; icon: string }[] = [
   { value: 'school', label: 'Pelajar', sub: 'Berangkat ke sekolah/kampus', icon: profileSchoolSvg },
   { value: 'travel', label: 'Penjelajah', sub: 'Suka jalan-jalan & eksplorasi', icon: profileTravelSvg },

@@ -59,7 +59,6 @@ export default function ConfusedMode() {
   } = useNearbyContext(position);
   const { route: currentRoute, destination, selectedMapPlace } = useRestoredNavigationContext();
 
-  // ChatGPT-style Multi-Session History hook
   const {
     sessions,
     activeSessionId,
@@ -228,7 +227,6 @@ export default function ConfusedMode() {
         />
       )}
 
-      {/* --- CHATGPT-STYLE SIDEBAR --- */}
       <aside
         className={`confused-history-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}
         style={{
@@ -687,7 +685,6 @@ export default function ConfusedMode() {
               </div>
             )}
 
-            {/* Animated AI Thinking Indicator */}
             {sending && !resolvingRoute && (
               <div
                 style={{

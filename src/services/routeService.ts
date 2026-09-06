@@ -182,30 +182,6 @@ function summarizeOption(legs: RouteLeg[]): Omit<RouteOption, 'id' | 'category' 
 }
 
 /**
- * Generates candidate multi-leg journeys between origin and destination:
- *  1. Direct walk — always included as a baseline. For long trips it will
- *     naturally lose on "fastest"/"moderate" once other options exist, but
- *     it stays technically correct as "cheapest" for anyone willing to walk.
- *  2. Direct ojek online (ride-hailing motorbike) — Indonesia's default
- *     answer for medium/long distances that aren't well served by a single
- *     fixed-route transit line. Door-to-door, no walking required.
- *  3. Walk -> nearest transit stop -> ride route -> walk -> destination,
- *     for every transit route that has a stop near both origin and
- *     destination. The search radius widens for longer trips, since it's
- *     worth walking 1.5-2km to reach transit that saves many km overall.
- *  4. Ojek to the nearest usable transit hub -> ride -> walk, used only
- *     when no single route directly covers both ends but a nearby hub
- *     does — this is the "walk a short amount, then find a bus/train
- *     near there" case, reached via a short ojek hop instead of an
- *     unreasonably long walk to the hub.
- *
- * NOTE: this is the original generic candidate generator, kept around
- * because `classifyRouteOptions` (used by the Budget Planner as well as
- * this file) is built to consume its flat un-opinionated option list.
- * The Route Comparison screen itself no longer calls this directly — see
- * `generateLogicalRouteOptions` / `planAndCompareRoutes` below for the
- * purpose-built "Efficient / Cheapest / Hurry" logic.
- */
 export async function generateRouteOptions(origin: PlaceResult, destination: PlaceResult): Promise<RouteOption[]> {
   const options: RouteOption[] = [];
   const directDistanceM = distanceMeters(origin, destination);
@@ -372,39 +348,6 @@ export function classifyRouteOptions(rawOptions: RouteOption[]): RouteComparison
 // Logical route planner — this is what actually powers the Route
 // Comparison screen. Instead of generating a pile of candidates and
 // labeling whichever "wins" on some score, it builds exactly three
-// journeys with real, explainable logic behind each one:
-//
-//   Efficient — ride the fastest-mode station reachable from the origin
-//     (train/MRT/KRL preferred over bus), even if it's far away. If
-//     walking there would be a slog (>1.2km), bridge the gap with an
-//     ojek instead of forcing a long walk. Ride straight through, then
-//     walk the last mile. Example: nearest station is a 5km walk away —
-//     take ojek to the station (~15-70k depending on distance), ride to
-//     the alighting stop (flat transit fare), then walk the last mile.
-//
-//   Cheapest — public transit only, no ojek anywhere. A real multi-hop
-//     search (up to MAX_TRANSFERS transfers) across every route/stop
-//     combination reachable on foot (walks up to ~2km are accepted),
-//     picking the lowest total fare. This is deliberately allowed to
-//     involve more transfers and more walking than "Efficient" — that
-//     trade-off is the whole point of the category. Example: nearest
-//     usable line is TransJakarta requiring a couple of transfers and
-//     ~2km of walking total, but costs only a few thousand rupiah.
-//
-//   Hurry — door-to-door ojek, no walking, no transfers. Costs the
-//     most but gets there fastest. Falls back to a direct walk only
-//     when the trip is short enough that booking a ride would be
-//     pointless.
-//
-// GUARANTEE: all three categories are always returned for any trip that
-// isn't trivially short (see NEAR_TRIP_THRESHOLD_M below). Efficient and
-// Cheapest search progressively wider before falling back to an honest
-// "no better route found, here's ojek instead" rather than disappearing —
-// so the UI never shows fewer than 3 cards except for the one deliberate
-// exception: a destination close enough that transit planning would be
-// pointless noise.
-// ------------------------------------------------------------------
-
 export type RouteCategory = 'efficient' | 'cheapest' | 'hurry';
 
 export interface LogicalRouteOption extends Omit<RouteOption, 'category'> {
@@ -426,56 +369,14 @@ export interface LogicalRouteComparisonResult {
   hurry: LogicalRouteOption | null;
 }
 
-// Trips shorter than this simply don't need the transit-planning machinery
-// at all — the honest answer for a 400m trip is "just walk", and offering
-// three "options" that would all amount to "walk there" (or "ojek there")
-// is confusing rather than helpful. This is the ONLY situation where fewer
-// than three options are returned; every other trip always gets all three.
 const NEAR_TRIP_THRESHOLD_M = 1500;
-
-// A walk under this is a non-issue; a walk over this is when ojek/transfer
-// tricks start being worth it for reaching a station on the *last* mile
-// (i.e. how close a stop needs to be to the destination to count as
-// walkable). Kept tight since this is the "you've arrived, just walk the
-// rest" leg, not the "get to the station in the first place" leg below.
 const WALK_COMFORT_RADIUS_M = 1200;
-
-// "Efficient" is allowed to search far for a fast station, because the
-// first mile can always be bridged with an ojek if it turns out to be a
-// genuine slog (e.g. a 5km walk to the nearest train station) — see
-// buildEfficientLegs, which compares each candidate's walking distance
-// against WALK_COMFORT_RADIUS_M and swaps to ojek automatically whenever
-// it's exceeded, however large that gap turns out to be.
 const OJEK_ACCESS_RADIUS_M = 8000;
-// If nothing is found at all within OJEK_ACCESS_RADIUS_M, widen once more
-// before conceding no transit route exists for this trip.
 const OJEK_ACCESS_RADIUS_FALLBACK_M = OJEK_ACCESS_RADIUS_M * 2;
-
-// "Cheapest" refuses to use ojek at all, so its access/egress walk radius
-// is capped at something a person would actually walk — roughly the 2km
-// in the example.
 const CHEAPEST_WALK_RADIUS_M = 2000;
-// Widened once if the first pass finds no viable all-transit path.
 const CHEAPEST_WALK_RADIUS_FALLBACK_M = 3000;
-
-// Two stops within this distance of each other are considered a valid
-// walking transfer between routes.
 const TRANSFER_WALK_RADIUS_M = 500;
-
-// Caps how many transfers the "Cheapest" search will consider (i.e. up to
-// MAX_TRANSFERS + 1 transit legs — 6 transit legs at this setting). This
-// bounds the search to a reasonable number of API calls; going deeper than
-// this makes a "cheapest" journey unrealistically fiddly to actually walk
-// through in real life, even though it's technically allowed now.
 const MAX_TRANSFERS = 5;
-
-// Safety valve on top of MAX_TRANSFERS: each extra depth level multiplies
-// the branching factor (routeStops fanout × findNearbyStops calls per
-// stop), so going from a shallow search to a 5-transfer search can explode
-// into hundreds of Supabase/API calls if left unchecked. This caps the
-// total number of new BFS states created across the whole search — once
-// hit, no further transfers are explored (deeper branches are simply
-// abandoned; already-queued finishers are unaffected).
 const MAX_CHEAPEST_STATES_EXPANDED = 120;
 
 /**

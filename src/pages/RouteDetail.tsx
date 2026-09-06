@@ -57,8 +57,6 @@ export default function RouteDetail() {
   const now = new Date();
   const arrival = new Date(now.getTime() + option.totalDurationS * 1000);
 
-  // Waypoints for live tracking: the "to" point of every leg (i.e. every
-  // stop/transfer/destination along the journey, in order).
   const waypoints = option.legs.map((leg, i) => ({
     lat: leg.to.lat,
     lng: leg.to.lng,

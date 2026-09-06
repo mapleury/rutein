@@ -12,6 +12,8 @@ import {
   X,
   Footprints,
   Bike,
+  Clock,
+  Repeat,
 } from 'lucide-react';
 import type { DirectionsResult } from '@/services/mapService';
 import type { PlaceResult, GeoPoint } from '@/types/domain.types';
@@ -76,13 +78,11 @@ export default function MapRouteDetailBar({
   onCloseRoute,
 }: MapRouteDetailBarProps) {
   const { t } = useLanguage();
-  // Phase management: 'compact' | 1 (Option selection + Summary) | 2 (Multi-transit Step-by-Step Directions)
   const [phase, setPhase] = useState<'compact' | 1 | 2>('compact');
   const [routeOptions, setRouteOptions] = useState<LogicalRouteOption[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<RouteCategory | null>(null);
 
-  // Fetch route options when destination changes
   useEffect(() => {
     if (!destination) {
       setRouteOptions([]);
@@ -122,14 +122,13 @@ export default function MapRouteDetailBar({
     ? routeOptions.find((o) => o.category === selectedCategory) || null
     : null;
 
-  // Handlers for phase transitions
   const handleOpenPhase1 = () => {
     setPhase(1);
     if (onOpenDetails) onOpenDetails();
   };
 
   const handleNextToPhase2 = () => {
-    // If user hasn't selected a category yet, default to budgetPreference or first option
+   
     if (!selectedCategory && routeOptions.length > 0) {
       const prefCategory: RouteCategory = budgetPreference === 'fastest' ? 'hurry' : (budgetPreference as RouteCategory);
       const defaultCat = routeOptions.find((o) => o.category === prefCategory)
@@ -156,7 +155,6 @@ export default function MapRouteDetailBar({
     >
       <style>{routeDetailStyles}</style>
 
-      {/* Mobile drag handle indicator */}
       <div className="route-drag-handle" />
 
       {/* HEADER ROW */}
@@ -170,7 +168,6 @@ export default function MapRouteDetailBar({
             via {roadName} (Menuju {destination.label})
           </span>
         </div>
-        {/* Top-right controls: ONLY close X button (chevron arrow button removed) */}
         {onCloseRoute && (
           <button onClick={handleClose} style={closeBtnStyle} title="Tutup">
             <X size={16} color="#666" />
@@ -181,9 +178,9 @@ export default function MapRouteDetailBar({
       {loading ? (
         <div style={statusTextStyle}>Menghitung rute perjalanan...</div>
       ) : phase === 1 ? (
-        /* DETAIL BAR PHASE 1: Route Option Cards (Inactive initially, active when selected) & Summary Box */
+    
         <div style={expandedContentStyle}>
-          {/* 1. ROUTE CATEGORY SELECTION CARDS (EFFICIENT, CHEAPEST, HURRY) */}
+
           <div style={categoryGridStyle}>
             {loadingOptions ? (
               <div style={statusTextStyle}>Memuat opsi perbandingan rute...</div>
@@ -230,11 +227,17 @@ export default function MapRouteDetailBar({
                       </span>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#6B7280', marginTop: 4 }}>
-                      <span>🕒 {formatDuration(opt.totalDurationS)}</span>
-                      <span>•</span>
-                      <span>🔄 {transitText}</span>
-                    </div>
+               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: '#6B7280', marginTop: 4 }}>
+  <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+    <Clock size={12} />
+    {formatDuration(opt.totalDurationS)}
+  </span>
+  <span>•</span>
+  <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+    < Repeat size={12} />
+    {transitText}
+  </span>
+</div>
                   </button>
                 );
               })

@@ -22,9 +22,6 @@ export interface UseConfusedModeChatResult {
   clearAllSessions: () => void;
 }
 
-/**
- * ChatGPT-Style Multi-Session Chat Manager with per-user LocalStorage persistence.
- */
 export function useConfusedModeChat(userId?: string): UseConfusedModeChatResult {
   const userKey = userId || 'guest';
   const localStorageKey = `rutein_confused_sessions_${userKey}`;

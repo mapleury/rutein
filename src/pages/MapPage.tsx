@@ -1,5 +1,3 @@
-// Merged map page — MapLibre (clean, smooth) base + transport-stop layer,
-// filter panel, and optional street view from the old Leaflet page.
 import React, { useEffect, useRef, useState, useCallback, useMemo, Suspense, lazy } from 'react';
 import { setWorkerUrl, type LngLatBounds } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
@@ -22,17 +20,12 @@ import type { PlaceResult, GeoPoint, RouteOption, RouteLeg } from '@/types/domai
 import type { TransportStop } from '@/types/database.types';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-// mapillary-js is a large WebGL lib only needed once the street view modal
-// actually opens — lazy-load it so it stays out of the main map bundle.
 const StreetViewModal = lazy(() => import('@/components/StreetViewModal'));
 
 const JAKARTA_CENTER: GeoPoint = { lat: -6.2088, lng: 106.8456 };
 type TravelMode = 'walk' | 'ojek';
 type BaseLayer = 'street' | 'satellite';
 
-// Esri World Imagery — free, no API key, no account required. Raw XYZ
-// raster tiles, so this needs a full MapLibre style object (not just a
-// style URL like getMapStyle() returns for the OpenFreeMap vector style).
 const SATELLITE_STYLE = {
   version: 8 as const,
   sources: {
@@ -47,10 +40,7 @@ const SATELLITE_STYLE = {
 };
 
 const ALL_TRANSPORT_TYPES = Object.keys(TRANSPORT_TYPE_LABELS) as IndonesiaTransportType[];
-const MAX_RENDERED_MARKERS = 200; // safety cap; viewport filtering normally keeps this far lower
-
-// A click on the map "confirms" the previous selection (opens street view)
-// only if it lands within this distance of it — otherwise it's a new pick.
+const MAX_RENDERED_MARKERS = 200;
 const STREET_VIEW_CONFIRM_RADIUS_M = 40;
 
 function formatDuration(seconds: number): string {
@@ -66,10 +56,6 @@ function formatDistance(meters: number): string {
   return meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`;
 }
 
-// Finds the point exactly halfway along a route's total length (by distance
-// walked along the line), not just the middle index of the coordinate array
-// — routes have uneven point spacing, so index-midpoint would drift toward
-// wherever ORS happened to place more vertices.
 function getRouteMidpoint(geometry: GeoPoint[]): GeoPoint | null {
   if (geometry.length === 0) return null;
   if (geometry.length === 1) return geometry[0];
@@ -98,8 +84,6 @@ function getRouteMidpoint(geometry: GeoPoint[]): GeoPoint | null {
   return geometry[geometry.length - 1];
 }
 
-// Returns a leg's actual path as [lng, lat] pairs for GeoJSON, falling back
-// to a straight line between its endpoints if no geometry was captured.
 function legCoordinates(leg: RouteLeg): [number, number][] {
   const points = leg.geometry && leg.geometry.length >= 2 ? leg.geometry : [leg.from, leg.to];
   return points.map((p) => [p.lng, p.lat]);
@@ -121,24 +105,15 @@ export default function MapPage() {
   const [directionsError, setDirectionsError] = useState<string | null>(null);
   const [popupTarget, setPopupTarget] = useState<'user' | 'place' | null>(null);
 
-  // Full multi-leg itinerary, when the user arrived here from "View route
-  // on map" on a Route Detail screen. Takes over route rendering entirely
-  // — see the conditional split further down between this and the plain
-  // single-destination `directions` flow above.
   const itineraryOption = (routerLocation.state as { option?: RouteOption } | null)?.option ?? null;
 
-  // Transport marker layer state
   const [activeTypes, setActiveTypes] = useState<Set<IndonesiaTransportType>>(new Set(ALL_TRANSPORT_TYPES));
   const [filterOpen, setFilterOpen] = useState(false);
   const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
   const [hoveredStopId, setHoveredStopId] = useState<string | null>(null);
   
-  // Disruption layer state
   const [hoveredDisruptionId, setHoveredDisruptionId] = useState<string | null>(null);
 
-  // Two-click street view state (click a spot to select it, click it again
-  // to look around at street level — ported from the old page, but now it
-  // just layers on top of the normal select/route flow instead of fighting it).
   const [pendingStreetViewPoint, setPendingStreetViewPoint] = useState<GeoPoint | null>(null);
   const [streetViewPoint, setStreetViewPoint] = useState<GeoPoint | null>(null);
   const [streetViewLabel, setStreetViewLabel] = useState<string | undefined>(undefined);
@@ -170,16 +145,12 @@ export default function MapPage() {
   }, [selectedPlace, userLocation]);
 
   useEffect(() => {
-    // Skip the "fly to selected/user point" behavior when a full itinerary
-    // is loaded — that case gets its own fitBounds effect below, over the
-    // whole route rather than a single point.
     if (itineraryOption) return;
     const point = selectedPlace ?? userLocation;
     if (!point || !mapRef.current) return;
     mapRef.current.flyTo({ center: [point.lng, point.lat], zoom: 15, duration: 800 });
   }, [selectedPlace, userLocation, itineraryOption]);
 
-  // Fit the map to the entire multi-leg itinerary once it (and the map) are ready.
   useEffect(() => {
     if (!itineraryOption || !mapRef.current) return;
     const allPoints = itineraryOption.legs.flatMap((leg) => legCoordinates(leg));
@@ -206,8 +177,6 @@ export default function MapPage() {
 
   useEffect(() => {
     if (itineraryOption) {
-      // A full itinerary already carries its own real per-leg routing —
-      // no need for the single-destination walk/ojek fetch below.
       setDirections(null);
       return;
     }
@@ -237,15 +206,12 @@ export default function MapPage() {
     };
   }, [userLocation, selectedPlace, travelMode, itineraryOption]);
 
-  // Refresh the transport-marker viewport filter whenever the map settles.
   const handleMoveEnd = useCallback(() => {
     const map = mapRef.current?.getMap();
     if (map) setMapBounds(map.getBounds());
   }, []);
 
   useEffect(() => {
-    // Capture bounds once on first mount too, so markers show up before
-    // the user ever pans/zooms.
     const map = mapRef.current?.getMap();
     if (map) setMapBounds(map.getBounds());
   }, []);
@@ -260,7 +226,6 @@ export default function MapPage() {
 
   const activeRoadDisruptions = useMemo(() => {
     if (!mapBounds) return [];
-    // Only show active disruptions that fall within the current map viewport bounds
     return INDONESIA_ROAD_DISRUPTIONS.filter(
       (d) => d.isActive && d.latitude && d.longitude && mapBounds.contains([d.longitude, d.latitude])
     );
@@ -279,8 +244,6 @@ export default function MapPage() {
     const { lat, lng } = e.lngLat;
     const point: GeoPoint = { lat, lng };
 
-    // Second click near the pending selection: confirm and open street view
-    // instead of re-selecting/re-geocoding the same spot.
     if (pendingStreetViewPoint && distanceMeters(point, pendingStreetViewPoint) <= STREET_VIEW_CONFIRM_RADIUS_M) {
       setStreetViewLabel(selectedPlace?.label);
       setStreetViewPoint(pendingStreetViewPoint);
