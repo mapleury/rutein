@@ -331,7 +331,7 @@ export default function BudgetPlanner() {
     }
 
     if (origin && destination) {
-      navigate('/routes', { state: { origin, destination, selectedCategory: result.category } });
+      navigate('/dashboard', { state: { origin, destination, selectedCategory: result.category } });
     }
   };
 

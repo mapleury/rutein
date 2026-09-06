@@ -637,7 +637,7 @@ export default function ConfusedMode() {
                         <div style={{ marginTop: 10, paddingTop: 8, borderTop: '1px solid #F0E2D5', display: 'flex', justifyContent: 'flex-end' }}>
                           <button
                             type="button"
-                            onClick={() => navigate('/routes')}
+                            onClick={() => navigate('/dashboard')}
                             className="font-jockey"
                             style={{
                               background: '#FDF0ED',
